@@ -43,6 +43,9 @@ cp .env.example .env
 | `ALLOW_LOCAL_NETWORK` | `true` | Permitir acceso desde redes locales |
 | `HOST` | `0.0.0.0` | Host del servidor |
 | `PORT` | `8001` | Puerto del servidor |
+| `RATE_LIMIT_ENABLED` | `true` | Habilitar rate limiting |
+| `RATE_LIMIT_STORAGE` | `memory://` | Backend: `memory://` o `redis://host:port` |
+| `RATE_LIMIT` | `120/minute` | Límite global de requests por IP |
 
 ## Ejecutar
 
@@ -54,6 +57,7 @@ python -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
 
 ```bash
 python scripts/load_data.py --file "data/06_ua_validadas_0626 (1).json"
+python scripts/load_data.py --file "data/06_ua_validadas_0626 (1).json" --clear  # limpiar antes
 ```
 
 ## Endpoints
@@ -63,7 +67,9 @@ python scripts/load_data.py --file "data/06_ua_validadas_0626 (1).json"
 | `GET` | `/` | Metadata de la API |
 | `GET` | `/health` | Estado de la API + conexión a BD |
 | `GET` | `/unidades` | Todas las unidades (GeoJSON FeatureCollection) |
-| `GET` | `/unidades/{id}` | Unidad por ID |
+| `GET` | `/unidades/raw` | Todas las unidades (JSON plano, sin GeoJSON wrapper) |
+| `GET` | `/unidades/{id}` | Unidad por ID (GeoJSON Feature) |
+| `GET` | `/unidades/{id}/raw` | Unidad por ID (JSON plano) |
 | `GET` | `/docs` | Swagger UI (solo en development) |
 | `GET` | `/redoc` | ReDoc (solo en development) |
 
@@ -71,7 +77,7 @@ python scripts/load_data.py --file "data/06_ua_validadas_0626 (1).json"
 
 | Parámetro | Tipo | Descripción |
 |---|---|---|
-| `limit` | int | Registros por página (default: 100, max: 1000) |
+| `limit` | int | Registros por página (default: 100, max: 1000). Usar `limit=0` para todos |
 | `offset` | int | Offset para paginación |
 | `region` | string | Filtrar por región |
 | `provincia` | string | Filtrar por provincia |
@@ -80,6 +86,25 @@ python scripts/load_data.py --file "data/06_ua_validadas_0626 (1).json"
 | `tipo` | string | Filtrar por tipo (INTRAMURAL/EXTRAMURAL) |
 | `area` | string | Filtrar por área (Urbano/Rural) |
 | `nombre` | string | Buscar por nombre |
+| `bbox` | string | Bounding box: `min_lng,min_lat,max_lng,max_lat` |
+
+### Filtros en `/unidades/raw`
+
+Mismos filtros disponibles, retorna JSON plano sin envoltorio GeoJSON.
+
+### Exportar mapa completo
+
+```
+GET /unidades?bbox=-81.1,-4.9,-75.0,1.5&limit=0
+```
+
+Retorna todas las unidades dentro del bounding box sin paginación.
+
+## Rate Limiting
+
+- Global: 120 requests/minute por IP (configurable vía `RATE_LIMIT`)
+- Storage: memoria por defecto, Redis para producción (`RATE_LIMIT_STORAGE`)
+- Deshabilitar: `RATE_LIMIT_ENABLED=false`
 
 ## Tests
 
@@ -105,7 +130,8 @@ ApiRestGeo/
 │   ├── config.py             # Configuración con Pydantic Settings
 │   ├── database.py           # Engine async SQLAlchemy
 │   ├── middleware/
-│   │   └── cors.py           # CORS dinámico
+│   │   ├── cors.py           # CORS dinámico
+│   │   └── rate_limit.py     # Rate limiting (slowapi)
 │   ├── models/
 │   │   ├── __init__.py       # Registro de modelos
 │   │   ├── base.py           # Base declarativa SQLAlchemy
@@ -131,6 +157,7 @@ ApiRestGeo/
 - CORS habilitado para redes locales por defecto
 - Orígenes externos se configuran vía `ALLOWED_ORIGINS` en `.env`
 - Documentación (Swagger/ReDoc) solo disponible en modo `development`
+- Rate limiting global habilitado por defecto
 - Nunca commitear archivos `.env` con credenciales
 
 ## Licencia

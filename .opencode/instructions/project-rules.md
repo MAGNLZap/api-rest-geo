@@ -9,28 +9,26 @@ ApiRestGeo/
 │   ├── database.py         # Engine async, session, get_db()
 │   ├── main.py             # Entry point FastAPI, lifespan, routers
 │   ├── middleware/
-│   │   └── cors.py         # CORS dinámico (local + ALLOWED_ORIGINS)
+│   │   ├── cors.py         # CORS dinámico (local + ALLOWED_ORIGINS)
+│   │   └── rate_limit.py   # Rate limiting global (slowapi)
 │   ├── models/
+│   │   ├── __init__.py     # Registro de modelos
 │   │   ├── base.py         # Base SQLAlchemy (DeclarativeBase)
-│   │   └── point.py        # GeoPoint y otros modelos
+│   │   └── unidad_atencion.py # Modelo UnidadAtencion (40+ campos)
 │   ├── routers/
-│   │   ├── health.py       # GET / y GET /health
-│   │   └── geo.py          # GET /geo/points, GET /geo/points/{id}
+│   │   ├── health.py       # GET /, GET /health
+│   │   └── unidad_atencion.py # GET /unidades, /raw, /{id}, /{id}/raw
 │   └── schemas/
-│       └── geo.py          # Schemas GeoJSON (Point, Feature, FeatureCollection)
+│       └── unidad_atencion.py # Schemas Pydantic (GeoJSON + Raw)
 ├── tests/
 │   ├── conftest.py         # Fixtures async, client, test DB
-│   ├── test_health.py
-│   └── test_geo.py
-├── .env                    # Variables de entorno (no commit)
-├── .env.example            # Template
-├── requirements.txt        # Dev dependencies
-└── requirements-prod.txt   # Prod dependencies (+ asyncpg)
+│   ├── test_health.py      # Tests de health
+│   └── test_unidades.py    # Tests de unidades (18+ tests)
 ```
 
 ## Convenciones de Código
 
-- **Python 3.14** con type hints en todos los métodos
+- **Python 3.12** con type hints en todos los métodos
 - **async/await** en toda capa de BD (SQLAlchemy async, aiosqlite, asyncpg)
 - **Pydantic v2** para schemas (modelos de request/response)
 - **Pydantic Settings** para configuración (.env)
@@ -57,4 +55,5 @@ ApiRestGeo/
 - CORS: redes locales habilitadas por defecto
 - Orígenes externos se configuran vía `ALLOWED_ORIGINS` en `.env`
 - Docs/Redoc solo disponibles en modo `development`
+- Rate limiting: 120 requests/minute por IP (configurable vía `RATE_LIMIT`)
 - Nunca commitear `.env` ni archivos con credenciales

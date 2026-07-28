@@ -102,9 +102,12 @@ async def test_get_unidad_by_id(client):
     response = await client.get(f"/unidades/{uid}")
     assert response.status_code == 200
     data = response.json()
-    assert data["nombre"] == "Unidad Individual"
-    assert data["id"] == uid
-    assert data["longitude"] == -77.7150
+    assert data["type"] == "Feature"
+    assert data["geometry"]["type"] == "Point"
+    assert data["geometry"]["coordinates"] == [-77.7150, 0.8317]
+    assert data["properties"]["nombre"] == "Unidad Individual"
+    assert data["properties"]["id"] == uid
+    assert data["id"] == str(uid)
 
 
 @pytest.mark.anyio
@@ -121,3 +124,126 @@ async def test_health_endpoint(client):
     assert "status" in data
     assert "version" in data
     assert "database" in data
+
+
+@pytest.mark.anyio
+async def test_list_unidades_raw_empty(client):
+    response = await client.get("/unidades/raw")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["data"] == []
+    assert data["total"] == 0
+
+
+@pytest.mark.anyio
+async def test_list_unidades_raw_returns_flat_json(client):
+    await _create_unidad()
+    response = await client.get("/unidades/raw")
+    assert response.status_code == 200
+    data = response.json()
+    assert "data" in data
+    assert len(data["data"]) == 1
+    item = data["data"][0]
+    assert item["nombre"] == "Unidad Test"
+    assert item["longitude"] == -77.7150
+    assert item["latitude"] == 0.8317
+    assert "type" not in item
+    assert "geometry" not in item
+    assert "properties" not in item
+
+
+@pytest.mark.anyio
+async def test_list_unidades_raw_pagination(client):
+    for i in range(5):
+        await _create_unidad(nombre=f"Unidad {i}")
+    response = await client.get("/unidades/raw?limit=2&offset=0")
+    data = response.json()
+    assert len(data["data"]) == 2
+    assert data["total"] == 5
+    assert data["limit"] == 2
+    assert data["offset"] == 0
+
+
+@pytest.mark.anyio
+async def test_list_unidades_raw_with_filters(client):
+    await _create_unidad(nombre="Sierra Raw", region="Sierra")
+    await _create_unidad(nombre="Costa Raw", region="Costa")
+    response = await client.get("/unidades/raw?region=Sierra")
+    data = response.json()
+    assert data["total"] == 1
+    assert data["data"][0]["region"] == "Sierra"
+
+
+@pytest.mark.anyio
+async def test_get_unidad_raw_by_id(client):
+    uid = await _create_unidad(nombre="Unidad Raw Individual")
+    response = await client.get(f"/unidades/{uid}/raw")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["nombre"] == "Unidad Raw Individual"
+    assert data["id"] == uid
+    assert data["longitude"] == -77.7150
+    assert data["latitude"] == 0.8317
+    assert "type" not in data
+    assert "geometry" not in data
+
+
+@pytest.mark.anyio
+async def test_get_unidad_raw_not_found(client):
+    response = await client.get("/unidades/999999/raw")
+    assert response.status_code == 404
+
+
+@pytest.mark.anyio
+async def test_list_unidades_bbox_filter(client):
+    await _create_unidad(nombre="Dentro", longitude=-77.71, latitude=0.83)
+    await _create_unidad(nombre="Fuera", longitude=-80.00, latitude=-2.00)
+    response = await client.get("/unidades?bbox=-78,0,-77,1")
+    data = response.json()
+    assert data["total"] == 1
+    assert data["features"][0]["properties"]["nombre"] == "Dentro"
+
+
+@pytest.mark.anyio
+async def test_list_unidades_limit_zero_returns_all(client):
+    for i in range(5):
+        await _create_unidad(nombre=f"Unidad {i}")
+    response = await client.get("/unidades?limit=0")
+    data = response.json()
+    assert len(data["features"]) == 5
+    assert data["total"] == 5
+    assert data["limit"] == 0
+
+
+@pytest.mark.anyio
+async def test_list_unidades_bbox_with_limit_zero(client):
+    await _create_unidad(nombre="Dentro A", longitude=-77.71, latitude=0.83)
+    await _create_unidad(nombre="Dentro B", longitude=-77.72, latitude=0.84)
+    await _create_unidad(nombre="Fuera", longitude=-80.00, latitude=-2.00)
+    response = await client.get("/unidades?bbox=-78,0,-77,1&limit=0")
+    data = response.json()
+    assert data["total"] == 2
+    assert len(data["features"]) == 2
+    nombres = [f["properties"]["nombre"] for f in data["features"]]
+    assert "Dentro A" in nombres
+    assert "Dentro B" in nombres
+
+
+@pytest.mark.anyio
+async def test_list_unidades_raw_bbox_filter(client):
+    await _create_unidad(nombre="Raw Dentro", longitude=-77.71, latitude=0.83)
+    await _create_unidad(nombre="Raw Fuera", longitude=-80.00, latitude=-2.00)
+    response = await client.get("/unidades/raw?bbox=-78,0,-77,1")
+    data = response.json()
+    assert data["total"] == 1
+    assert data["data"][0]["nombre"] == "Raw Dentro"
+
+
+@pytest.mark.anyio
+async def test_list_unidades_raw_limit_zero(client):
+    for i in range(5):
+        await _create_unidad(nombre=f"Raw {i}")
+    response = await client.get("/unidades/raw?limit=0")
+    data = response.json()
+    assert len(data["data"]) == 5
+    assert data["limit"] == 0

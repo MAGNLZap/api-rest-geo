@@ -12,20 +12,13 @@ Siempre `[longitude, latitude]` (NO `[lat, lng]`).
 [-73.9857, 40.7484]  // longitude, latitude
 ```
 
-## Tipos Geométricos Disponibles
+## Tipo Geométrico Disponible
 
-| Tipo | Coordenadas | Ejemplo |
-|---|---|---|
-| `Point` | `[lng, lat]` | `[-73.9857, 40.7484]` |
-| `LineString` | `[[lng, lat], ...]` | Mínimo 2 puntos |
-| `Polygon` | `[[[lng, lat], ...]]` | Anillos (exterior + interiores) |
-| `MultiPoint` | `[[lng, lat], ...]` | Lista de puntos |
-| `MultiLineString` | `[[[lng, lat], ...], ...]` | Lista de líneas |
-| `MultiPolygon` | `[[[lng, lat], ...], ...]` | Lista de polígonos |
+El sistema usa únicamente `Point` para representar ubicaciones geográficas.
 
-## Estructura de Respuesta
+### Estructura de Respuesta
 
-### Single Feature
+#### Single Feature
 
 ```json
 {
@@ -36,38 +29,44 @@ Siempre `[longitude, latitude]` (NO `[lat, lng]`).
   },
   "properties": {
     "id": 1,
-    "name": "Nombre del punto",
-    "description": "Descripción opcional",
-    "category": "categoría"
+    "nombre": "Nombre de la unidad",
+    "departamento": "Guayas",
+    "ciudad": "Guayaquil",
+    ...
   },
   "id": "1"
 }
 ```
 
-### FeatureCollection (listado)
+#### FeatureCollection (listado)
 
 ```json
 {
   "type": "FeatureCollection",
   "features": [
     { "type": "Feature", "geometry": {...}, "properties": {...}, "id": "1" }
-  ]
+  ],
+  "total": 1234,
+  "page": 1,
+  "per_page": 50
 }
 ```
 
-## Schemas Pydantic Disponibles
+## Schemas Pydantic
 
-En `app/schemas/geo.py`:
+En `app/schemas/unidad_atencion.py`:
 
-- `Point`, `LineString`, `Polygon`, `MultiPoint`, `MultiLineString`, `MultiPolygon`
-- `Geometry` = unión de todos los tipos
-- `Feature` (geometry + properties + id)
-- `FeatureCollection` (features [])
+- `Feature` — Feature GeoJSON con geometry Point + properties
+- `FeatureCollection` — Colección de features con metadata de paginación
+- `UnidadProperties` — Propiedades de la unidad de atención
+- `UnidadRaw` — Formato JSON plano (sin GeoJSON wrapper)
+- `UnidadRawList` — Lista de unidades en formato raw
 
 ## Al Crear Endpoints Geográficos
 
-1. Usar schemas de `app/schemas/geo.py` para respuestas
-2. Modelo en `app/models/point.py` con `longitude` y `latitude` como Float
-3. Convertir modelo → Feature con helper `_point_to_feature()`
+1. Usar schemas de `app/schemas/unidad_atencion.py`
+2. Modelo en `app/models/unidad_atencion.py` con campos `longitud` y `latitud` como Float
+3. Convertir modelo → Feature con helper `_unidad_to_feature()`
 4. Respuesta de listado → `FeatureCollection`
 5. Respuesta individual → `Feature`
+6. Formato raw → `UnidadRaw` / `UnidadRawList`

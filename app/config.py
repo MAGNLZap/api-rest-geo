@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     ALLOW_LOCAL_NETWORK: bool = True
     HOST: str = "0.0.0.0"
     PORT: int = 8001
+    RATE_LIMIT_ENABLED: bool = True
+    RATE_LIMIT_STORAGE: str = "memory://"
+    RATE_LIMIT: str = "120/minute"
 
     @property
     def origins(self) -> list[str]:
