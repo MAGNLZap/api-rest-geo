@@ -15,6 +15,7 @@ from app.models import UnidadAtencion  # noqa: F401
 from app.models.base import Base
 from app.routers.health import router as health_router
 from app.routers.unidad_atencion import router as unidad_router
+from app.routers.demo import router as demo_router
 
 logger = logging.getLogger(__name__)
 
@@ -48,6 +49,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 setup_cors(app)
 app.include_router(health_router)
 app.include_router(unidad_router)
+app.include_router(demo_router)
 
 
 if __name__ == "__main__":

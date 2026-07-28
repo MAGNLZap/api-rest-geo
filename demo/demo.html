@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Demo API GeoJSON</title>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+
+html,body{
+    margin:0;
+    height:100%;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+#map{
+    width:100%;
+    height:100%;
+}
+
+.panel{
+    position:absolute;
+    top:15px;
+    left:15px;
+    z-index:1000;
+    background:white;
+    padding:15px;
+    width:280px;
+    border-radius:10px;
+    box-shadow:0 3px 10px rgba(0,0,0,.25);
+}
+
+.panel h2{
+    margin:0 0 10px 0;
+    font-size:18px;
+}
+
+.panel button{
+
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+    border:none;
+    background:#1976d2;
+    color:white;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:14px;
+
+}
+
+.panel button:hover{
+
+    background:#125aa0;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="panel">
+
+<h2>API GeoJSON</h2>
+
+<p>
+<b>Registros:</b>
+<span id="total">0</span>
+</p>
+
+<button onclick="cargarDatos()">
+Recargar datos
+</button>
+
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+
+const API="http://127.0.0.1:8001/unidades?limit=0";
+
+const map=L.map("map");
+
+L.tileLayer(
+"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+{
+    maxZoom:19,
+    attribution:"© OpenStreetMap"
+}
+).addTo(map);
+
+function popup(feature){
+
+    const p=feature.properties;
+
+    return `
+    <div style="min-width:260px">
+
+        <h3 style="margin-top:0;color:#1565c0;">
+            ${p.nombre}
+        </h3>
+
+        <table style="width:100%;font-size:13px">
+
+            <tr>
+                <td><b>RUC</b></td>
+                <td>${p.ruc}</td>
+            </tr>
+
+            <tr>
+                <td><b>Modalidad</b></td>
+                <td>${p.mod}</td>
+            </tr>
+
+            <tr>
+                <td><b>Servicio</b></td>
+                <td>${p.servicio}</td>
+            </tr>
+
+            <tr>
+                <td><b>Provincia</b></td>
+                <td>${p.dpa_despro}</td>
+            </tr>
+
+            <tr>
+                <td><b>Cantón</b></td>
+                <td>${p.dpa_descan}</td>
+            </tr>
+
+            <tr>
+                <td><b>Área</b></td>
+                <td>${p.area}</td>
+            </tr>
+
+            <tr>
+                <td><b>Tipo</b></td>
+                <td>${p.tipo}</td>
+            </tr>
+
+        </table>
+
+        ${
+            p.link_ubi
+            ? `<br>
+            <a href="${p.link_ubi}"
+               target="_blank">
+               📍 Abrir en Google Maps
+            </a>`
+            : ""
+        }
+
+    </div>
+    `;
+}
+
+let capa=L.geoJSON(null,{
+
+    pointToLayer:function(feature,latlng){
+
+        return L.circleMarker(latlng,{
+
+            radius:6,
+            fillColor:"#1976d2",
+            color:"#ffffff",
+            weight:1,
+            opacity:1,
+            fillOpacity:.9
+
+        });
+
+    },
+
+    onEachFeature:function(feature,layer){
+
+        layer.bindPopup(
+            popup(feature)
+        );
+
+    }
+
+}).addTo(map);
+
+async function cargarDatos(){
+
+    try{
+
+        const response=await fetch(API);
+
+        const geojson=await response.json();
+
+        capa.clearLayers();
+
+        capa.addData(geojson);
+
+        document.getElementById("total").innerHTML=
+            geojson.features.length;
+
+        if(capa.getLayers().length>0){
+
+            map.fitBounds(
+                capa.getBounds(),
+                {padding:[30,30]}
+            );
+
+        }
+
+    }catch(error){
+
+        console.error(error);
+
+        alert("No fue posible consultar la API.");
+
+    }
+
+}
+
+cargarDatos();
+
+</script>
+
+</body>
+</html>
