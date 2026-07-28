@@ -2,10 +2,11 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Demo API GeoJSON</title>
+<title>Demo API GeoJSON - Clustering</title>
 
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
 
 <style>
 
@@ -27,7 +28,7 @@ html,body{
     z-index:1000;
     background:white;
     padding:15px;
-    width:280px;
+    width:300px;
     border-radius:10px;
     box-shadow:0 3px 10px rgba(0,0,0,.25);
 }
@@ -37,8 +38,15 @@ html,body{
     font-size:18px;
 }
 
-.panel button{
+.panel label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    cursor:pointer;
+    font-size:14px;
+}
 
+.panel button{
     width:100%;
     padding:10px;
     margin-top:10px;
@@ -48,13 +56,53 @@ html,body{
     border-radius:5px;
     cursor:pointer;
     font-size:14px;
-
 }
 
 .panel button:hover{
-
     background:#125aa0;
+}
 
+.stats{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid #eee;
+    font-size:13px;
+    color:#555;
+}
+
+.stats b{
+    color:#1976d2;
+}
+
+.cluster-marker{
+    background:#1976d2;
+    color:white;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+    font-size:12px;
+    border:2px solid white;
+    box-shadow:0 2px 6px rgba(0,0,0,.3);
+}
+
+.cluster-small{
+    width:30px;
+    height:30px;
+    font-size:11px;
+}
+
+.cluster-medium{
+    width:40px;
+    height:40px;
+    font-size:13px;
+}
+
+.cluster-large{
+    width:50px;
+    height:50px;
+    font-size:14px;
 }
 
 </style>
@@ -67,159 +115,195 @@ html,body{
 
 <h2>API GeoJSON</h2>
 
-<p>
-<b>Registros:</b>
-<span id="total">0</span>
-</p>
+<label>
+    <input type="checkbox" id="clusterToggle" checked>
+    Agrupar puntos (clustering)
+</label>
+
+<label style="margin-top:8px">
+    Grid size:
+    <select id="gridSize">
+        <option value="4">4x4</option>
+        <option value="6">6x6</option>
+        <option value="8" selected>8x8</option>
+        <option value="12">12x12</option>
+        <option value="16">16x16</option>
+    </select>
+</label>
 
 <button onclick="cargarDatos()">
-Recargar datos
+    Recargar datos
 </button>
+
+<div class="stats">
+    <div><b>Puntos visibles:</b> <span id="visibleCount">0</span></div>
+    <div><b>Total en vista:</b> <span id="totalCount">0</span></div>
+    <div><b>Zoom:</b> <span id="zoomLevel">0</span></div>
+    <div><b>BBox:</b> <span id="bboxDisplay">-</span></div>
+</div>
 
 </div>
 
 <div id="map"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
 <script>
 
-const API="http://127.0.0.1:8001/unidades?limit=0";
+const API = "/unidades";
 
-const map=L.map("map");
+const map = L.map("map");
 
 L.tileLayer(
-"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-{
-    maxZoom:19,
-    attribution:"© OpenStreetMap"
-}
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+        maxZoom:19,
+        attribution:"© OpenStreetMap"
+    }
 ).addTo(map);
 
-function popup(feature){
+map.setView([-1.83, -78.18], 7);
 
-    const p=feature.properties;
-
-    return `
-    <div style="min-width:260px">
-
-        <h3 style="margin-top:0;color:#1565c0;">
-            ${p.nombre}
-        </h3>
-
-        <table style="width:100%;font-size:13px">
-
-            <tr>
-                <td><b>RUC</b></td>
-                <td>${p.ruc}</td>
-            </tr>
-
-            <tr>
-                <td><b>Modalidad</b></td>
-                <td>${p.mod}</td>
-            </tr>
-
-            <tr>
-                <td><b>Servicio</b></td>
-                <td>${p.servicio}</td>
-            </tr>
-
-            <tr>
-                <td><b>Provincia</b></td>
-                <td>${p.dpa_despro}</td>
-            </tr>
-
-            <tr>
-                <td><b>Cantón</b></td>
-                <td>${p.dpa_descan}</td>
-            </tr>
-
-            <tr>
-                <td><b>Área</b></td>
-                <td>${p.area}</td>
-            </tr>
-
-            <tr>
-                <td><b>Tipo</b></td>
-                <td>${p.tipo}</td>
-            </tr>
-
-        </table>
-
-        ${
-            p.link_ubi
-            ? `<br>
-            <a href="${p.link_ubi}"
-               target="_blank">
-               📍 Abrir en Google Maps
-            </a>`
-            : ""
-        }
-
-    </div>
-    `;
-}
-
-let capa=L.geoJSON(null,{
-
-    pointToLayer:function(feature,latlng){
-
-        return L.circleMarker(latlng,{
-
-            radius:6,
-            fillColor:"#1976d2",
-            color:"#ffffff",
-            weight:1,
-            opacity:1,
-            fillOpacity:.9
-
+let capa = L.markerClusterGroup({
+    maxClusterRadius: 50,
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true,
+    iconCreateFunction: function(cluster) {
+        const count = cluster.getChildCount();
+        let size = "small";
+        if (count > 50) size = "large";
+        else if (count > 10) size = "medium";
+        return L.divIcon({
+            html: '<div class="cluster-marker cluster-' + size + '">' + count + '</div>',
+            className: "",
+            iconSize: L.point(40, 40)
         });
-
-    },
-
-    onEachFeature:function(feature,layer){
-
-        layer.bindPopup(
-            popup(feature)
-        );
-
     }
-
 }).addTo(map);
 
-async function cargarDatos(){
+let capaSinCluster = L.geoJSON(null, {
+    pointToLayer: function(feature, latlng) {
+        return L.circleMarker(latlng, {
+            radius: 6,
+            fillColor: "#1976d2",
+            color: "#ffffff",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.9
+        });
+    },
+    onEachFeature: function(feature, layer) {
+        layer.bindPopup(popup(feature));
+    }
+});
 
-    try{
+function popup(feature) {
+    const p = feature.properties;
+    const isCluster = p.cluster_count && p.cluster_count > 1;
 
-        const response=await fetch(API);
-
-        const geojson=await response.json();
-
-        capa.clearLayers();
-
-        capa.addData(geojson);
-
-        document.getElementById("total").innerHTML=
-            geojson.features.length;
-
-        if(capa.getLayers().length>0){
-
-            map.fitBounds(
-                capa.getBounds(),
-                {padding:[30,30]}
-            );
-
-        }
-
-    }catch(error){
-
-        console.error(error);
-
-        alert("No fue posible consultar la API.");
-
+    if (isCluster) {
+        return '<div style="min-width:200px">' +
+            '<h3 style="margin-top:0;color:#1565c0;">' +
+            p.cluster_count + ' unidades en esta zona' +
+            '</h3>' +
+            '<p style="font-size:13px;color:#666;">' +
+            'Celda: ' + p.cell_id + '<br>' +
+            'Haz click para hacer zoom y ver las unidades individuales.' +
+            '</p>' +
+            '</div>';
     }
 
+    return '<div style="min-width:260px">' +
+        '<h3 style="margin-top:0;color:#1565c0;">' + p.nombre + '</h3>' +
+        '<table style="width:100%;font-size:13px">' +
+            '<tr><td><b>RUC</b></td><td>' + (p.ruc || '-') + '</td></tr>' +
+            '<tr><td><b>Modalidad</b></td><td>' + (p.mod || '-') + '</td></tr>' +
+            '<tr><td><b>Servicio</b></td><td>' + (p.servicio || '-') + '</td></tr>' +
+            '<tr><td><b>Provincia</b></td><td>' + (p.dpa_despro || '-') + '</td></tr>' +
+            '<tr><td><b>Canton</b></td><td>' + (p.dpa_descan || '-') + '</td></tr>' +
+            '<tr><td><b>Area</b></td><td>' + (p.area || '-') + '</td></tr>' +
+            '<tr><td><b>Tipo</b></td><td>' + (p.tipo || '-') + '</td></tr>' +
+            (p.cluster_count ? '<tr><td><b>Unidades</b></td><td>' + p.cluster_count + '</td></tr>' : '') +
+        '</table>' +
+        (p.link_ubi ? '<br><a href="' + p.link_ubi + '" target="_blank">Abrir en Google Maps</a>' : '') +
+        '</div>';
 }
+
+function getBBox() {
+    const b = map.getBounds();
+    return b.getWest() + "," + b.getSouth() + "," + b.getEast() + "," + b.getNorth();
+}
+
+function getClusterThreshold() {
+    const zoom = map.getZoom();
+    if (zoom >= 12) return false;
+    if (zoom >= 10) return true;
+    return true;
+}
+
+async function cargarDatos() {
+    try {
+        const bbox = getBBox();
+        const useCluster = document.getElementById("clusterToggle").checked;
+        const gridSize = parseInt(document.getElementById("gridSize").value);
+
+        let url = API + "?bbox=" + bbox + "&limit=0";
+
+        if (useCluster) {
+            url += "&cluster=true&grid_size=" + gridSize;
+        }
+
+        const response = await fetch(url);
+        const geojson = await response.json();
+
+        map.removeLayer(capa);
+        map.removeLayer(capaSinCluster);
+
+        if (useCluster) {
+            capa.clearLayers();
+            geojson.features.forEach(function(f) {
+                if (f.geometry && f.geometry.coordinates) {
+                    var marker = L.marker(
+                        [f.geometry.coordinates[1], f.geometry.coordinates[0]]
+                    );
+                    marker.feature = f;
+                    marker.bindPopup(popup(f));
+                    capa.addLayer(marker);
+                }
+            });
+            map.addLayer(capa);
+        } else {
+            capaSinCluster.clearLayers();
+            capaSinCluster.addData(geojson);
+            map.addLayer(capaSinCluster);
+        }
+
+        document.getElementById("visibleCount").textContent = geojson.features.length;
+        document.getElementById("totalCount").textContent = geojson.total;
+        document.getElementById("zoomLevel").textContent = map.getZoom();
+        document.getElementById("bboxDisplay").textContent =
+            bbox.split(",").map(function(v) { return parseFloat(v).toFixed(3); }).join(", ");
+
+    } catch(error) {
+        console.error(error);
+        alert("Error al consultar la API: " + error.message);
+    }
+}
+
+let debounceTimer = null;
+
+function cargarConDebounce() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(cargarDatos, 300);
+}
+
+map.on("moveend", cargarConDebounce);
+map.on("zoomend", cargarConDebounce);
+
+document.getElementById("clusterToggle").addEventListener("change", cargarDatos);
+document.getElementById("gridSize").addEventListener("change", cargarDatos);
 
 cargarDatos();
 

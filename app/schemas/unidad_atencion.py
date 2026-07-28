@@ -8,6 +8,8 @@ class Point(BaseModel):
 
 class UnidadProperties(BaseModel):
     id: int
+    cluster_count: int | None = None
+    cell_id: str | None = None
     zon_plan: str | None = None
     dis_sen: str | None = None
     uni_des: str | None = None

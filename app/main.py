@@ -35,6 +35,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(
+    root_path="/api-geo",
     title="ApiRestGeo",
     description="API REST para información geográfica",
     version=VERSION,
