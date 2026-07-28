@@ -47,8 +47,8 @@ El sistema usa únicamente `Point` para representar ubicaciones geográficas.
     { "type": "Feature", "geometry": {...}, "properties": {...}, "id": "1" }
   ],
   "total": 1234,
-  "page": 1,
-  "per_page": 50
+  "limit": 50,
+  "offset": 0
 }
 ```
 
@@ -65,7 +65,7 @@ En `app/schemas/unidad_atencion.py`:
 ## Al Crear Endpoints Geográficos
 
 1. Usar schemas de `app/schemas/unidad_atencion.py`
-2. Modelo en `app/models/unidad_atencion.py` con campos `longitud` y `latitud` como Float
+2. Modelo en `app/models/unidad_atencion.py` con campos `longitude` y `latitude` como Float
 3. Convertir modelo → Feature con helper `_unidad_to_feature()`
 4. Respuesta de listado → `FeatureCollection`
 5. Respuesta individual → `Feature`

@@ -1,4 +1,4 @@
-from sqlalchemy import Float, Integer, String
+from sqlalchemy import Float, Index, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -6,6 +6,15 @@ from app.models.base import Base
 
 class UnidadAtencion(Base):
     __tablename__ = "unidades_atencion"
+    __table_args__ = (
+        Index("idx_unidades_region", "region"),
+        Index("idx_unidades_dpa_despro", "dpa_despro"),
+        Index("idx_unidades_dpa_descan", "dpa_descan"),
+        Index("idx_unidades_servicio", "servicio"),
+        Index("idx_unidades_tipo", "tipo"),
+        Index("idx_unidades_area", "area"),
+        Index("idx_unidades_coords", "longitude", "latitude"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     zon_plan: Mapped[str | None] = mapped_column(String(255))

@@ -1,6 +1,19 @@
+import socket
+
 from pydantic_settings import BaseSettings
 
 VERSION = "0.1.0"
+
+
+def _get_local_ip() -> str:
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "127.0.0.1"
 
 
 class Settings(BaseSettings):
@@ -13,6 +26,7 @@ class Settings(BaseSettings):
     RATE_LIMIT_ENABLED: bool = True
     RATE_LIMIT_STORAGE: str = "memory://"
     RATE_LIMIT: str = "120/minute"
+    LOG_LEVEL: str = "INFO"
 
     @property
     def origins(self) -> list[str]:
@@ -23,17 +37,14 @@ class Settings(BaseSettings):
         ]
 
         if self.ALLOW_LOCAL_NETWORK:
+            local_ip = _get_local_ip()
             local = [
                 "http://localhost",
+                f"http://localhost:{self.PORT}",
                 "http://127.0.0.1",
-                "http://localhost:3000",
-                "http://localhost:5173",
-                "http://localhost:8000",
-                "http://localhost:8001",
-                "http://127.0.0.1:3000",
-                "http://127.0.0.1:5173",
-                "http://127.0.0.1:8000",
-                "http://127.0.0.1:8001",
+                f"http://127.0.0.1:{self.PORT}",
+                f"http://{local_ip}",
+                f"http://{local_ip}:{self.PORT}",
             ]
             return local + external
 

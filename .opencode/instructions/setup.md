@@ -38,6 +38,7 @@ Copiar `.env.example` a `.env` y configurar:
 | `RATE_LIMIT_ENABLED` | `true` | Habilitar rate limiting |
 | `RATE_LIMIT_STORAGE` | `memory://` | Backend: `memory://` o `redis://host:port` |
 | `RATE_LIMIT` | `120/minute` | Límite global de requests |
+| `LOG_LEVEL` | `INFO` | Nivel de log: DEBUG, INFO, WARNING, ERROR, CRITICAL |
 
 ## Iniciar servidor
 
@@ -97,5 +98,5 @@ ApiRestGeo/
 └── tests/
     ├── conftest.py           # Fixtures async
     ├── test_health.py        # Tests de health
-    └── test_unidades.py      # Tests de unidades (18 tests)
+    └── test_unidades.py      # Tests de unidades (22 tests)
 ```

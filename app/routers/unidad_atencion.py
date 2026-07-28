@@ -16,6 +16,22 @@ from app.schemas.unidad_atencion import (
 router = APIRouter(prefix="/unidades", tags=["unidades"])
 
 
+def _parse_bbox(bbox: str) -> tuple[float, float, float, float]:
+    parts = bbox.split(",")
+    if len(parts) != 4:
+        raise HTTPException(
+            status_code=400,
+            detail="bbox must have exactly 4 values: min_lng,min_lat,max_lng,max_lat",
+        )
+    try:
+        return float(parts[0]), float(parts[1]), float(parts[2]), float(parts[3])
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail="bbox values must be numbers: min_lng,min_lat,max_lng,max_lat",
+        )
+
+
 def _unidad_to_feature(u: UnidadAtencion) -> Feature:
     return Feature(
         geometry=Point(coordinates=(u.longitude, u.latitude)),
@@ -135,8 +151,7 @@ async def list_unidades(
     count_query = select(func.count(UnidadAtencion.id))
 
     if bbox:
-        coords = [float(c) for c in bbox.split(",")]
-        min_lng, min_lat, max_lng, max_lat = coords
+        min_lng, min_lat, max_lng, max_lat = _parse_bbox(bbox)
         bbox_filter = [
             UnidadAtencion.longitude >= min_lng,
             UnidadAtencion.longitude <= max_lng,
@@ -205,8 +220,7 @@ async def list_unidades_raw(
     count_query = select(func.count(UnidadAtencion.id))
 
     if bbox:
-        coords = [float(c) for c in bbox.split(",")]
-        min_lng, min_lat, max_lng, max_lat = coords
+        min_lng, min_lat, max_lng, max_lat = _parse_bbox(bbox)
         bbox_filter = [
             UnidadAtencion.longitude >= min_lng,
             UnidadAtencion.longitude <= max_lng,

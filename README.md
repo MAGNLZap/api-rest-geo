@@ -46,11 +46,22 @@ cp .env.example .env
 | `RATE_LIMIT_ENABLED` | `true` | Habilitar rate limiting |
 | `RATE_LIMIT_STORAGE` | `memory://` | Backend: `memory://` o `redis://host:port` |
 | `RATE_LIMIT` | `120/minute` | Límite global de requests por IP |
+| `LOG_LEVEL` | `INFO` | Nivel de log: DEBUG, INFO, WARNING, ERROR, CRITICAL |
 
 ## Ejecutar
 
 ```bash
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+```
+
+## Docker
+
+```bash
+# Build image
+docker build -t apirestgeo .
+
+# Run container
+docker run -p 8001:8001 -e DATABASE_URL=postgresql+asyncpg://user:pass@host:5432/db apirestgeo
 ```
 
 ## Cargar datos
@@ -119,6 +130,7 @@ ApiRestGeo/
 ├── .venv/                    # Entorno virtual
 ├── .env                      # Variables de entorno (no commitear)
 ├── .env.example              # Template de variables de entorno
+├── Dockerfile                # Imagen Docker multi-stage
 ├── requirements-base.txt     # Dependencias base
 ├── requirements.txt          # Dependencias de desarrollo
 ├── requirements-prod.txt     # Dependencias de producción
