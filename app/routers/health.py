@@ -2,23 +2,23 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter
 
-from app.config import settings
+from app.config import VERSION, settings
 from app.database import check_db_connection
 
 router = APIRouter(tags=["health"])
 
-VERSION = "0.1.0"
-
 
 @router.get("/")
 def root():
-    return {
-        "message": "ApiRestGeo API v0.1.0",
+    response = {
+        "message": f"ApiRestGeo API v{VERSION}",
         "version": VERSION,
         "timestamp": datetime.now(timezone.utc).isoformat(),
-        "docs": "/docs",
         "environment": settings.ENVIRONMENT,
     }
+    if settings.is_dev:
+        response["docs"] = "/docs"
+    return response
 
 
 @router.get("/health")

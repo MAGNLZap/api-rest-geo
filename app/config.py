@@ -1,12 +1,15 @@
 from pydantic_settings import BaseSettings
 
+VERSION = "0.1.0"
+
 
 class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DATABASE_URL: str = "sqlite+aiosqlite:///./test.db"
     ALLOWED_ORIGINS: str = ""
     ALLOW_LOCAL_NETWORK: bool = True
-    PORT: int = 8000
+    HOST: str = "0.0.0.0"
+    PORT: int = 8001
 
     @property
     def origins(self) -> list[str]:
@@ -20,8 +23,14 @@ class Settings(BaseSettings):
             local = [
                 "http://localhost",
                 "http://127.0.0.1",
-                "http://localhost:*",
-                "http://127.0.0.1:*",
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "http://localhost:8000",
+                "http://localhost:8001",
+                "http://127.0.0.1:3000",
+                "http://127.0.0.1:5173",
+                "http://127.0.0.1:8000",
+                "http://127.0.0.1:8001",
             ]
             return local + external
 

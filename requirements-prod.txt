@@ -1,3 +1,2 @@
-# Producción - instalar en servidor Linux/CI
--r requirements.txt
+-r requirements-base.txt
 asyncpg==0.30.0

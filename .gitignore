@@ -31,3 +31,7 @@ htmlcov/
 # Logs
 *.log
 logs/
+
+# Datos
+data/*.json
+data/*.xlsx

@@ -1,10 +1,10 @@
 # ApiRestGeo
 
-API REST para información geográfica con estándar GeoJSON.
+API REST para información geográfica con unidades de atención.
 
 ## Requisitos
 
-- Python 3.14+
+- Python 3.12+
 - pip
 
 ## Instalación
@@ -41,6 +41,7 @@ cp .env.example .env
 | `DATABASE_URL` | `sqlite+aiosqlite:///./test.db` | SQLite dev / PostgreSQL prod |
 | `ALLOWED_ORIGINS` | (vacío) | Orígenes CORS externos (separados por coma) |
 | `ALLOW_LOCAL_NETWORK` | `true` | Permitir acceso desde redes locales |
+| `HOST` | `0.0.0.0` | Host del servidor |
 | `PORT` | `8001` | Puerto del servidor |
 
 ## Ejecutar
@@ -49,16 +50,36 @@ cp .env.example .env
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
 ```
 
+## Cargar datos
+
+```bash
+python scripts/load_data.py --file "data/06_ua_validadas_0626 (1).json"
+```
+
 ## Endpoints
 
 | Método | Ruta | Descripción |
 |---|---|---|
 | `GET` | `/` | Metadata de la API |
 | `GET` | `/health` | Estado de la API + conexión a BD |
-| `GET` | `/geo/points` | Todos los puntos geográficos |
-| `GET` | `/geo/points/{id}` | Punto por ID |
+| `GET` | `/unidades` | Todas las unidades (GeoJSON FeatureCollection) |
+| `GET` | `/unidades/{id}` | Unidad por ID |
 | `GET` | `/docs` | Swagger UI (solo en development) |
 | `GET` | `/redoc` | ReDoc (solo en development) |
+
+### Filtros disponibles en `/unidades`
+
+| Parámetro | Tipo | Descripción |
+|---|---|---|
+| `limit` | int | Registros por página (default: 100, max: 1000) |
+| `offset` | int | Offset para paginación |
+| `region` | string | Filtrar por región |
+| `provincia` | string | Filtrar por provincia |
+| `canton` | string | Filtrar por cantón |
+| `servicio` | string | Filtrar por tipo de servicio |
+| `tipo` | string | Filtrar por tipo (INTRAMURAL/EXTRAMURAL) |
+| `area` | string | Filtrar por área (Urbano/Rural) |
+| `nombre` | string | Buscar por nombre |
 
 ## Tests
 
@@ -73,8 +94,12 @@ ApiRestGeo/
 ├── .venv/                    # Entorno virtual
 ├── .env                      # Variables de entorno (no commitear)
 ├── .env.example              # Template de variables de entorno
+├── requirements-base.txt     # Dependencias base
 ├── requirements.txt          # Dependencias de desarrollo
-├── requirements-prod.txt     # Dependencias de producción (+ asyncpg)
+├── requirements-prod.txt     # Dependencias de producción
+├── data/                     # Archivos de datos
+├── scripts/
+│   └── load_data.py          # Script de carga masiva
 ├── app/
 │   ├── main.py               # Entry point FastAPI
 │   ├── config.py             # Configuración con Pydantic Settings
@@ -82,17 +107,18 @@ ApiRestGeo/
 │   ├── middleware/
 │   │   └── cors.py           # CORS dinámico
 │   ├── models/
+│   │   ├── __init__.py       # Registro de modelos
 │   │   ├── base.py           # Base declarativa SQLAlchemy
-│   │   └── point.py          # Modelo GeoPoint
+│   │   └── unidad_atencion.py # Modelo UnidadAtencion
 │   ├── routers/
 │   │   ├── health.py         # Endpoints de salud
-│   │   └── geo.py            # Endpoints geográficos
+│   │   └── unidad_atencion.py # Endpoints de unidades
 │   └── schemas/
-│       └── geo.py            # Schemas GeoJSON (RFC 7946)
+│       └── unidad_atencion.py # Schemas Pydantic + GeoJSON
 └── tests/
     ├── conftest.py           # Fixtures y configuración de tests
     ├── test_health.py        # Tests de health endpoints
-    └── test_geo.py           # Tests de endpoints geográficos
+    └── test_unidades.py      # Tests de endpoints de unidades
 ```
 
 ## Base de datos
