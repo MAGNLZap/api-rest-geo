@@ -1,4 +1,11 @@
--r requirements-base.txt
+fastapi==0.115.12
+uvicorn[standard]==0.34.3
+pydantic-settings==2.9.1
+python-dotenv==1.1.0
+sqlalchemy[asyncio]==2.0.41
+aiosqlite==0.21.0
+asyncpg==0.30.0
+slowapi==0.1.9
 pytest==8.4.1
-pytest-asyncio==1.4.0
+pytest-asyncio==0.25.3
 httpx==0.28.1

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy import Float, Integer, func, literal as lit, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -30,6 +31,18 @@ def _parse_bbox(bbox: str) -> tuple[float, float, float, float]:
             status_code=400,
             detail="bbox values must be numbers: min_lng,min_lat,max_lng,max_lat",
         )
+
+
+def _zoom_to_grid_size(zoom: int) -> int:
+    if zoom <= 5:
+        return 4
+    if zoom <= 8:
+        return 8
+    if zoom <= 11:
+        return 12
+    if zoom <= 14:
+        return 16
+    return 20
 
 
 def _unidad_to_feature(u: UnidadAtencion) -> Feature:
@@ -282,6 +295,7 @@ async def list_unidades(
     bbox: str | None = Query(None),
     cluster: bool = Query(False),
     grid_size: int = Query(8, ge=2, le=32),
+    zoom: int | None = Query(None, ge=0, le=19),
     db: AsyncSession = Depends(get_db),
 ):
     filters = []
@@ -302,17 +316,34 @@ async def list_unidades(
 
     if cluster and bbox:
         min_lng, min_lat, max_lng, max_lat = _parse_bbox(bbox)
-        clustered = await _cluster_unidades(
-            db, min_lng, min_lat, max_lng, max_lat, grid_size, filters
+
+        effective_grid = _zoom_to_grid_size(zoom) if zoom is not None else grid_size
+
+        bbox_filter = [
+            UnidadAtencion.longitude >= min_lng,
+            UnidadAtencion.longitude <= max_lng,
+            UnidadAtencion.latitude >= min_lat,
+            UnidadAtencion.latitude <= max_lat,
+        ]
+        count_result = await db.execute(
+            select(func.count(UnidadAtencion.id)).where(*bbox_filter).where(*filters)
         )
-        return FeatureCollection(
-            features=[
-                _unidad_to_clustered_feature(u, count, cell_id)
-                for u, count, cell_id in clustered
-            ],
-            total=len(clustered),
-            limit=grid_size * grid_size,
-            offset=0,
+        total_real = count_result.scalar()
+
+        clustered = await _cluster_unidades(
+            db, min_lng, min_lat, max_lng, max_lat, effective_grid, filters
+        )
+        return JSONResponse(
+            content=FeatureCollection(
+                features=[
+                    _unidad_to_clustered_feature(u, count, cell_id)
+                    for u, count, cell_id in clustered
+                ],
+                total=total_real,
+                limit=effective_grid * effective_grid,
+                offset=0,
+            ).model_dump(),
+            media_type="application/geo+json",
         )
 
     query = select(UnidadAtencion)
@@ -343,11 +374,14 @@ async def list_unidades(
     result = await db.execute(query)
     unidades = result.scalars().all()
 
-    return FeatureCollection(
-        features=[_unidad_to_feature(u) for u in unidades],
-        total=total,
-        limit=limit if limit else 0,
-        offset=offset,
+    return JSONResponse(
+        content=FeatureCollection(
+            features=[_unidad_to_feature(u) for u in unidades],
+            total=total,
+            limit=limit if limit else 0,
+            offset=offset,
+        ).model_dump(),
+        media_type="application/geo+json",
     )
 
 
@@ -428,7 +462,10 @@ async def get_unidad(request: Request, unidad_id: int, db: AsyncSession = Depend
     unidad = result.scalar_one_or_none()
     if not unidad:
         raise HTTPException(status_code=404, detail="Unidad no encontrada")
-    return _unidad_to_feature(unidad)
+    return JSONResponse(
+        content=_unidad_to_feature(unidad).model_dump(),
+        media_type="application/geo+json",
+    )
 
 
 @router.get("/{unidad_id}/raw", response_model=UnidadRaw)

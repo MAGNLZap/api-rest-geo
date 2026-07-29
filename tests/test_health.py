@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 async def test_root(client):
     response = await client.get("/")
     assert response.status_code == 200
@@ -12,7 +12,7 @@ async def test_root(client):
     assert data["version"] == "0.1.0"
 
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 async def test_health(client):
     response = await client.get("/health")
     assert response.status_code == 200

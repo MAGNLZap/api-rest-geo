@@ -28,13 +28,17 @@ async def load_json(file_path: str, clear: bool = False):
 
     batch_size = 500
     total_inserted = 0
+    skipped = 0
+    errors = 0
 
     for i in range(0, len(data), batch_size):
         batch = data[i : i + batch_size]
+        batch_num = i // batch_size + 1
         objetos = []
 
         for item in batch:
             if not item.get("long") or not item.get("lat"):
+                skipped += 1
                 continue
 
             objetos.append(
@@ -85,14 +89,20 @@ async def load_json(file_path: str, clear: bool = False):
                 )
             )
 
-        async with async_session() as session:
-            session.add_all(objetos)
-            await session.commit()
+        try:
+            async with async_session() as session:
+                session.add_all(objetos)
+                await session.commit()
+            total_inserted += len(objetos)
+            print(f"Batch {batch_num}: {len(objetos)} insertados ({total_inserted}/{len(data)})")
+        except Exception as e:
+            errors += 1
+            print(f"Batch {batch_num}: ERROR - {e}")
 
-        total_inserted += len(objetos)
-        print(f"Insertados: {total_inserted}/{len(data)}")
-
-    print(f"\nCarga completada: {total_inserted} registros insertados.")
+    print(f"\nResumen:")
+    print(f"  Insertados: {total_inserted}")
+    print(f"  Sin coordenadas: {skipped}")
+    print(f"  Errores: {errors}")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,3 @@
-# Stage 1: builder - install dependencies with gcc
 FROM python:3.12-slim AS builder
 
 WORKDIR /app
@@ -7,10 +6,9 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends gcc && \
     rm -rf /var/lib/apt/lists/*
 
-COPY requirements-base.txt requirements-prod.txt ./
-RUN pip install --no-cache-dir --prefix=/install -r requirements-base.txt -r requirements-prod.txt
+COPY requirements.txt ./
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
-# Stage 2: runtime - minimal image without gcc
 FROM python:3.12-slim AS runtime
 
 WORKDIR /app
@@ -19,7 +17,7 @@ COPY --from=builder /install /usr/local
 
 COPY app/ ./app/
 COPY scripts/ ./scripts/
-COPY data/ ./data/
+COPY demo/ ./demo/
 
 RUN adduser --disabled-password --gecos "" appuser && \
     chown -R appuser:appuser /app

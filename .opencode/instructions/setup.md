@@ -18,9 +18,6 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-Para producción (PostgreSQL en Linux):
-```pwsh
-pip install -r requirements-prod.txt
 ```
 
 ## Variables de entorno
@@ -73,9 +70,7 @@ ApiRestGeo/
 ├── .venv/                    # Entorno virtual
 ├── .env                      # Variables de entorno (no commit)
 ├── .env.example              # Template de variables
-├── requirements-base.txt     # Dependencias compartidas
-├── requirements.txt          # Dependencias dev (+ test)
-├── requirements-prod.txt     # Dependencias prod (+ asyncpg)
+├── requirements.txt          # Dependencias (todas incluidas)
 ├── data/                     # Archivos de datos (JSON, Excel)
 ├── scripts/
 │   └── load_data.py          # Carga masiva JSON → SQLite

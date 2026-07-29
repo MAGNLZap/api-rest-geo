@@ -37,7 +37,7 @@ ApiRestGeo/
 ## Base de Datos
 
 - **Dev:** SQLite (`sqlite+aiosqlite:///./test.db`)
-- **Prod:** PostgreSQL (`postgresql+asyncpg://...`) — requiere `requirements-prod.txt`
+- **Prod:** PostgreSQL (`postgresql+asyncpg://...`) — incluido en `requirements.txt`
 - Engine y session se crean en `app/database.py`
 - Dependency injection con `Depends(get_db)` en los routers
 - Tablas se crean automáticamente al iniciar (`Base.metadata.create_all`)

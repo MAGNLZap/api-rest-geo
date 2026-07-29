@@ -131,9 +131,7 @@ ApiRestGeo/
 ├── .env                      # Variables de entorno (no commitear)
 ├── .env.example              # Template de variables de entorno
 ├── Dockerfile                # Imagen Docker multi-stage
-├── requirements-base.txt     # Dependencias base
-├── requirements.txt          # Dependencias de desarrollo
-├── requirements-prod.txt     # Dependencias de producción
+├── requirements.txt          # Dependencias
 ├── data/                     # Archivos de datos
 ├── scripts/
 │   └── load_data.py          # Script de carga masiva
@@ -162,7 +160,7 @@ ApiRestGeo/
 ## Base de datos
 
 - **Desarrollo:** SQLite (archivo `test.db`, se crea automáticamente)
-- **Producción:** PostgreSQL (requiere `pip install -r requirements-prod.txt`)
+- **Producción:** PostgreSQL (incluido en `requirements.txt`)
 
 ## Seguridad
 

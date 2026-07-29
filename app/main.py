@@ -31,6 +31,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         await conn.run_sync(Base.metadata.create_all)
     logger.info("Database tables created/verified")
     yield
+    await engine.dispose()
     logger.info("Shutting down ApiRestGeo API")
 
 

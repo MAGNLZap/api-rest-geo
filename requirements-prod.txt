@@ -1,2 +1,0 @@
--r requirements-base.txt
-asyncpg==0.30.0
