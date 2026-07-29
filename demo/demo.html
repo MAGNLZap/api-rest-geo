@@ -36,6 +36,11 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:#f0f2f5}
 .leaflet-popup-content-wrapper{border-radius:12px!important;box-shadow:0 8px 32px rgba(0,0,0,.15)!important;padding:0!important;overflow:hidden}
 .leaflet-popup-content{margin:0!important;min-width:280px!important}
 .leaflet-popup-tip{box-shadow:0 4px 12px rgba(0,0,0,.1)!important}
+.marker-pin{transition:transform .2s,filter .2s;cursor:pointer}
+.marker-pin:hover{transform:scale(1.15);filter:brightness(1.1)}
+.cluster-pin{transition:transform .2s}
+.cluster-pin:hover{transform:scale(1.1)}
+.cluster-pin:hover{transform:scale(1.1)}
 .popup-card{font-family:'Inter',sans-serif}
 .popup-header{padding:14px 16px 10px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:white}
 .popup-header h3{font-size:14px;font-weight:600;line-height:1.3;margin:0}
@@ -45,8 +50,8 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:#f0f2f5}
 .popup-row:last-child{border-bottom:none}
 .popup-row .label{color:#888;font-weight:500}
 .popup-row .value{color:#1a1a2e;font-weight:600;text-align:right;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.popup-link{display:block;text-align:center;padding:10px 16px;background:#f8fffe;border-top:1px solid #eee;color:#0d9488;text-decoration:none;font-size:12px;font-weight:600;transition:background .2s}
-.popup-link:hover{background:#e6f7f5}
+.popup-link{display:block;padding:12px 16px;text-align:center;color:white;text-decoration:none;font-size:13px;font-weight:700;transition:opacity .2s;border:none;width:100%;cursor:pointer;font-family:inherit}
+.popup-link:hover{opacity:.85}
 .popup-cluster{padding:20px;text-align:center}
 .popup-cluster .count{font-size:32px;font-weight:700;color:#0d9488;line-height:1}
 .popup-cluster .label{font-size:13px;color:#888;margin-top:4px}
@@ -78,8 +83,10 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:#f0f2f5}
     </div>
 </div>
 <div id="map"></div>
+<div style="position:absolute;bottom:20px;left:20px;z-index:1000;background:rgba(255,255,255,.85);padding:6px 12px;border-radius:8px;font-size:11px;color:#888;font-family:Inter,sans-serif;backdrop-filter:blur(4px);box-shadow:0 2px 8px rgba(0,0,0,.08)">Datos: Ministerio de Desarrollo Humano · Mapas: Google</div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/supercluster@8/dist/supercluster.min.js"></script>
+<script src="https://unpkg.com/@turf/turf@7/turf.min.js"></script>
 <script>
 const ROOT=window.location.pathname.replace(/\/demo\/?$/,'');
 const API=ROOT+"/unidades";
@@ -89,22 +96,36 @@ L.tileLayer("https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",{maxZoom:20,att
 map.setView([-1.83,-78.18],7);
 
 const maskLayer=L.layerGroup().addTo(map);
-const regionsLayer=L.layerGroup().addTo(map);
+const outlineLayer=L.layerGroup().addTo(map);
 const markersLayer=L.layerGroup().addTo(map);
 
-const ECUADOR_GEOJSON_URL="https://raw.githubusercontent.com/elias-gm/ecuador-geojson/master/provincias.geojson";
+const ECUADOR_GEOJSON_URL="https://raw.githubusercontent.com/jpmarindiaz/geo-collection/master/ecu/ecuador.geojson";
+
+const regionKeys=['costa','sierra','amazonia','galapagos'];
 
 const regionColors={
-    costa:{fill:'#FFCD56',border:'#e6b800',label:'#b8860b'},
-    sierra:{fill:'#5C9EFF',border:'#3a7fd9',label:'#2563eb'},
-    amazonia:{fill:'#FF6978',border:'#e04858',label:'#dc2626'},
-    galapagos:{fill:'#18B2A2',border:'#128f82',label:'#0d7a6e'}
+    costa:{fill:'#FFCD56',border:'#e6b800',label:'#b8860b',text:'rgba(0,0,0,.8)'},
+    sierra:{fill:'#5C9EFF',border:'#3a7fd9',label:'#2563eb',text:'white'},
+    amazonia:{fill:'#FF6978',border:'#e04858',label:'#dc2626',text:'white'},
+    galapagos:{fill:'#18B2A2',border:'#128f82',label:'#0d7a6e',text:'white'}
 };
 
-const costaProvinces=["ESMERALDAS","MANABI","SANTA ELENA","GUAYAS","LOS RIOS","EL ORO","SANTO DOMINGO DE LOS TSACHILAS"];
-const sierraProvinces=["CARCHI","IMBABURA","PICHINCHA","COTOPAXI","TUNGURAHUA","BOLIVAR","CHIMBORAZO","CAÑAR","AZUAY","LOJA"];
-const amazoniaProvinces=["SUCUMBIOS","ORELLANA","NAPO","PASTAZA","MORONA SANTIAGO","ZAMORA CHINCHIPE"];
-const galapagosProvinces=["GALAPAGOS"];
+const provinceRegion={};
+'07,08,09,12,13,23,24'.split(',').forEach(function(c){provinceRegion[c]='costa'});
+'01,02,03,04,05,06,10,11,17,18'.split(',').forEach(function(c){provinceRegion[c]='sierra'});
+'14,15,16,19,21,22'.split(',').forEach(function(c){provinceRegion[c]='amazonia'});
+'20'.split(',').forEach(function(c){provinceRegion[c]='galapagos'});
+
+const regionLayers={};
+regionKeys.forEach(function(k){regionLayers[k]=L.layerGroup()});
+
+const regionNames={costa:'Costa',sierra:'Sierra',amazonia:'Amazonía',galapagos:'Galápagos'};
+
+function getRegionKey(provCode){
+    return provinceRegion[provCode]||null;
+}
+
+
 
 let ecuadorGeo=null;
 
@@ -117,19 +138,10 @@ async function loadEcuadorGeo(){
     }
 }
 
-function getProvinceName(f){
-    return (f.properties.DPA_DESPRO||f.properties.PROVINCIA||f.properties.NAME_1||f.properties.name||'').toUpperCase();
-}
-
-function getProvincesByRegion(regionKey){
-    const map={costa:costaProvinces,sierra:sierraProvinces,amazonia:amazoniaProvinces,galapagos:galapagosProvinces};
-    return map[regionKey]||[];
-}
-
 function buildMask(){
     maskLayer.clearLayers();
     if(!ecuadorGeo)return;
-    const worldCoords=[[-180,-85],[-180,85],[180,85],[180,-85],[-180,-85]];
+    const worldCoords=[[-90,-180],[-90,180],[90,180],[90,-180],[-90,-180]];
     const holes=[];
     ecuadorGeo.features.forEach(function(f){
         const geom=f.geometry;
@@ -147,76 +159,100 @@ function buildMask(){
     });
     if(holes.length>0){
         const maskCoords=[worldCoords,...holes];
-        L.polygon(maskCoords,{color:'transparent',fillColor:'#f0f2f5',fillOpacity:0.65,weight:0,interactive:false}).addTo(maskLayer);
+        L.polygon(maskCoords,{color:'transparent',fillColor:'white',fillOpacity:0.8,weight:0,interactive:false}).addTo(maskLayer);
     }
 }
 
 function buildRegions(){
-    regionsLayer.clearLayers();
+    regionKeys.forEach(function(k){regionLayers[k].clearLayers()});
     if(!ecuadorGeo)return;
-    Object.keys(regionColors).forEach(function(key){
-        const provNames=getProvincesByRegion(key);
-        const color=regionColors[key];
-        const polys=[];
-        ecuadorGeo.features.forEach(function(f){
-            const name=getProvinceName(f);
-            if(provNames.indexOf(name)!==-1){
-                const geom=f.geometry;
-                if(geom.type==="Polygon"){
-                    polys.push(geom.coordinates[0].map(function(c){return[c[1],c[0]]}));
-                }else if(geom.type==="MultiPolygon"){
-                    geom.coordinates.forEach(function(poly){
-                        polys.push(poly[0].map(function(c){return[c[1],c[0]]}));
-                    });
-                }
-            }
-        });
-        if(polys.length>0){
-            const merged=L.polygon(polys,{
-                color:color.border,fillColor:color.fill,fillOpacity:0.25,weight:2,opacity:0.7
+    ecuadorGeo.features.forEach(function(f){
+        const code=f.properties.dpa_provin;
+        if(!code)return;
+        const regionKey=provinceRegion[code];
+        if(!regionKey)return;
+        const color=regionColors[regionKey];
+        const geom=f.geometry;
+        const processRing=function(ring){return ring.map(function(c){return[c[1],c[0]]})};
+        if(geom.type==="Polygon"){
+            L.polygon(processRing(geom.coordinates[0]),{
+                color:'white',fillColor:color.fill,fillOpacity:0.5,weight:3,opacity:0.9
+            }).addTo(regionLayers[regionKey]);
+        }else if(geom.type==="MultiPolygon"){
+            geom.coordinates.forEach(function(poly){
+                L.polygon(processRing(poly[0]),{
+                    color:'white',fillColor:color.fill,fillOpacity:0.5,weight:3,opacity:0.9
+                }).addTo(regionLayers[regionKey]);
             });
-            regionsLayer.addLayer(merged);
-
-            let bounds=null;
-            polys.forEach(function(coords){
-                const p=L.polygon(coords);
-                const b=p.getBounds();
-                bounds=bounds?bounds.extend(b):b;
-            });
-            if(bounds){
-                const c=bounds.getCenter();
-                L.marker(c,{
-                    icon:L.divIcon({
-                        className:'',
-                        iconSize:[80,20],
-                        iconAnchor:[40,10],
-                        html:'<div style="text-align:center;font-family:Inter,sans-serif;font-size:11px;font-weight:700;color:'+color.label+';text-shadow:1px 1px 2px white,-1px -1px 2px white,1px -1px 2px white,-1px 1px 2px white;letter-spacing:.5px">'+key.toUpperCase()+'</div>'
-                    }),
-                    interactive:false
-                }).addTo(regionsLayer);
-            }
         }
     });
 }
 
+function buildOutline(){
+    outlineLayer.clearLayers();
+    if(!ecuadorGeo)return;
+    try{
+        let merged=null;
+        ecuadorGeo.features.forEach(function(f){
+            if(merged===null){
+                merged=f.geometry;
+            }else{
+                merged=turf.union(merged,f.geometry);
+            }
+        });
+        if(merged){
+            L.geoJSON(merged,{
+                style:{color:'white',weight:6,fillOpacity:0,opacity:0.95}
+            }).addTo(outlineLayer);
+        }
+    }catch(e){
+        console.warn("Could not build outline:",e);
+    }
+}
+
 let allFeatures=[];
 let index=new Supercluster({radius:80,maxZoom:14});
+let stickyMarker=null;
+let currentPopup=null;
+
+function openPopupFor(marker,feature){
+    closePopup();
+    currentPopup=L.popup({maxWidth:320,minWidth:280})
+        .setLatLng(marker.getLatLng())
+        .setContent(popup(feature))
+        .addTo(map);
+    requestAnimationFrame(function(){
+        const el=currentPopup.getElement();
+        if(!el)return;
+        const btn=el.querySelector('.popup-link');
+        if(btn){
+            btn.addEventListener('click',function(e){
+                e.stopPropagation();
+                window.open(btn.getAttribute('data-href'),'_blank');
+            });
+        }
+    });
+}
+
+function closePopup(){
+    if(currentPopup){map.closePopup(currentPopup);currentPopup=null}
+}
 
 function createMarkerIcon(){
     return L.divIcon({
-        className:"",
-        iconSize:[28,38],iconAnchor:[14,38],popupAnchor:[0,-36],
-        html:'<svg width="28" height="38" viewBox="0 0 28 38" fill="none"><path d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 24 14 24s14-13.5 14-24C28 6.268 21.732 0 14 0z" fill="#0d9488"/><circle cx="14" cy="13" r="7" fill="white"/><path d="M14 9v8M10 13h8" stroke="#0d9488" stroke-width="2" stroke-linecap="round"/></svg>'
+        className:"marker-pin",
+        iconSize:[36,46],iconAnchor:[18,46],popupAnchor:[0,-44],
+        html:'<div style="display:flex;align-items:flex-start;justify-content:center;width:36px;height:46px;padding-top:4px"><svg pointer-events="none" width="28" height="38" viewBox="0 0 28 38" fill="none"><path d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 24 14 24s14-13.5 14-24C28 6.268 21.732 0 14 0z" fill="#0d9488"/><circle cx="14" cy="13" r="7" fill="white"/><path d="M14 9v8M10 13h8" stroke="#0d9488" stroke-width="2" stroke-linecap="round"/></svg></div>'
     });
 }
 
 function createClusterIcon(count,size){
-    const r=size==='large'?28:size==='medium'?22:17;
-    const fs=size==='large'?13:size==='medium'?12:11;
+    const r=size==='large'?22:size==='medium'?17:13;
+    const fs=size==='large'?11:size==='medium'?10:9;
     return L.divIcon({
-        className:"",
+        className:"cluster-pin",
         iconSize:[r*2,r*2],iconAnchor:[r,r],
-        html:'<div style="width:'+r*2+'px;height:'+r*2+'px;background:linear-gradient(135deg,#0d9488,#14b8a6);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:'+fs+'px;border:3px solid white;box-shadow:0 2px 12px rgba(13,148,136,.4);font-family:Inter,sans-serif">'+count+'</div>'
+        html:'<div style="width:'+r*2+'px;height:'+r*2+'px;background:linear-gradient(135deg,#0d9488,#14b8a6);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:'+fs+'px;border:2px solid white;box-shadow:0 1px 8px rgba(13,148,136,.3);font-family:Inter,sans-serif">'+count+'</div>'
     });
 }
 
@@ -225,18 +261,26 @@ function popup(feature){
     if(p.cluster){
         return '<div class="popup-card"><div class="popup-cluster"><div class="count">'+p.point_count+'</div><div class="label">unidades agrupadas</div><div class="hint">Haz click para acercar y ver individuales</div></div></div>';
     }
+    const regionKey=getRegionKey(p.dpa_prov);
+    const region=regionKey?regionNames[regionKey]:'';
+    const headerBg=regionKey?'background:'+regionColors[regionKey].fill:'background:linear-gradient(135deg,#0d9488,#14b8a6)';
+    const headerColor=regionKey?regionColors[regionKey].text:'white';
     let rows='';
     [['RUC',p.ruc],['Modalidad',p.mod],['Servicio',p.servicio],['Provincia',p.dpa_despro],['Cantón',p.dpa_descan],['Área',p.area],['Tipo',p.tipo],['Dirigido a',p.corte]].forEach(function(f){
         if(f[1]) rows+='<div class="popup-row"><span class="label">'+f[0]+'</span><span class="value">'+f[1]+'</span></div>';
     });
-    let link=p.link_ubi?'<a class="popup-link" href="'+p.link_ubi+'" target="_blank">📍 Abrir en Google Maps</a>':'';
-    return '<div class="popup-card"><div class="popup-header"><h3>'+p.nombre+'</h3>'+(p.tipo?'<span class="popup-tag">'+p.tipo+'</span>':'')+'</div><div class="popup-body">'+rows+'</div>'+link+'</div>';
+    const btnBg=regionKey?regionColors[regionKey].fill:'#0d9488';
+    const dataHref=p.link_ubi?p.link_ubi.replace(/"/g,'&quot;'):'';
+    let link=dataHref?('<button class="popup-link" data-href="'+dataHref+'" style="background:'+btnBg+'">Abrir en Google Maps</button>'):'';
+    const regionBadge=region?('<span class="popup-tag" style="background:rgba(0,0,0,.12);color:'+regionColors[regionKey].text+';font-weight:600">'+region+'</span>'):'';
+    return '<div class="popup-card"><div class="popup-header" style="'+headerBg+';color:'+headerColor+'"><h3>'+p.nombre+'</h3>'+regionBadge+'</div><div class="popup-body">'+rows+'</div>'+link+'</div>';
 }
 
 function getBBox(){const b=map.getBounds();return[b.getWest(),b.getSouth(),b.getEast(),b.getNorth()]}
 
 function updateClusters(){
     markersLayer.clearLayers();
+    closePopup();stickyMarker=null;
     const bbox=getBBox(),zoom=map.getZoom();
     const useCluster=document.getElementById("clusterToggle").checked;
     let clusters=useCluster?index.getClusters(bbox,zoom):index.getClusters(bbox,zoom).filter(function(f){return !f.properties.cluster});
@@ -248,11 +292,30 @@ function updateClusters(){
             const c=f.properties.point_count;
             const s=c>50?'large':c>10?'medium':'small';
             m=L.marker(ll,{icon:createClusterIcon(c,s)});
+            m.on('mouseover',function(){m.openPopup()});
+            m.on('mouseout',function(){m.closePopup()});
             m.on('click',function(){map.setView(ll,index.getClusterExpansionZoom(f.properties.cluster_id))});
+            m.bindPopup(popup(f),{maxWidth:320,minWidth:280});
         }else{
             m=L.marker(ll,{icon:icon});
+            m.on('mouseover',function(){
+                if(stickyMarker!==m) openPopupFor(m,f);
+            });
+            m.on('mouseout',function(){
+                if(stickyMarker!==m) closePopup();
+            });
+            m.on('click',function(e){
+                L.DomEvent.stopPropagation(e);
+                L.DomEvent.preventDefault(e);
+                if(stickyMarker===m){
+                    closePopup();
+                    stickyMarker=null;
+                }else{
+                    stickyMarker=m;
+                    openPopupFor(m,f);
+                }
+            });
         }
-        m.bindPopup(popup(f),{maxWidth:320,minWidth:280});
         markersLayer.addLayer(m);
     });
     document.getElementById('visibleCount').textContent=clusters.length;
@@ -281,27 +344,37 @@ async function reloadData(){
     await loadAllData();
 }
 
+function toggleRegion(key,show){
+    if(show){map.addLayer(regionLayers[key])}else{map.removeLayer(regionLayers[key])}
+}
+
 function syncRegionToggles(mainChecked){
-    ['toggleCosta','toggleSierra','toggleAmazonia','toggleGalapagos'].forEach(function(id){
+    regionKeys.forEach(function(key){
+        const id='toggle'+key.charAt(0).toUpperCase()+key.slice(1);
         document.getElementById(id).checked=mainChecked;
+        toggleRegion(key,mainChecked);
     });
-    mainChecked?map.addLayer(regionsLayer):map.removeLayer(regionsLayer);
 }
 
 document.getElementById('toggleMask').addEventListener('change',function(){this.checked?map.addLayer(maskLayer):map.removeLayer(maskLayer)});
 document.getElementById('toggleRegions').addEventListener('change',function(){syncRegionToggles(this.checked)});
-document.getElementById('toggleCosta').addEventListener('change',function(){this.checked?regionsLayer.addTo(map):regionsLayer.remove()});
-document.getElementById('toggleSierra').addEventListener('change',function(){});
-document.getElementById('toggleAmazonia').addEventListener('change',function(){});
-document.getElementById('toggleGalapagos').addEventListener('change',function(){});
+document.getElementById('toggleCosta').addEventListener('change',function(){toggleRegion('costa',this.checked)});
+document.getElementById('toggleSierra').addEventListener('change',function(){toggleRegion('sierra',this.checked)});
+document.getElementById('toggleAmazonia').addEventListener('change',function(){toggleRegion('amazonia',this.checked)});
+document.getElementById('toggleGalapagos').addEventListener('change',function(){toggleRegion('galapagos',this.checked)});
 document.getElementById('clusterToggle').addEventListener('change',updateClusters);
 map.on('moveend',updateClusters);
 map.on('zoomend',updateClusters);
+map.on('click',function(){
+    if(stickyMarker){closePopup();stickyMarker=null}
+});
 
 (async function init(){
     await loadEcuadorGeo();
     buildMask();
+    buildOutline();
     buildRegions();
+    regionKeys.forEach(function(k){map.addLayer(regionLayers[k])});
     await loadAllData();
 })();
 </script>
