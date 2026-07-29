@@ -2,47 +2,48 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Unidades de Atención - Ecuador</title>
+<title>Servicios de Desarrollo Infantil - Ecuador</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Inter',sans-serif;background:#f0f2f5}
+html,body{height:100%;font-family:'Nunito',sans-serif;background:#f0f2f5}
 #map{width:100%;height:100%}
 .panel{position:absolute;top:20px;left:20px;z-index:1000;background:white;padding:20px;width:280px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.12);max-height:calc(100vh - 40px);overflow-y:auto}
 .panel-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #eee}
-.panel-icon{width:36px;height:36px;background:linear-gradient(135deg,#0d9488,#14b8a6);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.panel-icon{width:36px;height:36px;background:linear-gradient(135deg,#5B2A86,#3D1A6E);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .panel-icon svg{width:20px;height:20px}
-.panel h2{font-size:16px;font-weight:700;color:#1a1a2e;line-height:1.2}
+.panel h2{font-size:16px;font-weight:700;color:#1a1a2e;line-height:1.2;font-family:'Fredoka',sans-serif}
 .panel-sub{font-size:11px;color:#888;margin-top:2px}
 .section-title{font-size:11px;font-weight:600;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin:14px 0 8px}
 .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0}
 .toggle-row label{font-size:13px;color:#444;cursor:pointer;display:flex;align-items:center;gap:8px}
 .toggle{position:relative;width:40px;height:22px;appearance:none;-webkit-appearance:none;background:#ccc;border-radius:11px;cursor:pointer;transition:.2s;outline:none;border:none;flex-shrink:0}
-.toggle:checked{background:#0d9488}
+.toggle:checked{background:#5B2A86}
 .toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;background:white;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .toggle:checked::after{left:20px}
 .region-dot{display:inline-block;width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.btn{width:100%;padding:10px;border:none;background:linear-gradient(135deg,#0d9488,#14b8a6);color:white;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:opacity .2s;margin-top:8px}
+.btn{width:100%;padding:10px;border:none;background:linear-gradient(135deg,#5B2A86,#3D1A6E);color:white;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:opacity .2s;margin-top:8px}
 .btn:hover{opacity:.9}
 .stats{margin-top:14px;padding-top:12px;border-top:1px solid #eee}
 .stats-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
 .stats-label{font-size:12px;color:#888}
 .stats-value{font-size:13px;font-weight:600;color:#1a1a2e}
 .loading-bar{width:100%;height:3px;background:#e0e0e0;border-radius:2px;overflow:hidden;margin-top:10px}
-.loading-bar::after{content:'';display:block;width:40%;height:100%;background:linear-gradient(90deg,#0d9488,#14b8a6);border-radius:2px;animation:loading 1s ease-in-out infinite}
+.loading-bar::after{content:'';display:block;width:40%;height:100%;background:linear-gradient(90deg,#5B2A86,#3D1A6E);border-radius:2px;animation:loading 1s ease-in-out infinite}
 @keyframes loading{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}
 .leaflet-popup-content-wrapper{border-radius:12px!important;box-shadow:0 8px 32px rgba(0,0,0,.15)!important;padding:0!important;overflow:hidden}
-.leaflet-popup-content{margin:0!important;min-width:280px!important}
+.leaflet-popup-content{margin:0!important}
+.leaflet-popup-content.cluster-popup{min-width:0!important;width:auto!important}
 .leaflet-popup-tip{box-shadow:0 4px 12px rgba(0,0,0,.1)!important}
 .marker-pin{transition:transform .2s,filter .2s;cursor:pointer}
 .marker-pin:hover{transform:scale(1.15);filter:brightness(1.1)}
 .cluster-pin{transition:transform .2s}
 .cluster-pin:hover{transform:scale(1.1)}
 .cluster-pin:hover{transform:scale(1.1)}
-.popup-card{font-family:'Inter',sans-serif}
-.popup-header{padding:14px 16px 10px;background:linear-gradient(135deg,#0d9488,#14b8a6);color:white}
+.popup-card{font-family:'Nunito',sans-serif}
+.popup-header{padding:14px 16px 10px;background:linear-gradient(135deg,#5B2A86,#3D1A6E);color:white}
 .popup-header h3{font-size:14px;font-weight:600;line-height:1.3;margin:0}
 .popup-header .popup-tag{display:inline-block;background:rgba(255,255,255,.25);padding:2px 8px;border-radius:4px;font-size:11px;margin-top:6px;font-weight:500}
 .popup-body{padding:12px 16px}
@@ -50,30 +51,24 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:#f0f2f5}
 .popup-row:last-child{border-bottom:none}
 .popup-row .label{color:#888;font-weight:500}
 .popup-row .value{color:#1a1a2e;font-weight:600;text-align:right;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.popup-link{display:block;padding:12px 16px;text-align:center;color:white;text-decoration:none;font-size:13px;font-weight:700;transition:opacity .2s;border:none;width:100%;cursor:pointer;font-family:inherit}
+.popup-link{display:inline-block;padding:8px 20px;text-align:center;color:white;text-decoration:none;font-size:12px;font-weight:700;transition:opacity .2s;border:none;border-radius:6px;cursor:pointer;font-family:inherit}
 .popup-link:hover{opacity:.85}
-.popup-cluster{padding:20px;text-align:center}
-.popup-cluster .count{font-size:32px;font-weight:700;color:#0d9488;line-height:1}
-.popup-cluster .label{font-size:13px;color:#888;margin-top:4px}
-.popup-cluster .hint{font-size:11px;color:#bbb;margin-top:10px;padding-top:10px;border-top:1px solid #eee}
+.popup-cluster{padding:0;overflow:hidden}
+.popup-cluster-header{background:linear-gradient(135deg,#5B2A86,#3D1A6E);padding:14px 16px 10px;color:white;text-align:center}
+.popup-cluster-count{font-size:36px;font-weight:700;line-height:1;color:white}
+.popup-cluster-label{font-size:13px;font-weight:600;opacity:.9;margin-top:4px}
+.popup-cluster-body{padding:12px 16px;text-align:center}
+.popup-cluster-hint{font-size:11px;color:#888;line-height:1.4}
 </style>
 </head>
 <body>
 <div class="panel">
     <div class="panel-header">
         <div class="panel-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L12 22"/><path d="M2 12L22 12"/><circle cx="12" cy="12" r="10"/></svg></div>
-        <div><h2>Unidades de Atención</h2><div class="panel-sub">Red de salud · Ecuador</div></div>
+        <div><h2>Unidades de Atención</h2><div class="panel-sub">Servicios de Desarrollo Infantil · Ecuador</div></div>
     </div>
-    <div class="section-title">Capas del mapa</div>
-    <div class="toggle-row"><label for="toggleMask"><span class="region-dot" style="background:#555"></span>Ocultar fuera de Ecuador</label><input type="checkbox" class="toggle" id="toggleMask" checked></div>
-    <div class="toggle-row"><label for="toggleRegions"><span class="region-dot" style="background:linear-gradient(135deg,#FFCD56,#5C9EFF)"></span>Regiones</label><input type="checkbox" class="toggle" id="toggleRegions" checked></div>
-    <div class="section-title">Regiones</div>
-    <div class="toggle-row"><label for="toggleCosta"><span class="region-dot" style="background:#FFCD56"></span>Costa</label><input type="checkbox" class="toggle" id="toggleCosta" checked></div>
-    <div class="toggle-row"><label for="toggleSierra"><span class="region-dot" style="background:#5C9EFF"></span>Sierra</label><input type="checkbox" class="toggle" id="toggleSierra" checked></div>
-    <div class="toggle-row"><label for="toggleAmazonia"><span class="region-dot" style="background:#FF6978"></span>Amazonía</label><input type="checkbox" class="toggle" id="toggleAmazonia" checked></div>
-    <div class="toggle-row"><label for="toggleGalapagos"><span class="region-dot" style="background:#18B2A2"></span>Galápagos</label><input type="checkbox" class="toggle" id="toggleGalapagos" checked></div>
     <div class="section-title">Datos</div>
-    <div class="toggle-row"><label for="clusterToggle"><span class="region-dot" style="background:#0d9488"></span>Agrupar puntos</label><input type="checkbox" class="toggle" id="clusterToggle" checked></div>
+    <div class="toggle-row"><label for="clusterToggle"><span class="region-dot" style="background:#5B2A86"></span>Agrupar puntos</label><input type="checkbox" class="toggle" id="clusterToggle" checked></div>
     <button class="btn" onclick="reloadData()">Recargar datos</button>
     <div id="loadingIndicator"><div class="loading-bar"></div></div>
     <div class="stats" id="statsContent" style="display:none">
@@ -83,7 +78,7 @@ html,body{height:100%;font-family:'Inter',sans-serif;background:#f0f2f5}
     </div>
 </div>
 <div id="map"></div>
-<div style="position:absolute;bottom:20px;left:20px;z-index:1000;background:rgba(255,255,255,.85);padding:6px 12px;border-radius:8px;font-size:11px;color:#888;font-family:Inter,sans-serif;backdrop-filter:blur(4px);box-shadow:0 2px 8px rgba(0,0,0,.08)">Datos: Ministerio de Desarrollo Humano · Mapas: Google</div>
+<div style="position:absolute;bottom:20px;left:20px;z-index:1000;background:rgba(255,255,255,.85);padding:6px 12px;border-radius:8px;font-size:11px;color:#888;font-family:Nunito,sans-serif;backdrop-filter:blur(4px);box-shadow:0 2px 8px rgba(0,0,0,.08)">Datos: Ministerio de Desarrollo Humano · Servicios de Desarrollo Infantil · Mapas: Google</div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/supercluster@8/dist/supercluster.min.js"></script>
 <script src="https://unpkg.com/@turf/turf@7/turf.min.js"></script>
@@ -217,13 +212,15 @@ let currentPopup=null;
 
 function openPopupFor(marker,feature){
     closePopup();
-    currentPopup=L.popup({maxWidth:320,minWidth:280})
+    const isCluster=feature.properties.cluster;
+    currentPopup=L.popup({maxWidth:320,minWidth:isCluster?0:280})
         .setLatLng(marker.getLatLng())
         .setContent(popup(feature))
         .addTo(map);
     requestAnimationFrame(function(){
         const el=currentPopup.getElement();
         if(!el)return;
+        if(isCluster)el.querySelector('.leaflet-popup-content').classList.add('cluster-popup');
         const btn=el.querySelector('.popup-link');
         if(btn){
             btn.addEventListener('click',function(e){
@@ -241,8 +238,8 @@ function closePopup(){
 function createMarkerIcon(){
     return L.divIcon({
         className:"marker-pin",
-        iconSize:[36,46],iconAnchor:[18,46],popupAnchor:[0,-44],
-        html:'<div style="display:flex;align-items:flex-start;justify-content:center;width:36px;height:46px;padding-top:4px"><svg pointer-events="none" width="28" height="38" viewBox="0 0 28 38" fill="none"><path d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 24 14 24s14-13.5 14-24C28 6.268 21.732 0 14 0z" fill="#0d9488"/><circle cx="14" cy="13" r="7" fill="white"/><path d="M14 9v8M10 13h8" stroke="#0d9488" stroke-width="2" stroke-linecap="round"/></svg></div>'
+        iconSize:[80,80],iconAnchor:[40,40],popupAnchor:[0,-42],
+        html:'<div style="display:flex;align-items:flex-start;justify-content:center;width:80px;height:80px;padding-top:40px"><svg pointer-events="none" width="28" height="38" viewBox="0 0 28 38" fill="none"><path d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 24 14 24s14-13.5 14-24C28 6.268 21.732 0 14 0z" fill="#5B2A86"/><circle cx="14" cy="13" r="7" fill="white"/><path d="M14 9v8M10 13h8" stroke="#5B2A86" stroke-width="2" stroke-linecap="round"/></svg></div>'
     });
 }
 
@@ -252,27 +249,27 @@ function createClusterIcon(count,size){
     return L.divIcon({
         className:"cluster-pin",
         iconSize:[r*2,r*2],iconAnchor:[r,r],
-        html:'<div style="width:'+r*2+'px;height:'+r*2+'px;background:linear-gradient(135deg,#0d9488,#14b8a6);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:'+fs+'px;border:2px solid white;box-shadow:0 1px 8px rgba(13,148,136,.3);font-family:Inter,sans-serif">'+count+'</div>'
+        html:'<div style="width:'+r*2+'px;height:'+r*2+'px;background:linear-gradient(135deg,#5B2A86,#3D1A6E);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:'+fs+'px;border:2px solid white;box-shadow:0 1px 8px rgba(91,42,134,.3);font-family:Nunito,sans-serif">'+count+'</div>'
     });
 }
 
 function popup(feature){
     const p=feature.properties;
     if(p.cluster){
-        return '<div class="popup-card"><div class="popup-cluster"><div class="count">'+p.point_count+'</div><div class="label">unidades agrupadas</div><div class="hint">Haz click para acercar y ver individuales</div></div></div>';
+        return '<div class="popup-card"><div class="popup-cluster"><div class="popup-cluster-header"><div class="popup-cluster-count">'+p.point_count+'</div><div class="popup-cluster-label">unidades</div></div><div class="popup-cluster-body"><div class="popup-cluster-hint">Click para acercar</div></div></div></div>';
     }
     const regionKey=getRegionKey(p.dpa_prov);
     const region=regionKey?regionNames[regionKey]:'';
-    const headerBg=regionKey?'background:'+regionColors[regionKey].fill:'background:linear-gradient(135deg,#0d9488,#14b8a6)';
+    const headerBg=regionKey?'background:'+regionColors[regionKey].fill:'background:linear-gradient(135deg,#5B2A86,#3D1A6E)';
     const headerColor=regionKey?regionColors[regionKey].text:'white';
     let rows='';
     [['RUC',p.ruc],['Modalidad',p.mod],['Servicio',p.servicio],['Provincia',p.dpa_despro],['Cantón',p.dpa_descan],['Área',p.area],['Tipo',p.tipo],['Dirigido a',p.corte]].forEach(function(f){
         if(f[1]) rows+='<div class="popup-row"><span class="label">'+f[0]+'</span><span class="value">'+f[1]+'</span></div>';
     });
-    const btnBg=regionKey?regionColors[regionKey].fill:'#0d9488';
+    const btnBg=regionKey?regionColors[regionKey].fill:'#5B2A86';
     const dataHref=p.link_ubi?p.link_ubi.replace(/"/g,'&quot;'):'';
-    let link=dataHref?('<button class="popup-link" data-href="'+dataHref+'" style="background:'+btnBg+'">Abrir en Google Maps</button>'):'';
-    const regionBadge=region?('<span class="popup-tag" style="background:rgba(0,0,0,.12);color:'+regionColors[regionKey].text+';font-weight:600">'+region+'</span>'):'';
+    let link=dataHref?('<div style="padding:8px 16px 12px;text-align:center"><button class="popup-link" data-href="'+dataHref+'" style="background:'+btnBg+'">Abrir en Google Maps</button></div>'):'';
+    const regionBadge=region?('<span class="popup-tag" style="background:rgba(255,255,255,.25);color:'+regionColors[regionKey].text+';font-weight:600">'+region+'</span>'):'';
     return '<div class="popup-card"><div class="popup-header" style="'+headerBg+';color:'+headerColor+'"><h3>'+p.nombre+'</h3>'+regionBadge+'</div><div class="popup-body">'+rows+'</div>'+link+'</div>';
 }
 
@@ -295,7 +292,8 @@ function updateClusters(){
             m.on('mouseover',function(){m.openPopup()});
             m.on('mouseout',function(){m.closePopup()});
             m.on('click',function(){map.setView(ll,index.getClusterExpansionZoom(f.properties.cluster_id))});
-            m.bindPopup(popup(f),{maxWidth:320,minWidth:280});
+            m.bindPopup(popup(f),{maxWidth:320,minWidth:0});
+            m.on('popupopen',function(){var el=m.getElement();if(el){var p=el.querySelector('.leaflet-popup-content');if(p)p.classList.add('cluster-popup')}});
         }else{
             m=L.marker(ll,{icon:icon});
             m.on('mouseover',function(){
@@ -344,24 +342,6 @@ async function reloadData(){
     await loadAllData();
 }
 
-function toggleRegion(key,show){
-    if(show){map.addLayer(regionLayers[key])}else{map.removeLayer(regionLayers[key])}
-}
-
-function syncRegionToggles(mainChecked){
-    regionKeys.forEach(function(key){
-        const id='toggle'+key.charAt(0).toUpperCase()+key.slice(1);
-        document.getElementById(id).checked=mainChecked;
-        toggleRegion(key,mainChecked);
-    });
-}
-
-document.getElementById('toggleMask').addEventListener('change',function(){this.checked?map.addLayer(maskLayer):map.removeLayer(maskLayer)});
-document.getElementById('toggleRegions').addEventListener('change',function(){syncRegionToggles(this.checked)});
-document.getElementById('toggleCosta').addEventListener('change',function(){toggleRegion('costa',this.checked)});
-document.getElementById('toggleSierra').addEventListener('change',function(){toggleRegion('sierra',this.checked)});
-document.getElementById('toggleAmazonia').addEventListener('change',function(){toggleRegion('amazonia',this.checked)});
-document.getElementById('toggleGalapagos').addEventListener('change',function(){toggleRegion('galapagos',this.checked)});
 document.getElementById('clusterToggle').addEventListener('change',updateClusters);
 map.on('moveend',updateClusters);
 map.on('zoomend',updateClusters);
