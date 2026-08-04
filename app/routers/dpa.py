@@ -9,9 +9,9 @@ router = APIRouter(prefix="/dpa", tags=["dpa"])
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
 DPA_FILES = {
-    "provincias": "provincias.json",
-    "cantones": "cantones.json",
-    "parroquias": "parroquias.json",
+    "provincias": "provincias_6dec.json",
+    "cantones": "cantones_6dec.json",
+    "parroquias": "parroquias_6dec.json",
 }
 
 _cache: dict[str, dict] = {}
