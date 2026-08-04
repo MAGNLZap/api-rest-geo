@@ -1,56 +1,59 @@
-import json
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import Response
 
 router = APIRouter(prefix="/dpa", tags=["dpa"])
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
 DPA_FILES = {
-    "provincias": "provincias_6dec.json",
-    "cantones": "cantones_6dec.json",
-    "parroquias": "parroquias_6dec.json",
+    "provincias": "provincias_6dec.json.gz",
+    "cantones": "cantones_6dec.json.gz",
+    "parroquias": "parroquias_6dec.json.gz",
 }
 
-_cache: dict[str, dict] = {}
+_cache: dict[str, bytes] = {}
 
 
-def _load_geojson(name: str) -> dict:
+def warmup_cache():
+    for name in DPA_FILES:
+        _load_geojson_raw(name)
+
+
+def _load_geojson_raw(name: str) -> bytes:
     if name in _cache:
         return _cache[name]
     path = DATA_DIR / DPA_FILES[name]
     if not path.is_file():
         raise HTTPException(status_code=404, detail="Recurso no encontrado")
-    try:
-        with path.open("r", encoding="utf-8") as f:
-            data = json.load(f)
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=500, detail="Archivo GeoJSON inválido")
-    _cache[name] = data
-    return data
+    raw = path.read_bytes()
+    _cache[name] = raw
+    return raw
 
 
 @router.get("/provincias")
 async def get_provincias(request: Request):
-    return JSONResponse(
-        content=_load_geojson("provincias"),
+    return Response(
+        content=_load_geojson_raw("provincias"),
         media_type="application/geo+json",
+        headers={"Content-Encoding": "gzip", "Cache-Control": "public, max-age=3600"},
     )
 
 
 @router.get("/cantones")
 async def get_cantones(request: Request):
-    return JSONResponse(
-        content=_load_geojson("cantones"),
+    return Response(
+        content=_load_geojson_raw("cantones"),
         media_type="application/geo+json",
+        headers={"Content-Encoding": "gzip", "Cache-Control": "public, max-age=3600"},
     )
 
 
 @router.get("/parroquias")
 async def get_parroquias(request: Request):
-    return JSONResponse(
-        content=_load_geojson("parroquias"),
+    return Response(
+        content=_load_geojson_raw("parroquias"),
         media_type="application/geo+json",
+        headers={"Content-Encoding": "gzip", "Cache-Control": "public, max-age=3600"},
     )

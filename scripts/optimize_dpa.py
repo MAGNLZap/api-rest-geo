@@ -1,9 +1,11 @@
 """
-Optimiza archivos GeoJSON DPA reduciendo precisión de coordenadas a 6 decimales.
-Genera archivos nuevos sin modificar los originales.
+Optimiza archivos GeoJSON DPA:
+1. Reduce precisión de coordenadas a 6 decimales
+2. Genera archivos pre-comprimidos .gz
 
 Uso: python scripts/optimize_dpa.py
 """
+import gzip
 import json
 import os
 from pathlib import Path
@@ -34,10 +36,15 @@ def optimize_geojson(input_path, output_path, decimals):
             feature["geometry"]["coordinates"], decimals
         )
 
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(data, f, separators=(",", ":"))
+    json_bytes = json.dumps(data, separators=(",", ":")).encode("utf-8")
+    with open(output_path, "wb") as f:
+        f.write(json_bytes)
 
-    return os.path.getsize(input_path), os.path.getsize(output_path)
+    gz_path = str(output_path) + ".gz"
+    with gzip.open(gz_path, "wb", compresslevel=9) as f:
+        f.write(json_bytes)
+
+    return os.path.getsize(input_path), os.path.getsize(output_path), os.path.getsize(gz_path)
 
 
 if __name__ == "__main__":
@@ -45,6 +52,7 @@ if __name__ == "__main__":
 
     total_before = 0
     total_after = 0
+    total_gz = 0
 
     for name, filename in DPA_FILES.items():
         input_path = DATA_DIR / filename
@@ -55,19 +63,24 @@ if __name__ == "__main__":
             print(f"  {filename}: no encontrado, omitiendo")
             continue
 
-        before, after = optimize_geojson(input_path, output_path, TARGET_DECIMALS)
+        before, after, gz_size = optimize_geojson(input_path, output_path, TARGET_DECIMALS)
         reduction = (1 - after / before) * 100
+        gz_reduction = (1 - gz_size / before) * 100
         total_before += before
         total_after += after
+        total_gz += gz_size
 
         print(
-            f"  {filename} -> {output_name}: "
-            f"{before / 1024 / 1024:.1f} MB -> {after / 1024 / 1024:.1f} MB (-{reduction:.0f}%)"
+            f"  {filename}: {before / 1024 / 1024:.1f} MB -> "
+            f"{after / 1024 / 1024:.1f} MB (-{reduction:.0f}%) "
+            f"gz:{gz_size / 1024:.0f}KB (-{gz_reduction:.0f}%)"
         )
 
     if total_before > 0:
         total_reduction = (1 - total_after / total_before) * 100
+        gz_reduction = (1 - total_gz / total_before) * 100
         print(
             f"\nTotal: {total_before / 1024 / 1024:.1f} MB -> "
-            f"{total_after / 1024 / 1024:.1f} MB (-{total_reduction:.0f}%)"
+            f"{total_after / 1024 / 1024:.1f} MB (-{total_reduction:.0f}%) "
+            f"gz:{total_gz / 1024:.0f}KB (-{gz_reduction:.0f}%)"
         )

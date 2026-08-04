@@ -17,7 +17,7 @@ from app.models.base import Base
 from app.routers.health import router as health_router
 from app.routers.unidad_atencion import router as unidad_router
 from app.routers.demo import router as demo_router
-from app.routers.dpa import router as dpa_router
+from app.routers.dpa import router as dpa_router, warmup_cache
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +32,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     logger.info("Database tables created/verified")
+    warmup_cache()
     yield
     await engine.dispose()
     logger.info("Shutting down ApiRestGeo API")
