@@ -10,29 +10,26 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Nunito',sans-serif;background:#f0f2f5}
 #map{width:100%;height:100%}
-.panel{position:absolute;top:20px;left:20px;z-index:1000;background:white;padding:20px;width:280px;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.12);max-height:calc(100vh - 40px);overflow-y:auto}
-.panel-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #eee}
-.panel-icon{width:36px;height:36px;background:linear-gradient(135deg,#5B2A86,#3D1A6E);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.panel-icon svg{width:20px;height:20px}
-.panel h2{font-size:16px;font-weight:700;color:#1a1a2e;line-height:1.2;font-family:'Fredoka',sans-serif}
-.panel-sub{font-size:11px;color:#888;margin-top:2px}
-.section-title{font-size:11px;font-weight:600;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin:14px 0 8px}
-.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0}
-.toggle-row label{font-size:13px;color:#444;cursor:pointer;display:flex;align-items:center;gap:8px}
-.toggle{position:relative;width:40px;height:22px;appearance:none;-webkit-appearance:none;background:#ccc;border-radius:11px;cursor:pointer;transition:.2s;outline:none;border:none;flex-shrink:0}
-.toggle:checked{background:#5B2A86}
-.toggle::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;background:white;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.toggle:checked::after{left:20px}
-.region-dot{display:inline-block;width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.btn{width:100%;padding:10px;border:none;background:linear-gradient(135deg,#5B2A86,#3D1A6E);color:white;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:opacity .2s;margin-top:8px}
-.btn:hover{opacity:.9}
-.stats{margin-top:14px;padding-top:12px;border-top:1px solid #eee}
-.stats-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0}
-.stats-label{font-size:12px;color:#888}
-.stats-value{font-size:13px;font-weight:600;color:#1a1a2e}
-.loading-bar{width:100%;height:3px;background:#e0e0e0;border-radius:2px;overflow:hidden;margin-top:10px}
-.loading-bar::after{content:'';display:block;width:40%;height:100%;background:linear-gradient(90deg,#5B2A86,#3D1A6E);border-radius:2px;animation:loading 1s ease-in-out infinite}
+.topbar{position:absolute;top:16px;left:16px;z-index:1000;display:flex;align-items:center;gap:8px}
+.topbar-brand{display:flex;flex-direction:column;align-items:center;gap:0;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-radius:16px;padding:10px 14px 8px;box-shadow:0 2px 12px rgba(0,0,0,.1)}
+.topbar-brand-top{display:flex;align-items:center;gap:8px}
+.panel-icon{width:30px;height:30px;background:linear-gradient(135deg,#5B2A86,#3D1A6E);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.panel-icon svg{width:16px;height:16px}
+.topbar-brand h2{font-size:13px;font-weight:700;color:#1a1a2e;line-height:1.1;font-family:'Fredoka',sans-serif;white-space:nowrap}
+.brand-loading{width:100%;height:2px;background:rgba(91,42,134,.08);border-radius:2px;overflow:hidden;margin-top:6px;display:none}
+.brand-loading::after{content:'';display:block;width:40%;height:100%;background:linear-gradient(90deg,#5B2A86,#3D1A6E);border-radius:2px;animation:loading 1s ease-in-out infinite}
 @keyframes loading{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}
+.dpa-seg{display:flex;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-radius:24px;padding:3px;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.1)}
+.dpa-pill{position:relative;display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;color:#6b7280;transition:all .15s;user-select:none;white-space:nowrap}
+.dpa-pill input{position:absolute;opacity:0;pointer-events:none}
+.dpa-pill .region-dot{width:8px;height:8px}
+.dpa-pill:hover{color:#5B2A86}
+.dpa-pill.active{background:#5B2A86;color:white;box-shadow:0 2px 8px rgba(91,42,134,.3)}
+.dpa-pill.active .region-dot{background:white!important}
+.region-dot{display:inline-block;width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.icon-btn{width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#5B2A86;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.1);flex-shrink:0}
+.icon-btn:hover{background:#5B2A86;color:white}
+.icon-btn svg{width:16px;height:16px}
 .leaflet-popup-content-wrapper{border-radius:12px!important;box-shadow:0 8px 32px rgba(0,0,0,.15)!important;padding:0!important;overflow:hidden}
 .leaflet-popup-content{margin:0!important}
 .leaflet-popup-content.cluster-popup{min-width:0!important;width:auto!important}
@@ -59,25 +56,33 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:#f0f2f5}
 .popup-cluster-label{font-size:13px;font-weight:600;opacity:.9;margin-top:4px}
 .popup-cluster-body{padding:12px 16px;text-align:center}
 .popup-cluster-hint{font-size:11px;color:#888;line-height:1.4}
+.dpa-legend{position:absolute;right:20px;top:20px;z-index:1000;background:rgba(255,255,255,.88);border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.1);padding:8px 12px;font-family:'Nunito',sans-serif;font-size:12px;color:#444;pointer-events:none;opacity:0;transition:opacity .15s;backdrop-filter:blur(12px)}
+.dpa-legend.visible{opacity:1}
+.dpa-legend .dpa-legend-label{font-size:9px;font-weight:700;color:#a5a5c0;text-transform:uppercase;letter-spacing:.6px}
+.dpa-legend .dpa-legend-value{font-size:12px;font-weight:700;color:#1a1a2e;margin-top:1px}
 </style>
 </head>
 <body>
-<div class="panel">
-    <div class="panel-header">
-        <div class="panel-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L12 22"/><path d="M2 12L22 12"/><circle cx="12" cy="12" r="10"/></svg></div>
-        <div><h2>Unidades de Atención</h2><div class="panel-sub">Servicios de Desarrollo Infantil · Ecuador</div></div>
+<div class="topbar">
+    <div class="topbar-brand">
+        <div class="topbar-brand-top">
+            <div class="panel-icon"><svg viewBox="0 0 24 24" fill="white" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg></div>
+            <h2>Unidades de Atención</h2>
+        </div>
+        <div class="brand-loading" id="brandLoading"></div>
     </div>
-    <div class="section-title">Datos</div>
-    <div class="toggle-row"><label for="clusterToggle"><span class="region-dot" style="background:#5B2A86"></span>Agrupar puntos</label><input type="checkbox" class="toggle" id="clusterToggle" checked></div>
-    <button class="btn" onclick="reloadData()">Recargar datos</button>
-    <div id="loadingIndicator"><div class="loading-bar"></div></div>
-    <div class="stats" id="statsContent" style="display:none">
-        <div class="stats-row"><span class="stats-label">Visibles</span><span class="stats-value" id="visibleCount">0</span></div>
-        <div class="stats-row"><span class="stats-label">Total</span><span class="stats-value" id="totalCount">0</span></div>
-        <div class="stats-row"><span class="stats-label">Zoom</span><span class="stats-value" id="zoomLevel">0</span></div>
+    <div class="dpa-seg">
+        <label class="dpa-pill active"><span class="region-dot" style="background:#5C9EFF"></span>Provincias<input type="radio" name="dpaLevel" value="provincias" checked></label>
+        <label class="dpa-pill"><span class="region-dot" style="background:#18B2A2"></span>Cantones<input type="radio" name="dpaLevel" value="cantones"></label>
+        <label class="dpa-pill"><span class="region-dot" style="background:#FFCD56"></span>Parroquias<input type="radio" name="dpaLevel" value="parroquias"></label>
     </div>
+    <button class="icon-btn" onclick="reloadData()" title="Recargar datos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.3"/><path d="M21 3v6h-6"/></svg></button>
 </div>
 <div id="map"></div>
+<div class="dpa-legend" id="dpaLegend">
+    <div class="dpa-legend-label" id="dpaLegendLabel">Zona</div>
+    <div class="dpa-legend-value" id="dpaLegendValue">—</div>
+</div>
 <div style="position:absolute;bottom:20px;left:20px;z-index:1000;background:rgba(255,255,255,.85);padding:6px 12px;border-radius:8px;font-size:11px;color:#888;font-family:Nunito,sans-serif;backdrop-filter:blur(4px);box-shadow:0 2px 8px rgba(0,0,0,.08)">Datos: Ministerio de Desarrollo Humano · Servicios de Desarrollo Infantil · Mapas: Google</div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/supercluster@8/dist/supercluster.min.js"></script>
@@ -111,10 +116,78 @@ const provinceRegion={};
 '14,15,16,19,21,22'.split(',').forEach(function(c){provinceRegion[c]='amazonia'});
 '20'.split(',').forEach(function(c){provinceRegion[c]='galapagos'});
 
-const regionLayers={};
-regionKeys.forEach(function(k){regionLayers[k]=L.layerGroup()});
-
 const regionNames={costa:'Costa',sierra:'Sierra',amazonia:'Amazonía',galapagos:'Galápagos'};
+
+const dpaConfig={
+    provincias:{url:ROOT+"/dpa/provincias",prop:'DPA_DESPRO',label:'Provincia'},
+    cantones:{url:ROOT+"/dpa/cantones",prop:'DPA_DESCAN',label:'Cantón'},
+    parroquias:{url:ROOT+"/dpa/parroquias",prop:'DPA_DESPAR',label:'Parroquia'}
+};
+
+const legendEl=document.getElementById('dpaLegend');
+const legendLabelEl=document.getElementById('dpaLegendLabel');
+const legendValueEl=document.getElementById('dpaLegendValue');
+
+const dpaLayers={};
+const dpaData={};
+let activeDpa='provincias';
+
+function getDpaStyle(feature){
+    const region=provinceRegion[feature.properties.DPA_PROVIN];
+    const colors=region?regionColors[region]:regionColors.sierra;
+    return {
+        fillColor:colors.fill,
+        fillOpacity:0.4,
+        color:'white',
+        weight:activeDpa==='parroquias'?1:activeDpa==='cantones'?2:3,
+        opacity:0.9
+    };
+}
+
+async function loadDpaLayer(level){
+    if(!dpaData[level]){
+        const r=await fetch(dpaConfig[level].url);
+        dpaData[level]=await r.json();
+    }
+    dpaLayers[level].clearLayers();
+    L.geoJSON(dpaData[level],{
+        style:getDpaStyle,
+        onEachFeature:function(feature,layer){
+            layer.on('mouseover',function(){
+                layer.setStyle({fillOpacity:0.75});
+                layer.bringToFront();
+                const name=feature.properties[dpaConfig[level].prop];
+                legendLabelEl.textContent=dpaConfig[level].label;
+                legendValueEl.textContent=name||'—';
+                legendEl.classList.add('visible');
+            });
+            layer.on('mouseout',function(){
+                layer.setStyle(getDpaStyle(feature));
+                legendEl.classList.remove('visible');
+            });
+            layer.on('click',function(){
+                map.fitBounds(layer.getBounds(),{padding:[30,30],maxZoom:14});
+            });
+        }
+    }).addTo(dpaLayers[level]);
+}
+
+function setDpaLevel(level){
+    activeDpa=level;
+    Object.keys(dpaLayers).forEach(function(k){map.removeLayer(dpaLayers[k])});
+    document.querySelectorAll('.dpa-pill').forEach(function(opt){
+        opt.classList.toggle('active',opt.querySelector('input').value===level);
+    });
+    document.getElementById('brandLoading').style.display='block';
+    loadDpaLayer(level).then(function(){
+        if(activeDpa===level)map.addLayer(dpaLayers[level]);
+        document.getElementById('brandLoading').style.display='none';
+    });
+}
+
+document.querySelectorAll('input[name="dpaLevel"]').forEach(function(input){
+    input.addEventListener('change',function(){setDpaLevel(this.value)});
+});
 
 function getRegionKey(provCode){
     return provinceRegion[provCode]||null;
@@ -158,31 +231,6 @@ function buildMask(){
     }
 }
 
-function buildRegions(){
-    regionKeys.forEach(function(k){regionLayers[k].clearLayers()});
-    if(!ecuadorGeo)return;
-    ecuadorGeo.features.forEach(function(f){
-        const code=f.properties.dpa_provin;
-        if(!code)return;
-        const regionKey=provinceRegion[code];
-        if(!regionKey)return;
-        const color=regionColors[regionKey];
-        const geom=f.geometry;
-        const processRing=function(ring){return ring.map(function(c){return[c[1],c[0]]})};
-        if(geom.type==="Polygon"){
-            L.polygon(processRing(geom.coordinates[0]),{
-                color:'white',fillColor:color.fill,fillOpacity:0.5,weight:3,opacity:0.9
-            }).addTo(regionLayers[regionKey]);
-        }else if(geom.type==="MultiPolygon"){
-            geom.coordinates.forEach(function(poly){
-                L.polygon(processRing(poly[0]),{
-                    color:'white',fillColor:color.fill,fillOpacity:0.5,weight:3,opacity:0.9
-                }).addTo(regionLayers[regionKey]);
-            });
-        }
-    });
-}
-
 function buildOutline(){
     outlineLayer.clearLayers();
     if(!ecuadorGeo)return;
@@ -197,7 +245,7 @@ function buildOutline(){
         });
         if(merged){
             L.geoJSON(merged,{
-                style:{color:'white',weight:6,fillOpacity:0,opacity:0.95}
+                style:{color:'white',weight:9,fillOpacity:0,opacity:0.95,smoothFactor:1}
             }).addTo(outlineLayer);
         }
     }catch(e){
@@ -279,8 +327,7 @@ function updateClusters(){
     markersLayer.clearLayers();
     closePopup();stickyMarker=null;
     const bbox=getBBox(),zoom=map.getZoom();
-    const useCluster=document.getElementById("clusterToggle").checked;
-    let clusters=useCluster?index.getClusters(bbox,zoom):index.getClusters(bbox,zoom).filter(function(f){return !f.properties.cluster});
+    const clusters=index.getClusters(bbox,zoom);
     const icon=createMarkerIcon();
     clusters.forEach(function(f){
         const ll=[f.geometry.coordinates[1],f.geometry.coordinates[0]];
@@ -316,24 +363,20 @@ function updateClusters(){
         }
         markersLayer.addLayer(m);
     });
-    document.getElementById('visibleCount').textContent=clusters.length;
-    document.getElementById('totalCount').textContent=allFeatures.length;
-    document.getElementById('zoomLevel').textContent=zoom;
 }
 
 async function loadAllData(){
-    document.getElementById('loadingIndicator').style.display='block';
-    document.getElementById('statsContent').style.display='none';
+    document.getElementById('brandLoading').style.display='block';
     try{
         const r=await fetch(API+'?limit=0');
         const j=await r.json();
         allFeatures=j.features;
         index.load(allFeatures);
         updateClusters();
-        document.getElementById('loadingIndicator').style.display='none';
-        document.getElementById('statsContent').style.display='block';
+        document.getElementById('brandLoading').style.display='none';
     }catch(e){
-        document.getElementById('loadingIndicator').innerHTML='<span style="color:#ef4444;font-size:12px">Error: '+e.message+'</span>';
+        document.getElementById('brandLoading').style.display='none';
+        console.error('Error loading data:',e);
     }
 }
 
@@ -342,19 +385,17 @@ async function reloadData(){
     await loadAllData();
 }
 
-document.getElementById('clusterToggle').addEventListener('change',updateClusters);
-map.on('moveend',updateClusters);
-map.on('zoomend',updateClusters);
+map.on('moveend',updateClusters);map.on('zoomend',updateClusters);
 map.on('click',function(){
     if(stickyMarker){closePopup();stickyMarker=null}
 });
 
 (async function init(){
+    ['provincias','cantones','parroquias'].forEach(function(k){dpaLayers[k]=L.layerGroup()});
     await loadEcuadorGeo();
     buildMask();
     buildOutline();
-    buildRegions();
-    regionKeys.forEach(function(k){map.addLayer(regionLayers[k])});
+    setDpaLevel('provincias');
     await loadAllData();
 })();
 </script>

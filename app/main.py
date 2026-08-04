@@ -16,6 +16,7 @@ from app.models.base import Base
 from app.routers.health import router as health_router
 from app.routers.unidad_atencion import router as unidad_router
 from app.routers.demo import router as demo_router
+from app.routers.dpa import router as dpa_router
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +53,7 @@ setup_cors(app)
 app.include_router(health_router)
 app.include_router(unidad_router)
 app.include_router(demo_router)
+app.include_router(dpa_router)
 
 
 if __name__ == "__main__":
