@@ -1,29 +1,19 @@
-from datetime import datetime, timezone
+from fastapi import APIRouter
+from fastapi.responses import FileResponse, JSONResponse
 
-from fastapi import APIRouter, Request
-from fastapi.responses import JSONResponse
-
-from app.config import VERSION, settings
+from app.config import VERSION
 from app.database import check_db_connection
 
 router = APIRouter(tags=["health"])
 
 
 @router.get("/")
-def root(request: Request):
-    response = {
-        "message": f"ApiRestGeo API v{VERSION}",
-        "version": VERSION,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "environment": settings.ENVIRONMENT,
-    }
-    if settings.is_dev:
-        response["docs"] = "/docs"
-    return response
+def root() -> FileResponse:
+    return FileResponse("demo/index.html")
 
 
 @router.get("/health")
-async def health(request: Request):
+async def health() -> JSONResponse:
     db_ok = await check_db_connection()
     status_code = 200 if db_ok else 503
     return JSONResponse(

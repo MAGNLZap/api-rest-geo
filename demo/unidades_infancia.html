@@ -29,6 +29,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:#f0f2f5}
 .region-dot{display:inline-block;width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .icon-btn{width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#5B2A86;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.1);flex-shrink:0}
 .icon-btn:hover{background:#5B2A86;color:white}
+.icon-btn:focus-visible{outline:2px solid #f5c842;outline-offset:3px}
 .icon-btn svg{width:16px;height:16px}
 .leaflet-popup-content-wrapper{border-radius:12px!important;box-shadow:0 8px 32px rgba(0,0,0,.15)!important;padding:0!important;overflow:hidden}
 .leaflet-popup-content{margin:0!important}
@@ -64,6 +65,9 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:#f0f2f5}
 </head>
 <body>
 <div class="topbar">
+    <a class="icon-btn" href="." title="Volver a la vista principal" aria-label="Volver a la vista principal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M9 20v-6h6v6"/></svg>
+    </a>
     <div class="topbar-brand">
         <div class="topbar-brand-top">
             <div class="panel-icon"><svg viewBox="0 0 24 24" fill="white" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg></div>
@@ -85,10 +89,9 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:#f0f2f5}
 </div>
 <div style="position:absolute;bottom:20px;left:20px;z-index:1000;background:rgba(255,255,255,.85);padding:6px 12px;border-radius:8px;font-size:11px;color:#888;font-family:Nunito,sans-serif;backdrop-filter:blur(4px);box-shadow:0 2px 8px rgba(0,0,0,.08)">Datos: Ministerio de Desarrollo Humano · Servicios de Desarrollo Infantil · Mapas: Google</div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/supercluster@8/dist/supercluster.min.js"></script>
 <script src="https://unpkg.com/@turf/turf@7/turf.min.js"></script>
 <script>
-const ROOT=window.location.pathname.replace(/\/demo\/?$/,'');
+const ROOT=window.location.pathname.replace(/\/(?:unidades_infancia|demo)\/?$/,'').replace(/\/$/,'');
 const API=ROOT+"/unidades";
 const map=L.map("map",{zoomControl:false,minZoom:6,maxZoom:20});
 L.control.zoom({position:'bottomright'}).addTo(map);
@@ -119,9 +122,9 @@ const provinceRegion={};
 const regionNames={costa:'Costa',sierra:'Sierra',amazonia:'Amazonía',galapagos:'Galápagos'};
 
 const dpaConfig={
-    provincias:{url:ROOT+"/dpa/provincias",prop:'DPA_DESPRO',label:'Provincia'},
-    cantones:{url:ROOT+"/dpa/cantones",prop:'DPA_DESCAN',label:'Cantón'},
-    parroquias:{url:ROOT+"/dpa/parroquias",prop:'DPA_DESPAR',label:'Parroquia'}
+    provincias:{url:ROOT+"/dpa/provincias",prop:'name',label:'Provincia'},
+    cantones:{url:ROOT+"/dpa/cantones",prop:'name',label:'Cantón'},
+    parroquias:{url:ROOT+"/dpa/parroquias",prop:'name',label:'Parroquia'}
 };
 
 const legendEl=document.getElementById('dpaLegend');
@@ -133,7 +136,7 @@ const dpaData={};
 let activeDpa='provincias';
 
 function getDpaStyle(feature){
-    const region=provinceRegion[feature.properties.DPA_PROVIN];
+    const region=provinceRegion[feature.properties.province_id||feature.properties.id];
     const colors=region?regionColors[region]:regionColors.sierra;
     return {
         fillColor:colors.fill,
@@ -253,10 +256,9 @@ function buildOutline(){
     }
 }
 
-let allFeatures=[];
-let index=new Supercluster({radius:80,maxZoom:14});
 let stickyMarker=null;
 let currentPopup=null;
+let clusterRequest=0;
 
 function openPopupFor(marker,feature){
     closePopup();
@@ -303,8 +305,9 @@ function createClusterIcon(count,size){
 
 function popup(feature){
     const p=feature.properties;
-    if(p.cluster){
-        return '<div class="popup-card"><div class="popup-cluster"><div class="popup-cluster-header"><div class="popup-cluster-count">'+p.point_count+'</div><div class="popup-cluster-label">unidades</div></div><div class="popup-cluster-body"><div class="popup-cluster-hint">Click para acercar</div></div></div></div>';
+    const clusterCount=Number(p.cluster_count||0);
+    if(clusterCount>1){
+        return '<div class="popup-card"><div class="popup-cluster"><div class="popup-cluster-header"><div class="popup-cluster-count">'+clusterCount+'</div><div class="popup-cluster-label">unidades</div></div><div class="popup-cluster-body"><div class="popup-cluster-hint">Click para acercar</div></div></div></div>';
     }
     const regionKey=getRegionKey(p.dpa_prov);
     const region=regionKey?regionNames[regionKey]:'';
@@ -323,69 +326,70 @@ function popup(feature){
 
 function getBBox(){const b=map.getBounds();return[b.getWest(),b.getSouth(),b.getEast(),b.getNorth()]}
 
-function updateClusters(){
-    markersLayer.clearLayers();
+async function updateClusters(){
+    const requestId=++clusterRequest;
+    const loading=document.getElementById('brandLoading');
+    loading.style.display='block';
     closePopup();stickyMarker=null;
-    const bbox=getBBox(),zoom=map.getZoom();
-    const clusters=index.getClusters(bbox,zoom);
-    const icon=createMarkerIcon();
-    clusters.forEach(function(f){
-        const ll=[f.geometry.coordinates[1],f.geometry.coordinates[0]];
-        let m;
-        if(f.properties.cluster){
-            const c=f.properties.point_count;
-            const s=c>50?'large':c>10?'medium':'small';
-            m=L.marker(ll,{icon:createClusterIcon(c,s)});
-            m.on('mouseover',function(){m.openPopup()});
-            m.on('mouseout',function(){m.closePopup()});
-            m.on('click',function(){map.setView(ll,index.getClusterExpansionZoom(f.properties.cluster_id))});
-            m.bindPopup(popup(f),{maxWidth:320,minWidth:0});
-            m.on('popupopen',function(){var el=m.getElement();if(el){var p=el.querySelector('.leaflet-popup-content');if(p)p.classList.add('cluster-popup')}});
-        }else{
-            m=L.marker(ll,{icon:icon});
-            m.on('mouseover',function(){
-                if(stickyMarker!==m) openPopupFor(m,f);
-            });
-            m.on('mouseout',function(){
-                if(stickyMarker!==m) closePopup();
-            });
-            m.on('click',function(e){
-                L.DomEvent.stopPropagation(e);
-                L.DomEvent.preventDefault(e);
-                if(stickyMarker===m){
-                    closePopup();
-                    stickyMarker=null;
-                }else{
-                    stickyMarker=m;
-                    openPopupFor(m,f);
-                }
-            });
-        }
-        markersLayer.addLayer(m);
-    });
-}
-
-async function loadAllData(){
-    document.getElementById('brandLoading').style.display='block';
+    const params=new URLSearchParams({cluster:'true',bbox:getBBox().join(','),zoom:String(Math.floor(map.getZoom()))});
     try{
-        const r=await fetch(API+'?limit=0');
-        const j=await r.json();
-        allFeatures=j.features;
-        index.load(allFeatures);
-        updateClusters();
-        document.getElementById('brandLoading').style.display='none';
-    }catch(e){
-        document.getElementById('brandLoading').style.display='none';
-        console.error('Error loading data:',e);
+        const response=await fetch(API+'?'+params.toString());
+        if(!response.ok)throw new Error('HTTP '+response.status);
+        const collection=await response.json();
+        if(requestId!==clusterRequest)return;
+        markersLayer.clearLayers();
+        const icon=createMarkerIcon();
+        collection.features.forEach(function(feature){
+            const coordinates=feature.geometry.coordinates;
+            const latLng=[coordinates[1],coordinates[0]];
+            const count=Number(feature.properties.cluster_count||1);
+            let marker;
+            if(count>1){
+                const size=count>50?'large':count>10?'medium':'small';
+                marker=L.marker(latLng,{icon:createClusterIcon(count,size)});
+                marker.on('mouseover',function(){marker.openPopup()});
+                marker.on('mouseout',function(){marker.closePopup()});
+                marker.on('click',function(){map.setView(latLng,Math.min(map.getZoom()+2,map.getMaxZoom()))});
+                marker.bindPopup(popup(feature),{maxWidth:320,minWidth:0});
+                marker.on('popupopen',function(){
+                    const element=marker.getElement();
+                    const content=element&&element.querySelector('.leaflet-popup-content');
+                    if(content)content.classList.add('cluster-popup');
+                });
+            }else{
+                marker=L.marker(latLng,{icon:icon});
+                marker.on('mouseover',function(){
+                    if(stickyMarker!==marker)openPopupFor(marker,feature);
+                });
+                marker.on('mouseout',function(){
+                    if(stickyMarker!==marker)closePopup();
+                });
+                marker.on('click',function(event){
+                    L.DomEvent.stopPropagation(event);
+                    L.DomEvent.preventDefault(event);
+                    if(stickyMarker===marker){
+                        closePopup();
+                        stickyMarker=null;
+                    }else{
+                        stickyMarker=marker;
+                        openPopupFor(marker,feature);
+                    }
+                });
+            }
+            markersLayer.addLayer(marker);
+        });
+    }catch(error){
+        if(requestId===clusterRequest)console.error('Error loading map clusters:',error);
+    }finally{
+        if(requestId===clusterRequest)loading.style.display='none';
     }
 }
 
 async function reloadData(){
-    index=new Supercluster({radius:80,maxZoom:14});
-    await loadAllData();
+    await updateClusters();
 }
 
-map.on('moveend',updateClusters);map.on('zoomend',updateClusters);
+map.on('moveend',updateClusters);
 map.on('click',function(){
     if(stickyMarker){closePopup();stickyMarker=null}
 });
@@ -396,7 +400,7 @@ map.on('click',function(){
     buildMask();
     buildOutline();
     setDpaLevel('provincias');
-    await loadAllData();
+    await updateClusters();
 })();
 </script>
 </body>

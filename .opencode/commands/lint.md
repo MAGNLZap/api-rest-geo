@@ -1,18 +1,13 @@
 ---
-description: Verifica estilo y sintaxis del código
+description: Verifica lint y formato de Python
 agent: build
 ---
 
-Verifica que el código esté correcto:
+Ejecuta Ruff sobre `$ARGUMENTS`. Si está vacío, usa `app scripts tests`:
 
-1. Ejecuta imports para detectar errores de sintaxis:
 ```pwsh
-.venv\Scripts\activate; python -c "from app.main import app; print('OK')"
+python -m ruff check app scripts tests
+python -m ruff format --check app scripts tests
 ```
 
-2. Ejecuta tests para verificar que todo funciona:
-```pwsh
-.venv\Scripts\activate; python -m pytest tests/ -v --tb=short
-```
-
-Reportar errores encontrados y sugerir correcciones.
+No ejecutes tests salvo que el usuario lo pida; `/test` cubre esa tarea.

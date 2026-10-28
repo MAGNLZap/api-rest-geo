@@ -1,6 +1,6 @@
 ---
 name: geo-endpoint
-description: Crea endpoints geográficos con estándar GeoJSON
+description: Use when creating or modifying GeoJSON, map, Point, MultiPolygon, DPA, or geographic FastAPI endpoints in ApiRestGeo.
 license: MIT
 compatibility: opencode
 metadata:
@@ -8,40 +8,21 @@ metadata:
   workflow: fastapi
 ---
 
-## Qué hace
+# Endpoints GeoJSON
 
-Crea endpoints REST que devuelven datos geográficos en formato GeoJSON (RFC 7946).
+Inspecciona primero el router y schema existente más cercano. Implementa el cambio mínimo con FastAPI, SQLAlchemy async y Pydantic v2.
 
-## Cuándo usarlo
+## Convenciones
 
-Cuando el usuario pide:
-- Crear un endpoint geográfico
-- Agregar un punto/feature/featurecollection
-- Cualquier cosa relacionada con datos espaciales o mapas
+- Seguir RFC 7946 y usar `[longitude, latitude]`.
+- Unidades de atención: `Point` y schemas de `app/schemas/unidad_atencion.py`.
+- DPA: `MultiPolygon`, cuatro decimales y propiedades `id`, `name`, `province_id`, `canton_id` según el nivel.
+- Listados: `FeatureCollection`; elementos: `Feature`.
 
 ## Flujo
 
-1. Crear modelo SQLAlchemy con `longitude` y `latitude` (Float)
-2. Crear router con `APIRouter(prefix="/...", tags=["geo"])`
-3. Implementar conversión modelo → Feature usando Point de `app/schemas/geo.py`
-4. Respuestas: listado → FeatureCollection, individual → Feature
-5. Registrar router en `app/main.py`
-
-## Schemas disponibles
-
-`app/schemas/geo.py` contiene: Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon, Geometry, Feature, FeatureCollection.
-
-## Convenciones de coordenadas
-
-Siempre `[longitude, latitude]` (lon primero, lat segundo).
-
-## Ejemplo de Feature
-
-```json
-{
-  "type": "Feature",
-  "geometry": {"type": "Point", "coordinates": [-73.9857, 40.7484]},
-  "properties": {"id": 1, "name": "Lugar"},
-  "id": "1"
-}
-```
+1. Reutiliza schemas existentes; crea uno nuevo solo si el contrato cambia.
+2. Usa `Depends(get_db)` y consultas async para datos dinámicos.
+3. Registra routers nuevos en `app/main.py`.
+4. Respeta filtros, paginación y formato existentes.
+5. Describe la validación manual. Ejecuta tests solo por petición explícita o aprobación del usuario.

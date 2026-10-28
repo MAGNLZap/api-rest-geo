@@ -1,7 +1,8 @@
-from collections.abc import AsyncGenerator
 import logging
+from collections.abc import AsyncGenerator
+from typing import Any
 
-from sqlalchemy import text
+from sqlalchemy import event, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.config import settings
@@ -9,6 +10,16 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 
 engine = create_async_engine(settings.DATABASE_URL, echo=settings.is_dev)
+
+
+def _set_sqlite_pragma(dbapi_connection: Any, _: Any) -> None:
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
+
+
+if settings.DATABASE_URL.startswith("sqlite"):
+    event.listen(engine.sync_engine, "connect", _set_sqlite_pragma)
 
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 

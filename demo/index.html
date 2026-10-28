@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#29265f">
+  <meta name="description" content="Portal de mapas e información territorial del Ministerio de Trabajo y Desarrollo Humano.">
+  <title>Geoportal Territorial · MTDH</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --indigo: #29265f;
+      --indigo-deep: #201e4c;
+      --indigo-soft: #e9e8f4;
+      --gold: #f5c842;
+      --paper: #f4f6fa;
+      --white: #fff;
+      --ink: #20233a;
+      --muted: #5e6478;
+      --line: #dfe3ed;
+      --teal: #147c83;
+      --coral: #bd5949;
+      --shadow: 0 12px 34px rgb(31 34 65 / 7%);
+      --topographic-pattern: url("/portal/assets/patron-topografico.svg");
+      font-family: Montserrat, "Segoe UI", Arial, sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      background-color: var(--paper);
+      color: var(--ink);
+    }
+
+    body > .masthead,
+    body > main,
+    body > .footer { position: relative; z-index: 1; }
+
+    .masthead {
+      position: relative;
+      overflow: hidden;
+      min-height: 380px;
+      padding: 20px max(28px, calc((100vw - 1180px) / 2));
+      background: linear-gradient(112deg, var(--indigo-deep), var(--indigo) 68%, #252854);
+      color: var(--white);
+    }
+
+    .masthead::before {
+      position: absolute;
+      inset: 0;
+      background-image: url("/portal/assets/header_grid.svg");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      content: "";
+      opacity: .78;
+      pointer-events: none;
+    }
+
+    .hero,
+    .footer-inner {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 1180px);
+      margin-inline: auto;
+    }
+
+    .hero {
+      min-height: 340px;
+      padding-block: 52px 46px;
+    }
+
+    .hero-copy { position: relative; z-index: 2; max-width: 790px; }
+
+    .hero-institution {
+      display: inline-flex;
+      align-items: center;
+      gap: 13px;
+      margin: 0 0 25px;
+      border: 1px solid rgb(245 200 66 / 42%);
+      border-radius: 999px;
+      background: rgb(17 20 63 / 58%);
+      padding: 10px 18px 10px 13px;
+      box-shadow: 0 9px 24px rgb(7 9 38 / 22%), inset 0 1px 0 rgb(255 255 255 / 12%);
+      color: rgb(255 255 255 / 94%);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .01em;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-chip-dot {
+      position: relative;
+      flex: 0 0 10px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 12px rgb(245 200 66 / 56%);
+    }
+
+    .hero-chip-dot::after {
+      position: absolute;
+      inset: -4px;
+      border: 1px solid rgb(245 200 66 / 70%);
+      border-radius: 50%;
+      content: "";
+      animation: chip-ping 3.2s ease-out infinite;
+    }
+
+    @keyframes chip-ping {
+      0% { opacity: .55; transform: scale(.7); }
+      100% { opacity: 0; transform: scale(2.15); }
+    }
+
+    .hero h1 {
+      max-width: 730px;
+      margin: 0;
+      font-size: clamp(42px, 5.3vw, 68px);
+      font-weight: 680;
+      letter-spacing: -.05em;
+      line-height: 1.01;
+      text-wrap: balance;
+      color: var(--white);
+      text-shadow: 0 3px 24px rgb(6 8 38 / 28%);
+    }
+
+    .hero p {
+      max-width: 590px;
+      margin: 27px 0 0;
+      color: rgb(255 255 255 / 88%);
+      font-size: clamp(16px, 1.6vw, 18px);
+      line-height: 1.6;
+      text-shadow: 0 2px 14px rgb(6 8 38 / 28%);
+    }
+
+    .ecuador-visual {
+      position: absolute;
+      top: 50%;
+      right: -72px;
+      z-index: 0;
+      display: block;
+      width: min(62vw, 720px);
+      height: 460px;
+      object-fit: contain;
+      opacity: .44;
+      pointer-events: none;
+      transform: translateY(-50%);
+      filter: drop-shadow(0 20px 36px rgb(8 10 38 / 28%));
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 78%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 18%, #000 78%, transparent);
+    }
+
+    main {
+      position: relative;
+      isolation: isolate;
+      width: 100%;
+      padding-block: 38px 64px;
+    }
+
+    main::before {
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      background-color: var(--indigo);
+      content: "";
+      opacity: .055;
+      pointer-events: none;
+      -webkit-mask-image: var(--topographic-pattern);
+      mask-image: var(--topographic-pattern);
+      -webkit-mask-repeat: repeat;
+      mask-repeat: repeat;
+      -webkit-mask-size: 900px 520px;
+      mask-size: 900px 520px;
+    }
+
+    .main-content {
+      width: min(100% - 48px, 1360px);
+      margin-inline: auto;
+    }
+
+    .section-intro {
+      margin-bottom: 24px;
+    }
+
+    .section-intro h2 {
+      margin: 0;
+      color: var(--ink);
+      font-size: clamp(21px, 2.3vw, 28px);
+      font-weight: 650;
+      letter-spacing: -.025em;
+    }
+
+    .map-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .map-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 2px solid var(--card-border);
+      border-radius: 22px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      color: inherit;
+      text-decoration: none;
+      transition: transform 220ms cubic-bezier(.2, .75, .25, 1), box-shadow 220ms ease,
+        border-color 180ms ease, border-width 180ms ease, background-color 220ms ease;
+    }
+
+    .map-card--units {
+      --card-accent: var(--teal);
+      --card-border: #77a9a2;
+      --card-hover-border: #55b4a6;
+      --card-hover-bg: #0d555c;
+      --card-hover-glow: rgb(13 85 92 / 25%);
+    }
+
+    .map-card--hazards {
+      --card-accent: var(--gold);
+      --card-border: #c5a23f;
+      --card-hover-border: var(--gold);
+      --card-hover-bg: var(--indigo);
+      --card-hover-glow: rgb(41 38 95 / 24%);
+    }
+
+    .map-card:hover,
+    .map-card:focus-visible {
+      transform: translateY(-5px) scale(1.006);
+      border-width: 2.5px;
+      border-color: var(--card-hover-border);
+      background: var(--card-hover-bg);
+      box-shadow: 0 22px 48px var(--card-hover-glow), 0 0 28px var(--card-hover-glow);
+    }
+
+    .map-card:focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 4px;
+    }
+
+    .card-art::after {
+      position: absolute;
+      z-index: 2;
+      inset: 0;
+      background: var(--card-hover-bg);
+      content: "";
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 220ms ease;
+    }
+
+    .map-card:hover .card-art img,
+    .map-card:focus-visible .card-art img {
+      filter: saturate(1.06) contrast(1.02);
+      transform: scale(1.035);
+    }
+
+    .map-card:hover .card-art::after,
+    .map-card:focus-visible .card-art::after { opacity: .1; }
+
+    .map-card:hover .card-kicker,
+    .map-card:focus-visible .card-kicker { color: #ffe28a; }
+
+    .map-card:hover .card-body h3,
+    .map-card:focus-visible .card-body h3 { color: var(--white); }
+
+    .map-card:hover .card-body p,
+    .map-card:focus-visible .card-body p { color: rgb(255 255 255 / 86%); }
+
+    .card-art {
+      position: relative;
+      display: grid;
+      height: clamp(200px, 18vw, 240px);
+      place-items: center;
+      overflow: hidden;
+      background: linear-gradient(135deg, #e9e8f4, #f6f7fb);
+    }
+
+    .map-card--units .card-art {
+      background: linear-gradient(135deg, #e7f0f1, #f6f9f9);
+    }
+
+    .card-art img {
+      position: relative;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: transform 320ms cubic-bezier(.2, .75, .25, 1);
+    }
+
+    .card-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: flex-start;
+      border-top: 3px solid var(--card-accent);
+      padding: 21px 25px 24px;
+      transition: color 180ms ease, background-color 180ms ease;
+    }
+
+    .map-card--hazards .card-body { border-top-color: var(--gold); }
+
+    .card-kicker {
+      margin: 0 0 9px;
+      color: var(--teal);
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: .015em;
+      transition: color 180ms ease;
+    }
+
+    .map-card--hazards .card-kicker { color: #8b4a2b; }
+
+    .card-body h3 {
+      margin: 0;
+      color: var(--indigo-deep);
+      font-size: clamp(22px, 2.3vw, 27px);
+      font-weight: 670;
+      letter-spacing: -.025em;
+      line-height: 1.2;
+      transition: color 180ms ease;
+    }
+
+    .card-body p {
+      max-width: 480px;
+      margin: 10px 0 20px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.62;
+      transition: color 180ms ease;
+    }
+
+    .card-cue {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 4px;
+      color: var(--indigo);
+      font-size: 14px;
+      font-weight: 650;
+      line-height: 1;
+      transition: color 180ms ease;
+    }
+
+    .card-cue::after {
+      width: 7px;
+      height: 7px;
+      border-top: 1.5px solid currentColor;
+      border-right: 1.5px solid currentColor;
+      content: "";
+      transform: rotate(45deg);
+      transition: transform 180ms ease;
+    }
+
+    .map-card:hover .card-cue,
+    .map-card:focus-visible .card-cue { color: #ffe28a; }
+
+    .map-card:hover .card-cue::after,
+    .map-card:focus-visible .card-cue::after { transform: translateX(3px) rotate(45deg); }
+
+    @media (max-width: 900px) {
+      .map-grid { grid-template-columns: 1fr; }
+      .map-card { display: flex; }
+      .card-art { height: clamp(180px, 24vw, 224px); }
+    }
+
+    .footer {
+      border-top: 3px solid var(--gold);
+      background: var(--indigo-deep);
+      color: var(--white);
+    }
+
+    .footer-inner {
+      display: grid;
+      grid-template-columns: minmax(250px, .8fr) minmax(0, 1.2fr);
+      align-items: center;
+      gap: 64px;
+      padding: 32px 24px;
+      color: rgb(255 255 255 / 78%);
+      font-size: 12px;
+    }
+
+    .footer-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
+      color: var(--white);
+      text-decoration: none;
+      transition: opacity 180ms ease;
+    }
+
+    .footer-brand:hover { opacity: .86; }
+
+    .footer-brand:focus-visible {
+      border-radius: 4px;
+      outline: 2px solid var(--gold);
+      outline-offset: 5px;
+    }
+
+    .footer-brand img {
+      display: block;
+      width: min(270px, 100%);
+      height: auto;
+      object-fit: contain;
+    }
+
+    .footer-note {
+      display: flex;
+      align-items: center;
+      justify-self: end;
+      gap: 16px;
+      max-width: 500px;
+      color: rgb(255 255 255 / 82%);
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 1.55;
+    }
+
+    .footer-note::before {
+      flex: 0 0 28px;
+      height: 2px;
+      background: var(--gold);
+      content: "";
+    }
+
+    @media (hover: none) {
+      .map-card:active {
+        transform: translateY(-2px);
+        border-width: 2.5px;
+        border-color: var(--card-hover-border);
+        background: var(--card-hover-bg);
+        box-shadow: 0 16px 32px var(--card-hover-glow);
+      }
+      .map-card:active .card-kicker,
+      .map-card:active .card-cue { color: #ffe28a; }
+      .map-card:active .card-body h3 { color: var(--white); }
+      .map-card:active .card-body p { color: rgb(255 255 255 / 86%); }
+      .map-card:active .card-art::after { opacity: .1; }
+      .map-card:active .card-art img { transform: scale(1.02); }
+    }
+
+    @media (max-width: 760px) {
+      .masthead { min-height: 355px; }
+      .masthead::before { opacity: .65; }
+      .hero { min-height: 315px; padding-block: 45px 40px; }
+      .ecuador-visual { right: -76px; width: min(70vw, 510px); height: 360px; opacity: .28; }
+      .map-grid { grid-template-columns: 1fr; }
+      .card-art { height: clamp(190px, 32vw, 224px); }
+      .footer-inner { grid-template-columns: 1fr; gap: 22px; }
+      .footer-note { justify-self: start; }
+    }
+
+    @media (max-width: 640px) {
+      .masthead { min-height: auto; padding: 0 22px; }
+      .masthead::before { opacity: .52; }
+      .hero { min-height: 315px; padding-block: 40px 34px; }
+      .ecuador-visual { top: 50%; right: -100px; width: 310px; height: 320px; opacity: .19; }
+      .hero h1 { max-width: 540px; font-size: clamp(38px, 9vw, 50px); }
+      main { padding-block: 27px 46px; }
+      .main-content { width: min(100% - 36px, 560px); }
+      .section-intro { margin-bottom: 18px; }
+      .map-grid { gap: 16px; }
+      .map-card { display: flex; }
+      .card-art { height: auto; min-height: 0; aspect-ratio: 2.45 / 1; }
+      .card-body { min-height: 0; }
+      .footer-inner { gap: 18px; padding-inline: 18px; }
+    }
+
+    @media (max-width: 420px) {
+      .hero { min-height: 295px; padding-top: 34px; }
+      .hero h1 { font-size: 38px; }
+      .ecuador-visual { right: -112px; width: 280px; height: 290px; opacity: .16; }
+      .card-body { padding: 20px 20px 22px; }
+      .footer-brand img { width: min(250px, 78vw); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+      .hero-chip-dot::after { animation: none; opacity: .3; transform: scale(1.5); }
+    }
+  </style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="hero">
+      <div class="hero-copy">
+        <p class="hero-institution"><span class="hero-chip-dot" aria-hidden="true"></span>Ministerio de Desarrollo Humano</p>
+        <h1>Geoportal Territorial</h1>
+        <p>Mapas e información geográfica para explorar el territorio ecuatoriano.</p>
+      </div>
+      <img class="ecuador-visual" src="portal/assets/ecuador_hero.svg" alt="" aria-hidden="true">
+    </div>
+  </header>
+
+  <main>
+    <div class="main-content">
+      <section aria-labelledby="maps-heading">
+        <div class="section-intro">
+          <h2 id="maps-heading">Cada mapa, una mirada del territorio</h2>
+        </div>
+
+        <div class="map-grid">
+          <a class="map-card map-card--units" href="unidades_infancia" aria-labelledby="units-title units-cue">
+            <div class="card-art">
+              <img src="portal/assets/preview_unidades.svg" alt="Vista cartográfica de la distribución de las Unidades de Atención de Desarrollo Infantil" loading="lazy">
+            </div>
+            <div class="card-body">
+              <span class="card-kicker">Servicios de desarrollo infantil</span>
+              <h3 id="units-title">Unidades de Atención de Desarrollo Infantil</h3>
+              <p>Consulta los servicios de desarrollo infantil y su distribución por provincia, cantón y parroquia.</p>
+              <span class="card-cue" id="units-cue">Explorar mapa</span>
+            </div>
+          </a>
+
+          <a class="map-card map-card--hazards" href="ua_amenazas" aria-labelledby="hazards-title hazards-cue">
+            <div class="card-art">
+              <img src="portal/assets/preview_amenazas.svg" alt="Vista cartográfica de los niveles de susceptibilidad a inundaciones" loading="lazy">
+            </div>
+            <div class="card-body">
+              <span class="card-kicker">Planificación y amenazas</span>
+              <h3 id="hazards-title">Plan de Activación Fenómeno de El Niño</h3>
+              <p>Consulta la exposición a inundaciones, movimientos en masa, sequías e incendios forestales, con filtros y reportes.</p>
+              <span class="card-cue" id="hazards-cue">Explorar mapa</span>
+            </div>
+          </a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <a class="footer-brand" href="." aria-label="Ir al inicio">
+        <img src="ua_amenazas/assets/logo_encabezado.png" alt="Gobierno del Ecuador · Ministerio de Trabajo y Desarrollo Humano">
+      </a>
+      <p class="footer-note">Información geográfica para la consulta y planificación territorial.</p>
+    </div>
+  </footer>
+</body>
+</html>

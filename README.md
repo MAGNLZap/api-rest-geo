@@ -23,9 +23,11 @@ python -m venv .venv
 # Linux/Mac:
 source .venv/bin/activate
 
-# Instalar dependencias
-pip install -r requirements.txt
+# Desarrollo, pruebas y scripts de datos
+pip install -r requirements-dev.txt
 ```
+
+Para ejecutar únicamente la API se usa `requirements.txt`. Los scripts de carga y exportación requieren `requirements-data.txt`.
 
 ## Variables de entorno
 
@@ -43,6 +45,8 @@ cp .env.example .env
 | `ALLOW_LOCAL_NETWORK` | `true` | Permitir acceso desde redes locales |
 | `HOST` | `0.0.0.0` | Host del servidor |
 | `PORT` | `8001` | Puerto del servidor |
+| `ROOT_PATH` | `/api-geo` | Prefijo del reverse proxy; usar vacío si no aplica |
+| `FORWARDED_ALLOW_IPS` | `127.0.0.1` | IP/red confiable del proxy para identificar clientes reales |
 | `RATE_LIMIT_ENABLED` | `true` | Habilitar rate limiting |
 | `RATE_LIMIT_STORAGE` | `memory://` | Backend: `memory://` o `redis://host:port` |
 | `RATE_LIMIT` | `120/minute` | Límite global de requests por IP |
@@ -51,7 +55,7 @@ cp .env.example .env
 ## Ejecutar
 
 ```bash
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+python -m app.main
 ```
 
 **Nota:** La API usa `root_path=/api-geo` para reverse proxies. Detrás de un proxy, configurar la ruta base en el proxy (nginx `location /api-geo/`). En desarrollo local, acceder directamente en `http://localhost:8001`.
@@ -65,11 +69,9 @@ docker build -t apirestgeo .
 # Run container
 docker run -p 8001:8001 -e DATABASE_URL=postgresql+asyncpg://user:pass@host:5432/db apirestgeo
 
-# With volume for data files
-docker run -p 8001:8001 -v ./app/data:/app/app/data -e DATABASE_URL=postgresql+asyncpg://user:pass@host:5432/db apirestgeo
 ```
 
-El Dockerfile usa multi-stage build (builder + runtime) con usuario no-root `appuser`.
+La imagen instala solo dependencias de ejecución, usa el usuario no-root `app` e incluye un `HEALTHCHECK`. Los tres artefactos DPA comprimidos se incorporan durante el build.
 
 ## Cargar datos
 
@@ -78,42 +80,29 @@ python scripts/load_data.py --file "data/06_ua_validadas_0626 (1).json"
 python scripts/load_data.py --file "data/06_ua_validadas_0626 (1).json" --clear  # limpiar antes
 ```
 
-## Optimizar datos DPA
+## Datos DPA
 
-Los archivos GeoJSON de la División Político-Administrativa (provincias, cantones, parroquias) requieren optimización antes de ser servidos por la API. El script reduce la precisión de coordenadas y genera archivos comprimidos.
+La base de datos es la fuente principal de provincias, cantones y parroquias. Los GeoJSON de `data/seed/` se usan únicamente para la carga inicial. `app/data/` contiene solo los artefactos `.json.gz` generados desde la base de datos y servidos por la API.
 
 ```bash
-python scripts/optimize_dpa.py
+python scripts/load_data.py migrate
+python scripts/load_data.py dpa --clear
+python scripts/load_data.py dpa-export
+python scripts/load_data.py dpa-export --level parroquias
 ```
 
-**Qué hace:**
-1. Lee los archivos `.json` originales de `app/data/`
-2. Reduce coordenadas de 14 decimales a 6 (~11cm de precisión)
-3. Genera archivos `_6dec.json` (optimizados)
-4. Genera archivos `_6dec.json.gz` (comprimidos con gzip nivel 9)
-
-**Archivos generados:**
-
-| Archivo original | Archivo optimizado | Archivo comprimido |
-|---|---|---|
-| `provincias.json` | `provincias_6dec.json` | `provincias_6dec.json.gz` |
-| `cantones.json` | `cantones_6dec.json` | `cantones_6dec.json.gz` |
-| `parroquias.json` | `parroquias_6dec.json` | `parroquias_6dec.json.gz` |
-
-**Cuándo ejecutar:**
-- Al actualizar los archivos GeoJSON DPA
-- Al cambiar la precisión requerida (modificar `TARGET_DECIMALS` en el script)
-- Después de clonar el repositorio por primera vez
-
-**Nota:** Los archivos `.gz` son los que sirve la API. No eliminar los archivos `.json` originales (son fuente).
+El export genera GeoJSON RFC 7946 comprimido, con cuatro decimales y propiedades estándar (`id`, `name`, `province_id`, `canton_id`). La escritura es atómica y determinista, y conserva una copia `.bak` temporal del artefacto anterior. No genera JSON plano en `app/data/`.
 
 ## Endpoints
 
 | Método | Ruta | Content-Type | Descripción |
 |---|---|---|---|
-| `GET` | `/` | JSON | Metadata de la API (mensaje, versión, timestamp, environment, docs) |
+| `GET` | `/` | HTML | Portada del geoportal con acceso a los mapas |
 | `GET` | `/health` | JSON | Estado de la API + conexión a BD |
-| `GET` | `/demo` | HTML | Mapa demo interactivo (Leaflet + Supercluster + DPA) |
+| `GET` | `/ua_amenazas` | HTML | Mapa de amenazas conectado a la API |
+| `GET` | `/unidades_infancia` | HTML | Mapa de unidades de atención |
+| `GET` | `/portal/assets/{asset_name}` | SVG | Miniaturas geográficas de la portada |
+| `GET` | `/ua_amenazas/data` | `application/geo+json` | Dataset completo UA-Amenazas; admite filtros y bbox |
 | `GET` | `/unidades` | `application/geo+json` | Unidades (GeoJSON FeatureCollection, con clustering) |
 | `GET` | `/unidades/raw` | JSON | Unidades (JSON plano, sin GeoJSON wrapper) |
 | `GET` | `/unidades/{id}` | `application/geo+json` | Unidad por ID (GeoJSON Feature) |
@@ -123,6 +112,10 @@ python scripts/optimize_dpa.py
 | `GET` | `/dpa/parroquias` | `application/geo+json` (gzip) | Límites de parroquias (comprimido) |
 | `GET` | `/docs` | HTML | Swagger UI (solo en development) |
 | `GET` | `/redoc` | HTML | ReDoc (solo en development) |
+
+El mapa de amenazas solicita el dataset completo una vez para conservar los filtros, estadísticas, selección poligonal y exportación Excel. Los filtros DPA usan códigos oficiales como texto, sin FK; los polígonos se solicitan a `/dpa/*`.
+
+Las rutas web HTML inexistentes redirigen a `/`; las rutas de API desconocidas conservan su respuesta `404` JSON.
 
 ### Filtros disponibles en `/unidades`
 
@@ -168,9 +161,9 @@ El clustering se activa con `cluster=true` y un `bbox`. Usa SQL window functions
 
 Cada celda retorna el punto más cercano al centro con `cluster_count` y `cell_id` en las propiedades.
 
-## Demo (Mapa interactivo)
+## Mapa de unidades de atención
 
-Acceder en `http://localhost:8001/demo`. Mapa Leaflet con:
+Acceder en `http://localhost:8001/unidades_infancia`. Mapa Leaflet con:
 
 - **Base:** Google Maps tiles, centrado en Ecuador (zoom 6-20)
 - **Markers:** Supercluster para clustering client-side (radius: 80, maxZoom: 14)
@@ -197,10 +190,10 @@ Acceder en `http://localhost:8001/demo`. Mapa Leaflet con:
 python -m pytest tests/ -v
 ```
 
-24 tests en total: 2 de health + 22 de unidades. Configuración en `pyproject.toml`:
+27 tests en total: 3 de health/arranque + 20 de unidades + 4 de DPA. Configuración en `pyproject.toml`:
 - `asyncio_mode = "auto"` (pytest-asyncio)
 - `testpaths = ["tests"]`
-- Base de datos de test separada (`test_test.db`), se crea/destruye automáticamente por cada test
+- Base de datos SQLite en memoria, recreada automáticamente por cada test
 
 ## Estructura del proyecto
 
@@ -210,29 +203,31 @@ ApiRestGeo/
 ├── .env                      # Variables de entorno (no commitear)
 ├── .env.example              # Template de variables de entorno
 ├── pyproject.toml            # Metadata del proyecto, ruff, pytest
-├── requirements.txt          # Dependencias
-├── Dockerfile                # Imagen Docker multi-stage
+├── requirements.txt          # Dependencias de ejecución
+├── requirements-data.txt     # Dependencias para scripts geográficos
+├── requirements-dev.txt      # Dependencias de desarrollo y pruebas
+├── Dockerfile                # Imagen de producción
 ├── data/                     # Archivos de datos crudos
-│   └── 06_ua_validadas_0626 (1).json
 ├── demo/
-│   └── demo.html             # Mapa interactivo (Leaflet + Supercluster + DPA)
+│   ├── index.html            # Portada con acceso a los mapas
+│   ├── ua_amenazas.html      # Mapa de amenazas conectado a FastAPI
+│   └── unidades_infancia.html # Mapa de unidades de atención
 ├── scripts/
-│   ├── load_data.py          # Script de carga masiva JSON → SQLite
-│   └── optimize_dpa.py       # Optimización de archivos DPA (decimales + gzip)
+│   ├── load_data.py          # Migraciones, carga y exportación de datos
+│   ├── prepare_ua_amenazas_import.py # Prepara CSV homologado sin cargar la BD
+│   └── build_geoportal_previews.py # Genera miniaturas con DPA y puntos
+├── scripts/sql/              # Migraciones DPA y esquema provisional UA-Amenazas
+├── data/seed/                # Semilla DPA inicial (GeoJSON estándar, 4 decimales)
 ├── app/
 │   ├── main.py               # Entry point FastAPI, lifespan, GZipMiddleware
 │   ├── config.py             # Configuración con Pydantic Settings
 │   ├── database.py           # Engine async SQLAlchemy, session, get_db()
-│   ├── data/                 # Datos DPA (GeoJSON)
-│   │   ├── provincias.json       # Provincias (fuente, WGS84)
-│   │   ├── provincias_6dec.json  # Provincias (optimizado)
-│   │   ├── provincias_6dec.json.gz # Provincias (comprimido)
-│   │   ├── cantones.json         # Cantones (fuente)
-│   │   ├── cantones_6dec.json    # Cantones (optimizado)
-│   │   ├── cantones_6dec.json.gz # Cantones (comprimido)
-│   │   ├── parroquias.json       # Parroquias (fuente)
-│   │   ├── parroquias_6dec.json  # Parroquias (optimizado)
-│   │   └── parroquias_6dec.json.gz # Parroquias (comprimido)
+│   ├── data/                 # Artefactos DPA generados desde la base
+│   │   ├── provincias.json.gz
+│   │   ├── cantones.json.gz
+│   │   └── parroquias.json.gz
+│   ├── static/ua_amenazas/   # Logo y banner de reportes
+│   ├── static/portal/        # Miniaturas geográficas de la portada
 │   ├── middleware/
 │   │   ├── cors.py           # CORS dinámico (auto-detecta IP local)
 │   │   └── rate_limit.py     # Rate limiting (slowapi, per-IP)
@@ -243,22 +238,24 @@ ApiRestGeo/
 │   ├── routers/
 │   │   ├── health.py         # GET /, GET /health
 │   │   ├── unidad_atencion.py # GET /unidades, /raw, /{id}, /{id}/raw
-│   │   ├── demo.py           # GET /demo (sirve demo.html)
-│   │   └── dpa.py            # GET /dpa/provincias, /cantones, /parroquias
+│   │   ├── demo.py           # Rutas de mapas y recursos estáticos
+│   │   ├── dpa.py            # GET /dpa/provincias, /cantones, /parroquias
+│   │   └── ua_amenazas.py    # GET /ua_amenazas/data
 │   └── schemas/
 │       └── unidad_atencion.py # Schemas Pydantic + GeoJSON (Feature, FeatureCollection)
 └── tests/
     ├── conftest.py           # Fixtures async, client, test DB
+    ├── test_dpa.py           # Tests de endpoints DPA comprimidos
     ├── test_health.py        # Tests de health endpoints
-    └── test_unidades.py      # Tests de endpoints de unidades (22 tests)
+    └── test_unidades.py      # Tests de endpoints de unidades (20 tests)
 ```
 
 ## Base de datos
 
 - **Desarrollo:** SQLite async (`sqlite+aiosqlite:///./test.db`, se crea automáticamente al iniciar)
-- **Producción:** PostgreSQL async (`postgresql+asyncpg://...`, incluido en `requirements.txt`)
+- **Producción:** PostgreSQL/PostGIS async (`postgresql+asyncpg://...`, incluido en `requirements.txt`)
 - **Modelo:** `UnidadAtencion` con 39 campos y 7 índices (incluyendo compuesto `longitude, latitude`)
-- **Tests:** Base de datos SQLite separada (`test_test.db`), se crea/destruye por cada test
+- **Tests:** Base de datos SQLite en memoria, recreada para cada test
 
 ## Cache DPA
 
@@ -275,10 +272,10 @@ Configurado en `pyproject.toml`:
 
 ```bash
 # Linting
-ruff check app/
+ruff check app scripts tests
 
 # Formatting
-ruff format app/
+ruff format app scripts tests
 ```
 
 - **Ruff:** `line-length=120`, target `py312`, reglas: `E`, `F`, `I`, `UP`
@@ -290,6 +287,7 @@ ruff format app/
 - Orígenes externos se configuran vía `ALLOWED_ORIGINS` en `.env`
 - Documentación (Swagger/ReDoc) solo disponible en modo `development`
 - Rate limiting global habilitado por defecto (120 req/min por IP)
+- En despliegues con reverse proxy, configurar `FORWARDED_ALLOW_IPS` con la IP o red del proxy
 - Storage de rate limiting configurable: memoria (`memory://`) o Redis (`redis://host:port`)
 - GZipMiddleware habilitado para respuestas > 1KB
 - Nunca commitear archivos `.env` con credenciales

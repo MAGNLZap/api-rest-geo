@@ -1,0 +1,185 @@
+\set ON_ERROR_STOP on
+
+BEGIN;
+
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM ua_amenazas) THEN
+        RAISE EXCEPTION 'ua_amenazas no esta vacia; se cancela para evitar duplicar o reemplazar datos';
+    END IF;
+END;
+$$;
+
+CREATE TEMP TABLE ua_amenazas_stage (LIKE ua_amenazas);
+
+ALTER TABLE ua_amenazas_stage
+    DROP COLUMN id,
+    DROP COLUMN created_at,
+    DROP COLUMN updated_at;
+
+\copy ua_amenazas_stage (fecha_corte,codigo_ua,nombre_ua,servicio,modalidad,modalidad_etiqueta_reporte,zona_planificacion,codigo_distrito,unidad_desconcentrada,region,province_id,canton_id,parish_id,codigo_parroquia_origen,provincia_origen,canton_origen,parroquia_origen,codigo_cabecera_cantonal,nombre_cabecera_cantonal,tipo_atencion,area,tipo_administracion,cooperante,usuarios_hombres,usuarios_mujeres,usuarios_hombres_mapa,usuarios_mujeres_mapa,usuarios_total,direccion,referencia,ruc,asistencia_promedio,asistencia_norma_tecnica,usuarios_con_registro_social_2018,usuarios_sin_registro_social_2018,usuarios_extrema_pobreza_2018,usuarios_pobreza_2018,usuarios_no_pobres_2018,usuarios_con_registro_social_2025,usuarios_sin_registro_social_2025,usuarios_extrema_pobreza_2025,usuarios_pobreza_2025,usuarios_no_pobres_2025,coordenada_x_utm,coordenada_y_utm,geom,nivel_susceptibilidad_inundaciones,nivel_susceptibilidad_movimientos_en_masa,nivel_susceptibilidad_sequias,nivel_susceptibilidad_incendios_forestales,categoria_susceptibilidad_inundaciones,categoria_susceptibilidad_movimientos_en_masa,categoria_susceptibilidad_sequias,categoria_susceptibilidad_incendios_forestales,multiamenaza) FROM 'data/seed/ua_amenazas_pg.csv' WITH (FORMAT csv, HEADER true, ENCODING 'UTF8')
+
+DO $$
+BEGIN
+    IF (SELECT count(*) FROM ua_amenazas_stage) <> 9869 THEN
+        RAISE EXCEPTION 'Conteo inesperado en staging; se esperaban 9869 filas';
+    END IF;
+
+    IF EXISTS (
+        SELECT 1
+        FROM ua_amenazas_stage
+        GROUP BY fecha_corte, codigo_ua, modalidad
+        HAVING count(*) > 1
+    ) THEN
+        RAISE EXCEPTION 'Hay claves fecha_corte/codigo_ua/modalidad duplicadas en staging';
+    END IF;
+
+    IF EXISTS (
+        SELECT 1 FROM ua_amenazas_stage
+        WHERE ST_SRID(geom) <> 4326 OR GeometryType(geom) <> 'POINT' OR NOT ST_IsValid(geom)
+    ) THEN
+        RAISE EXCEPTION 'La columna geom debe tener puntos validos en SRID 4326';
+    END IF;
+
+    IF EXISTS (
+        SELECT 1
+        FROM ua_amenazas_stage AS s
+        LEFT JOIN provinces AS p ON p.id = s.province_id
+        LEFT JOIN cantons AS c ON c.id = s.canton_id
+        LEFT JOIN parishes AS pa ON pa.id = s.parish_id
+        WHERE p.id IS NULL
+           OR c.id IS NULL
+           OR pa.id IS NULL
+           OR c.province_id <> s.province_id
+           OR pa.province_id <> s.province_id
+           OR pa.canton_id <> s.canton_id
+    ) THEN
+        RAISE EXCEPTION 'Hay codigos DPA ausentes o con jerarquia inconsistente';
+    END IF;
+END;
+$$;
+
+INSERT INTO ua_amenazas (
+    fecha_corte,
+    codigo_ua,
+    nombre_ua,
+    servicio,
+    modalidad,
+    modalidad_etiqueta_reporte,
+    zona_planificacion,
+    codigo_distrito,
+    unidad_desconcentrada,
+    region,
+    province_id,
+    canton_id,
+    parish_id,
+    codigo_parroquia_origen,
+    provincia_origen,
+    canton_origen,
+    parroquia_origen,
+    codigo_cabecera_cantonal,
+    nombre_cabecera_cantonal,
+    tipo_atencion,
+    area,
+    tipo_administracion,
+    cooperante,
+    usuarios_hombres,
+    usuarios_mujeres,
+    usuarios_hombres_mapa,
+    usuarios_mujeres_mapa,
+    usuarios_total,
+    direccion,
+    referencia,
+    ruc,
+    asistencia_promedio,
+    asistencia_norma_tecnica,
+    usuarios_con_registro_social_2018,
+    usuarios_sin_registro_social_2018,
+    usuarios_extrema_pobreza_2018,
+    usuarios_pobreza_2018,
+    usuarios_no_pobres_2018,
+    usuarios_con_registro_social_2025,
+    usuarios_sin_registro_social_2025,
+    usuarios_extrema_pobreza_2025,
+    usuarios_pobreza_2025,
+    usuarios_no_pobres_2025,
+    coordenada_x_utm,
+    coordenada_y_utm,
+    geom,
+    nivel_susceptibilidad_inundaciones,
+    nivel_susceptibilidad_movimientos_en_masa,
+    nivel_susceptibilidad_sequias,
+    nivel_susceptibilidad_incendios_forestales,
+    categoria_susceptibilidad_inundaciones,
+    categoria_susceptibilidad_movimientos_en_masa,
+    categoria_susceptibilidad_sequias,
+    categoria_susceptibilidad_incendios_forestales,
+    multiamenaza
+)
+SELECT
+    fecha_corte,
+    codigo_ua,
+    nombre_ua,
+    servicio,
+    modalidad,
+    modalidad_etiqueta_reporte,
+    zona_planificacion,
+    codigo_distrito,
+    unidad_desconcentrada,
+    region,
+    province_id,
+    canton_id,
+    parish_id,
+    codigo_parroquia_origen,
+    provincia_origen,
+    canton_origen,
+    parroquia_origen,
+    codigo_cabecera_cantonal,
+    nombre_cabecera_cantonal,
+    tipo_atencion,
+    area,
+    tipo_administracion,
+    cooperante,
+    usuarios_hombres,
+    usuarios_mujeres,
+    usuarios_hombres_mapa,
+    usuarios_mujeres_mapa,
+    usuarios_total,
+    direccion,
+    referencia,
+    ruc,
+    asistencia_promedio,
+    asistencia_norma_tecnica,
+    usuarios_con_registro_social_2018,
+    usuarios_sin_registro_social_2018,
+    usuarios_extrema_pobreza_2018,
+    usuarios_pobreza_2018,
+    usuarios_no_pobres_2018,
+    usuarios_con_registro_social_2025,
+    usuarios_sin_registro_social_2025,
+    usuarios_extrema_pobreza_2025,
+    usuarios_pobreza_2025,
+    usuarios_no_pobres_2025,
+    coordenada_x_utm,
+    coordenada_y_utm,
+    geom,
+    nivel_susceptibilidad_inundaciones,
+    nivel_susceptibilidad_movimientos_en_masa,
+    nivel_susceptibilidad_sequias,
+    nivel_susceptibilidad_incendios_forestales,
+    categoria_susceptibilidad_inundaciones,
+    categoria_susceptibilidad_movimientos_en_masa,
+    categoria_susceptibilidad_sequias,
+    categoria_susceptibilidad_incendios_forestales,
+    multiamenaza
+FROM ua_amenazas_stage;
+
+DO $$
+BEGIN
+    IF (SELECT count(*) FROM ua_amenazas) <> 9869 THEN
+        RAISE EXCEPTION 'Conteo inesperado despues del INSERT; se esperaban 9869 filas';
+    END IF;
+END;
+$$;
+
+COMMIT;

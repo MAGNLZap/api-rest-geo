@@ -3,28 +3,12 @@ description: Crea un modelo SQLAlchemy + schema Pydantic
 agent: build
 ---
 
-Crea un nuevo modelo para el proyecto.
+Crea el modelo solicitado en `$ARGUMENTS`.
 
-Uso: `/add-model <Nombre> [campos]`
+1. Inspecciona modelos y migraciones existentes antes de editar.
+2. Usa SQLAlchemy 2 (`Mapped`, `mapped_column`) y `__tablename__` explícito.
+3. Añade el schema Pydantic solo si una ruta lo necesita.
+4. Registra el modelo donde corresponda y crea una migración si afecta una BD persistente.
+5. Indica qué validación manual realizar. Ejecuta tests solo si el usuario los aprueba.
 
-Ejemplo: `/add-model Place name:str description:optional longitude:float latitude:float category:optional`
-
-## Pasos
-
-1. Crear modelo en `app/models/<nombre_lowercase>.py`:
-   - Heredar de `Base` (app/models/base.py)
-   - Usar `Mapped` y `mapped_column` de SQLAlchemy
-   - `id` como primary key autoincremental
-   - `longitude: Mapped[float]` y `latitude: Mapped[float]`
-   - Otros campos según los proporcionados
-
-2. Importar el modelo en `app/main.py` (para que `create_all` lo registre)
-
-3. Crear schema Pydantic en `app/schemas/<nombre_lowercase>.py` (si es necesario)
-
-## Convenciones
-
-- `__tablename__` en snake_case plural (ej: `geo_places`)
-- Usar `String(255)` para strings, `Text` para descripciones largas
-- `Float` para coordenadas
-- `nullable=True` para campos opcionales
+No uses `create_all` como sustituto de una migración de producción.

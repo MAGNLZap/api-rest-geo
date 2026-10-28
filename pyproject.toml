@@ -10,15 +10,20 @@ dependencies = [
     "python-dotenv==1.1.0",
     "sqlalchemy[asyncio]==2.0.41",
     "aiosqlite==0.21.0",
-    "asyncpg==0.30.0",
+    "asyncpg==0.32.0",
     "slowapi==0.1.9",
 ]
 
 [project.optional-dependencies]
+data = [
+    "shapely==2.2.0",
+]
 dev = [
+    "shapely==2.2.0",
     "pytest==8.4.1",
     "pytest-asyncio==0.25.3",
     "httpx==0.28.1",
+    "ruff==0.13.2",
 ]
 
 [tool.pytest.ini_options]

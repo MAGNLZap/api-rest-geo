@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 470" role="img" aria-labelledby="title desc">
+  <title id="title">Muestras de papel tapiz topográfico</title>
+  <desc id="desc">Tres variantes de curvas topográficas para los fondos del geoportal.</desc>
+  <rect width="1180" height="470" fill="#f4f6fa"/>
+  <text x="32" y="52" fill="#201e4c" font-family="Montserrat,Arial,sans-serif" font-size="28" font-weight="650">Papel tapiz topográfico</text>
+  <text x="32" y="80" fill="#5e6478" font-family="Montserrat,Arial,sans-serif" font-size="14">Muestras de patrón y contraste sobre la paleta institucional</text>
+
+  <g transform="translate(32 108)">
+    <rect width="350" height="330" rx="14" fill="#fff" stroke="#dfe3ed"/>
+    <rect x="12" y="12" width="326" height="208" rx="9" fill="#edf0f6"/>
+    <g fill="none" stroke="#29265f" stroke-opacity=".25" stroke-width="1.2">
+      <path d="M66 99C68 66 105 42 143 49c36 7 62 32 55 61-7 30-40 50-76 45-35-5-58-26-56-56Z"/>
+      <path d="M82 101C84 77 110 60 140 65c27 5 45 24 40 46-5 22-31 36-57 32-25-4-42-20-41-42Z"/>
+      <path d="M99 102C100 85 117 74 137 77c19 3 31 17 27 32-4 15-22 25-40 22-17-3-26-15-25-29Z"/>
+      <path d="M204 159C208 139 230 127 251 132c20 5 31 21 27 38-5 17-25 28-44 23-19-4-33-17-30-34Z"/>
+      <path d="M218 160C221 146 234 139 249 143c13 3 21 14 18 26-3 12-17 19-30 16-13-3-21-13-19-25Z"/>
+    </g>
+    <text x="20" y="258" fill="#201e4c" font-family="Montserrat,Arial,sans-serif" font-size="17" font-weight="650">Curvas orgánicas</text>
+    <text x="20" y="282" fill="#5e6478" font-family="Montserrat,Arial,sans-serif" font-size="13">Fondo claro, trazo índigo tenue.</text>
+    <text x="20" y="304" fill="#5e6478" font-family="Montserrat,Arial,sans-serif" font-size="13">La opción más discreta para el contenido.</text>
+  </g>
+
+  <g transform="translate(415 108)">
+    <rect width="350" height="330" rx="14" fill="#fff" stroke="#dfe3ed"/>
+    <rect x="12" y="12" width="326" height="208" rx="9" fill="#201e4c"/>
+    <g fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="1.15">
+      <path d="M47 111C50 75 83 49 121 53c35 4 61 28 59 57-2 31-32 54-69 52-38-1-66-21-64-51Z"/>
+      <path d="M62 111C64 83 89 64 119 67c28 3 47 21 46 44-2 24-26 42-55 40-29-1-49-17-48-40Z"/>
+      <path d="M77 111C79 91 96 79 118 81c19 2 32 15 31 32-1 17-19 30-39 28-20-1-34-13-33-30Z"/>
+      <path d="M199 146C203 118 230 101 258 107c26 5 43 24 39 46-5 23-30 38-56 33-26-5-45-20-42-40Z"/>
+      <path d="M215 146C218 127 237 116 256 120c18 4 29 17 26 32-4 16-22 27-40 23-18-3-29-15-27-29Z"/>
+    </g>
+    <g fill="none" stroke="#f5c842" stroke-opacity=".55" stroke-width="1">
+      <path d="M91 111C92 98 103 90 117 91c13 1 21 10 20 21-1 11-13 19-26 18-13-1-21-9-20-19Z"/>
+      <path d="M228 146C230 135 241 129 253 132c11 2 18 10 16 20-2 10-13 17-24 14-11-2-18-10-17-20Z"/>
+    </g>
+    <text x="20" y="258" fill="#201e4c" font-family="Montserrat,Arial,sans-serif" font-size="17" font-weight="650">Relieve nocturno</text>
+    <text x="20" y="282" fill="#5e6478" font-family="Montserrat,Arial,sans-serif" font-size="13">Fondo índigo con trazos blancos</text>
+    <text x="20" y="304" fill="#5e6478" font-family="Montserrat,Arial,sans-serif" font-size="13">y acentos dorados.</text>
+  </g>
+
+  <g transform="translate(798 108)">
+    <rect width="350" height="330" rx="14" fill="#fff" stroke="#dfe3ed"/>
+    <rect x="12" y="12" width="326" height="208" rx="9" fill="#e8f0f1"/>
+    <g fill="none" stroke="#147c83" stroke-opacity=".24" stroke-width="1.15">
+      <path d="M48 87C59 59 88 48 115 56c25 7 38 26 30 46-8 21-35 33-59 25-24-8-46-21-38-40Z"/>
+      <path d="M65 88C73 69 91 62 110 68c18 5 28 19 22 33-6 15-26 23-43 18-17-5-30-17-24-31Z"/>
+      <path d="M191 131C198 100 227 81 257 87c28 5 48 26 43 50-5 25-33 42-62 37-29-4-53-20-47-43Z"/>
+      <path d="M209 132C214 110 235 97 256 101c20 4 34 19 30 37-4 18-24 30-45 27-21-3-36-16-32-33Z"/>
+      <path d="M226 132C229 118 243 110 256 113c13 2 21 12 18 24-3 11-16 19-29 17-13-2-21-11-19-22Z"/>
+    </g>
+    <g fill="none" stroke="#bd9b31" stroke-opacity=".38" stroke-width="1">
+      <path d="M82 88C88 75 100 71 111 75c11 3 17 12 13 21-4 9-15 14-26 11-10-3-19-11-16-19Z"/>
+      <path d="M238 132C241 121 249 116 258 118c8 2 13 8 11 16-2 8-11 13-20 12-8-1-13-7-11-14Z"/>
+    </g>
+    <text x="20" y="258" fill="#201e4c" font-family="Montserrat,Arial,sans-serif" font-size="17" font-weight="650">Relieve costero</text>
+    <text x="20" y="282" fill="#5e6478" font-family="Montserrat,Arial,sans-serif" font-size="13">Curvas teal con una segunda tinta</text>
+    <text x="20" y="304" fill="#5e6478" font-family="Montserrat,Arial,sans-serif" font-size="13">dorada, sobre fondo frío.</text>
+  </g>
+</svg>

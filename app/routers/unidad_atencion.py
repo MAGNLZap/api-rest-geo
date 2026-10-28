@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
-from sqlalchemy import Float, Integer, func, literal as lit, select
+from sqlalchemy import Float, Integer, func, select
+from sqlalchemy import literal as lit
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -145,9 +146,7 @@ def _unidad_to_raw(u: UnidadAtencion) -> UnidadRaw:
     )
 
 
-def _unidad_to_clustered_feature(
-    u: UnidadAtencion, cluster_count: int, cell_id: str
-) -> Feature:
+def _unidad_to_clustered_feature(u: UnidadAtencion, cluster_count: int, cell_id: str) -> Feature:
     props = UnidadProperties(
         id=u.id,
         cluster_count=cluster_count,
@@ -215,12 +214,8 @@ async def _cluster_unidades(
     cell_width = bbox_lng / grid_size
     cell_height = bbox_lat / grid_size
 
-    cell_col = func.cast(
-        (UnidadAtencion.longitude - min_lng) / cell_width, Integer
-    )
-    cell_row = func.cast(
-        (UnidadAtencion.latitude - min_lat) / cell_height, Integer
-    )
+    cell_col = func.cast((UnidadAtencion.longitude - min_lng) / cell_width, Integer)
+    cell_row = func.cast((UnidadAtencion.latitude - min_lat) / cell_height, Integer)
     cell_id_expr = func.concat(cell_col, lit(","), cell_row)
 
     center_lng = min_lng + (cell_col.cast(Float) + 0.5) * cell_width
@@ -229,9 +224,7 @@ async def _cluster_unidades(
     diff_lat = UnidadAtencion.latitude - center_lat
     dist_sq = diff_lng * diff_lng + diff_lat * diff_lat
 
-    row_number = func.row_number().over(
-        partition_by=[cell_col, cell_row], order_by=dist_sq
-    )
+    row_number = func.row_number().over(partition_by=[cell_col, cell_row], order_by=dist_sq)
     cluster_count = func.count("*").over(partition_by=[cell_col, cell_row])
 
     subq = (
@@ -252,9 +245,7 @@ async def _cluster_unidades(
     )
 
     ids_result = await db.execute(
-        select(subq.c.id, subq.c._cc, subq.c._cid)
-        .where(subq.c._rn == 1)
-        .limit(grid_size * grid_size)
+        select(subq.c.id, subq.c._cc, subq.c._cid).where(subq.c._rn == 1).limit(grid_size * grid_size)
     )
     rows = ids_result.all()
 
@@ -265,19 +256,10 @@ async def _cluster_unidades(
     for row in rows:
         id_map[row[0]] = (row[1], row[2])
 
-    unidades_result = await db.execute(
-        select(UnidadAtencion).where(UnidadAtencion.id.in_(list(id_map.keys())))
-    )
+    unidades_result = await db.execute(select(UnidadAtencion).where(UnidadAtencion.id.in_(list(id_map.keys()))))
     unidades = {u.id: u for u in unidades_result.scalars().all()}
 
-    return [
-        (unidades[uid], count, cell_id)
-        for uid, count, cell_id in [
-            (row[0], row[1], row[2]) for row in rows
-        ]
-    ]
-
-
+    return [(unidades[uid], count, cell_id) for uid, count, cell_id in [(row[0], row[1], row[2]) for row in rows]]
 
 
 @router.get("", response_model=FeatureCollection)
@@ -325,20 +307,13 @@ async def list_unidades(
             UnidadAtencion.latitude >= min_lat,
             UnidadAtencion.latitude <= max_lat,
         ]
-        count_result = await db.execute(
-            select(func.count(UnidadAtencion.id)).where(*bbox_filter).where(*filters)
-        )
+        count_result = await db.execute(select(func.count(UnidadAtencion.id)).where(*bbox_filter).where(*filters))
         total_real = count_result.scalar()
 
-        clustered = await _cluster_unidades(
-            db, min_lng, min_lat, max_lng, max_lat, effective_grid, filters
-        )
+        clustered = await _cluster_unidades(db, min_lng, min_lat, max_lng, max_lat, effective_grid, filters)
         return JSONResponse(
             content=FeatureCollection(
-                features=[
-                    _unidad_to_clustered_feature(u, count, cell_id)
-                    for u, count, cell_id in clustered
-                ],
+                features=[_unidad_to_clustered_feature(u, count, cell_id) for u, count, cell_id in clustered],
                 total=total_real,
                 limit=effective_grid * effective_grid,
                 offset=0,
@@ -456,9 +431,7 @@ async def list_unidades_raw(
 
 @router.get("/{unidad_id}", response_model=Feature)
 async def get_unidad(request: Request, unidad_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
-        select(UnidadAtencion).where(UnidadAtencion.id == unidad_id)
-    )
+    result = await db.execute(select(UnidadAtencion).where(UnidadAtencion.id == unidad_id))
     unidad = result.scalar_one_or_none()
     if not unidad:
         raise HTTPException(status_code=404, detail="Unidad no encontrada")
@@ -470,9 +443,7 @@ async def get_unidad(request: Request, unidad_id: int, db: AsyncSession = Depend
 
 @router.get("/{unidad_id}/raw", response_model=UnidadRaw)
 async def get_unidad_raw(request: Request, unidad_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
-        select(UnidadAtencion).where(UnidadAtencion.id == unidad_id)
-    )
+    result = await db.execute(select(UnidadAtencion).where(UnidadAtencion.id == unidad_id))
     unidad = result.scalar_one_or_none()
     if not unidad:
         raise HTTPException(status_code=404, detail="Unidad no encontrada")

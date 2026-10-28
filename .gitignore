@@ -35,3 +35,6 @@ logs/
 # Datos
 data/*.json
 data/*.xlsx
+app/data/*.json
+app/data/*.bak
+app/data/*.tmp

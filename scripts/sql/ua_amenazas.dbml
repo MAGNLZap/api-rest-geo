@@ -1,0 +1,84 @@
+Project ua_amenazas {
+  database_type: 'PostgreSQL'
+  Note: 'Dataset de consumo plano. Los códigos DPA son valores indexados para filtrar contra las tablas existentes; no se declaran FK.'
+}
+
+Table ua_amenazas {
+  id bigint [pk, increment]
+  fecha_corte date [not null, note: 'Septiembre de 2026 se representa como 2026-09-01 por convención mensual.']
+  created_at timestamptz [not null, default: `now()`]
+  updated_at timestamptz [not null, default: `now()`, note: 'Se actualiza automáticamente mediante trigger.']
+
+  codigo_ua text [not null]
+  nombre_ua text [not null]
+  servicio text [not null]
+  modalidad text [not null]
+  modalidad_etiqueta_reporte text [not null]
+
+  zona_planificacion text [not null]
+  codigo_distrito text [not null]
+  unidad_desconcentrada text [not null]
+  region text [not null]
+  province_id text [not null, note: 'Código oficial usado para filtrar con DPA']
+  canton_id text [not null, note: 'Código oficial usado para filtrar con DPA']
+  parish_id text [not null, note: 'Código oficial usado para filtrar con DPA']
+  codigo_parroquia_origen text [not null]
+  provincia_origen text [not null]
+  canton_origen text [not null]
+  parroquia_origen text [not null]
+  codigo_cabecera_cantonal text [not null]
+  nombre_cabecera_cantonal text [not null]
+
+  tipo_atencion text [not null]
+  area text [not null]
+  tipo_administracion text [not null]
+  cooperante text [not null]
+
+  usuarios_hombres integer [note: 'Nullable según la matriz del informe; el mapa puede presentar NULL como cero.']
+  usuarios_mujeres integer [note: 'Nullable según la matriz del informe; el mapa puede presentar NULL como cero.']
+  usuarios_hombres_mapa integer [not null]
+  usuarios_mujeres_mapa integer [not null]
+  usuarios_total integer [not null]
+
+  direccion text
+  referencia text
+  ruc text
+  asistencia_promedio numeric
+  asistencia_norma_tecnica integer
+  usuarios_con_registro_social_2018 integer
+  usuarios_sin_registro_social_2018 integer
+  usuarios_extrema_pobreza_2018 integer
+  usuarios_pobreza_2018 integer
+  usuarios_no_pobres_2018 integer
+  usuarios_con_registro_social_2025 integer
+  usuarios_sin_registro_social_2025 integer
+  usuarios_extrema_pobreza_2025 integer
+  usuarios_pobreza_2025 integer
+  usuarios_no_pobres_2025 integer
+
+  coordenada_x_utm numeric [not null]
+  coordenada_y_utm numeric [not null]
+  geom geometry(Point, 4326) [not null]
+
+  nivel_susceptibilidad_inundaciones smallint [not null]
+  nivel_susceptibilidad_movimientos_en_masa smallint [not null]
+  nivel_susceptibilidad_sequias smallint [not null]
+  nivel_susceptibilidad_incendios_forestales smallint [not null]
+  categoria_susceptibilidad_inundaciones text [not null]
+  categoria_susceptibilidad_movimientos_en_masa text [not null]
+  categoria_susceptibilidad_sequias text [not null]
+  categoria_susceptibilidad_incendios_forestales text [not null]
+  multiamenaza text
+
+  Indexes {
+    (fecha_corte, codigo_ua, modalidad) [unique]
+    province_id
+    canton_id
+    parish_id
+    servicio
+    modalidad
+    geom [type: gist]
+  }
+
+  Note: 'Una fila por registro original. Los códigos DPA del mapa se guardan sin FK para filtros; los códigos y nombres DPA del Excel se preservan como origen. Los datos de usuarios del mapa y del informe se mantienen separados cuando difieren.'
+}

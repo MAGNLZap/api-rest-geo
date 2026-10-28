@@ -1,0 +1,16 @@
+.git
+.github
+.opencode
+.venv
+.pytest_cache
+__pycache__
+*.py[cod]
+*.db
+*.sqlite3
+.env
+.env.*
+data
+tests
+app/data/*.bak
+app/data/*.json
+app/data/*.tmp

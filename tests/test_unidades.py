@@ -1,4 +1,5 @@
 import pytest
+
 from app.models.unidad_atencion import UnidadAtencion
 from tests.conftest import db_session_maker
 

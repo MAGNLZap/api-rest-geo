@@ -2,14 +2,17 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+import app.database as app_database
 from app.database import get_db
 from app.main import app
 from app.models.base import Base
 
-TEST_DATABASE_URL = "sqlite+aiosqlite:///./test_test.db"
+TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
 test_engine = create_async_engine(TEST_DATABASE_URL, echo=False)
 db_session_maker = async_sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False)
+
+app_database.engine = test_engine
 
 
 async def override_get_db():

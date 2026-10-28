@@ -3,10 +3,10 @@ description: Ejecuta la suite de tests
 agent: build
 ---
 
-Ejecuta los tests del proyecto:
+Ejecuta los tests indicados en `$ARGUMENTS`:
 
 ```pwsh
-.venv\Scripts\activate; python -m pytest tests/ -v $ARGUMENTS
+python -m pytest $ARGUMENTS -q
 ```
 
-Si `$ARGUMENTS` está vacío, ejecuta todos los tests. Si contiene un filtro, pasar como argumento a pytest (ej: `/test test_health`).
+Si está vacío, usa `tests/`. Para cambios pequeños, pasar el archivo afectado (ejemplo: `/test tests/test_health.py`).
