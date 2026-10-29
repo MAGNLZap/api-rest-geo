@@ -211,9 +211,12 @@
 
     .map-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: minmax(0, 760px);
+      justify-content: center;
       gap: 24px;
     }
+
+    .map-grid .map-card--units { display: none; }
 
     .map-card {
       position: relative;
@@ -240,19 +243,21 @@
 
     .map-card--hazards {
       --card-accent: var(--gold);
-      --card-border: #c5a23f;
-      --card-hover-border: var(--gold);
-      --card-hover-bg: var(--indigo);
-      --card-hover-glow: rgb(41 38 95 / 24%);
+      --card-border: var(--gold);
+      --card-hover-border: #ffe58a;
+      --card-hover-bg: #19183f;
+      --card-hover-glow: rgb(32 30 76 / 36%);
+      border-color: var(--gold);
+      background: var(--indigo);
+      box-shadow: 0 14px 32px rgb(32 30 76 / 20%), 0 0 0 3px rgb(245 200 66 / 16%);
     }
 
     .map-card:hover,
     .map-card:focus-visible {
-      transform: translateY(-5px) scale(1.006);
-      border-width: 2.5px;
+      transform: translateY(-6px) scale(1.01);
       border-color: var(--card-hover-border);
       background: var(--card-hover-bg);
-      box-shadow: 0 22px 48px var(--card-hover-glow), 0 0 28px var(--card-hover-glow);
+      box-shadow: 0 24px 52px var(--card-hover-glow), 0 0 0 5px rgb(245 200 66 / 13%);
     }
 
     .map-card:focus-visible {
@@ -273,8 +278,8 @@
 
     .map-card:hover .card-art img,
     .map-card:focus-visible .card-art img {
-      filter: saturate(1.06) contrast(1.02);
-      transform: scale(1.035);
+      filter: brightness(.76) saturate(.88) contrast(1.05);
+      transform: scale(1.055);
     }
 
     .map-card:hover .card-art::after,
@@ -324,6 +329,16 @@
 
     .map-card--hazards .card-body { border-top-color: var(--gold); }
 
+    .map-card--hazards .card-cue {
+      border: 1px solid rgb(245 200 66 / 55%);
+      border-radius: 999px;
+      background: rgb(255 255 255 / 9%);
+      padding: 11px 16px;
+      color: #ffe28a;
+      box-shadow: inset 0 1px 0 rgb(255 255 255 / 9%);
+      transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+    }
+
     .card-kicker {
       margin: 0 0 9px;
       color: var(--teal);
@@ -333,7 +348,11 @@
       transition: color 180ms ease;
     }
 
-    .map-card--hazards .card-kicker { color: #8b4a2b; }
+    .map-card--hazards .card-kicker { color: #ffe28a; }
+
+    .map-card--hazards .card-body h3 { color: var(--white); }
+
+    .map-card--hazards .card-body p { color: rgb(255 255 255 / 82%); }
 
     .card-body h3 {
       margin: 0;
@@ -382,6 +401,15 @@
 
     .map-card:hover .card-cue::after,
     .map-card:focus-visible .card-cue::after { transform: translateX(3px) rotate(45deg); }
+
+    .map-card--hazards:hover .card-cue,
+    .map-card--hazards:focus-visible .card-cue {
+      border-color: var(--gold);
+      background: var(--gold);
+      color: var(--indigo-deep);
+      box-shadow: 0 7px 18px rgb(0 0 0 / 22%);
+      transform: translateY(-1px);
+    }
 
     @media (max-width: 900px) {
       .map-grid { grid-template-columns: 1fr; }
@@ -465,6 +493,7 @@
       .map-card:active .card-body p { color: rgb(255 255 255 / 86%); }
       .map-card:active .card-art::after { opacity: .1; }
       .map-card:active .card-art img { transform: scale(1.02); }
+      .map-card--hazards:active .card-cue { background: var(--gold); color: var(--indigo-deep); }
     }
 
     @media (max-width: 760px) {
@@ -512,7 +541,7 @@
   <header class="masthead">
     <div class="hero">
       <div class="hero-copy">
-        <p class="hero-institution"><span class="hero-chip-dot" aria-hidden="true"></span>Consulta geográfica</p>
+        <p class="hero-institution"><span class="hero-chip-dot" aria-hidden="true"></span>Información geográfica</p>
         <h1>Geoportal del Ministerio de Trabajo y Desarrollo Humano</h1>
         <p>Insumos cartográficos institucionales a nivel nacional.</p>
       </div>
@@ -528,19 +557,18 @@
         </div>
 
         <div class="map-grid">
-          <a class="map-card map-card--units" href="unidades_infancia" aria-labelledby="units-title units-cue">
+          <a class="map-card map-card--units" href="unidades_infancia" aria-labelledby="units-title">
             <div class="card-art">
-              <img src="portal/assets/preview_unidades.svg" alt="Vista cartográfica de la distribución de las Unidades de Atención de Desarrollo Infantil" loading="lazy">
+              <img src="portal/assets/preview_unidades.svg" alt="Vista cartográfica de la distribución de las Unidades de Atención" loading="lazy">
             </div>
             <div class="card-body">
-              <span class="card-kicker">Servicios de desarrollo infantil</span>
-              <h3 id="units-title">Unidades de Atención de Desarrollo Infantil</h3>
-              <p>Consulta los servicios de desarrollo infantil y su distribución por provincia, cantón y parroquia.</p>
-              <span class="card-cue" id="units-cue">Explorar mapa</span>
+              <span class="card-kicker">Servicios de atención social</span>
+              <h3 id="units-title">Unidades de Atención</h3>
+              <p>Explora los servicios, modalidades y unidades de atención por provincia, cantón y parroquia.</p>
             </div>
           </a>
 
-          <a class="map-card map-card--hazards" href="ua_amenazas" aria-labelledby="hazards-title hazards-cue">
+          <a class="map-card map-card--hazards" href="ua_amenazas" aria-labelledby="hazards-title">
             <div class="card-art">
               <img src="portal/assets/preview_amenazas.svg" alt="Vista cartográfica de los niveles de susceptibilidad a inundaciones" loading="lazy">
             </div>
@@ -548,7 +576,6 @@
               <span class="card-kicker">Planificación y amenazas</span>
               <h3 id="hazards-title">Plan de Activación Fenómeno de El Niño</h3>
               <p>Consulta las Unidades de Atención que se encuentran en zonas susceptibles a amenazas asociadas al Evento El Niño.</p>
-              <span class="card-cue" id="hazards-cue">Explorar mapa</span>
             </div>
           </a>
         </div>

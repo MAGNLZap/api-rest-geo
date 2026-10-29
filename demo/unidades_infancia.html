@@ -2,37 +2,87 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Servicios de Desarrollo Infantil - Ecuador</title>
+<title>Unidades de Atención - Ecuador</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="portal/assets/map-loading.css">
 <style>
+ :root{--portal-indigo:#29265f;--portal-deep:#201e4c;--portal-gold:#f5c842;--portal-teal:#147c83;--portal-paper:#f4f6fa;--portal-line:#dfe3ed;--portal-muted:#5e6478;--portal-shadow:0 8px 24px rgba(32,30,76,.12);--service-dii:#147c83;--service-adult:#b38c21;--service-disability:#625fa0;--service-protection:#bd5949}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Nunito',sans-serif;background:#f0f2f5}
+html,body{height:100%;font-family:Montserrat,system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--portal-paper);color:#20233a}
 #map{width:100%;height:100%}
 .topbar{position:absolute;top:16px;left:16px;z-index:1000;display:flex;align-items:center;gap:8px}
-.topbar-brand{display:flex;flex-direction:column;align-items:center;gap:0;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-radius:16px;padding:10px 14px 8px;box-shadow:0 2px 12px rgba(0,0,0,.1)}
+.topbar-brand{display:flex;flex-direction:column;align-items:center;gap:0;background:rgba(255,255,255,.74);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.78);border-radius:16px;padding:10px 14px 8px;box-shadow:0 8px 24px rgba(32,30,76,.14),inset 0 1px 0 rgba(255,255,255,.82)}
 .topbar-brand-top{display:flex;align-items:center;gap:8px}
-.panel-icon{width:30px;height:30px;background:linear-gradient(135deg,#5B2A86,#3D1A6E);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.panel-icon{width:30px;height:30px;background:rgba(41,38,95,.9);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(8px);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(41,38,95,.2)}
 .panel-icon svg{width:16px;height:16px}
-.topbar-brand h2{font-size:13px;font-weight:700;color:#1a1a2e;line-height:1.1;font-family:'Fredoka',sans-serif;white-space:nowrap}
-.brand-loading{width:100%;height:2px;background:rgba(91,42,134,.08);border-radius:2px;overflow:hidden;margin-top:6px;display:none}
-.brand-loading::after{content:'';display:block;width:40%;height:100%;background:linear-gradient(90deg,#5B2A86,#3D1A6E);border-radius:2px;animation:loading 1s ease-in-out infinite}
+.topbar-brand h2{font-size:13px;font-weight:700;color:var(--portal-deep);line-height:1.2;font-family:Montserrat,system-ui,-apple-system,'Segoe UI',sans-serif;white-space:nowrap}
+.brand-loading{width:100%;height:2px;background:rgba(41,38,95,.08);border-radius:2px;overflow:hidden;margin-top:7px;display:none}
+.brand-loading::after{content:'';display:block;width:40%;height:100%;background:linear-gradient(90deg,var(--portal-teal),var(--portal-gold));border-radius:2px;animation:loading 1s ease-in-out infinite}
 @keyframes loading{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}
-.dpa-seg{display:flex;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-radius:24px;padding:3px;gap:2px;box-shadow:0 2px 12px rgba(0,0,0,.1)}
-.dpa-pill{position:relative;display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;color:#6b7280;transition:all .15s;user-select:none;white-space:nowrap}
+.dpa-seg{display:flex;background:rgba(255,255,255,.68);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.78);border-radius:24px;padding:4px;gap:3px;box-shadow:0 8px 24px rgba(32,30,76,.14),inset 0 1px 0 rgba(255,255,255,.82)}
+.dpa-pill{position:relative;display:flex;flex:1;align-items:center;justify-content:center;padding:7px 13px;border:1px solid transparent;border-radius:20px;background:rgba(255,255,255,.18);cursor:pointer;font-size:12px;font-weight:600;color:var(--portal-muted);transition:background .18s,color .18s,border-color .18s,box-shadow .18s;user-select:none;white-space:nowrap}
 .dpa-pill input{position:absolute;opacity:0;pointer-events:none}
-.dpa-pill .region-dot{width:8px;height:8px}
-.dpa-pill:hover{color:#5B2A86}
-.dpa-pill.active{background:#5B2A86;color:white;box-shadow:0 2px 8px rgba(91,42,134,.3)}
-.dpa-pill.active .region-dot{background:white!important}
-.region-dot{display:inline-block;width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.icon-btn{width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#5B2A86;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.1);flex-shrink:0}
-.icon-btn:hover{background:#5B2A86;color:white}
-.icon-btn:focus-visible{outline:2px solid #f5c842;outline-offset:3px}
+.dpa-pill:hover{color:var(--portal-indigo)}
+.dpa-pill:focus-within{outline:2px solid rgba(41,38,95,.65);outline-offset:2px}
+.dpa-pill.active{border-color:rgba(255,255,255,.28);background:rgba(41,38,95,.88);backdrop-filter:blur(10px);color:white;box-shadow:0 3px 10px rgba(41,38,95,.2),inset 0 1px 0 rgba(255,255,255,.16)}
+.icon-btn{width:36px;height:36px;border:1px solid rgba(255,255,255,.78);border-radius:50%;background:rgba(255,255,255,.7);backdrop-filter:blur(14px);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--portal-indigo);transition:background .18s,color .18s,box-shadow .18s,transform .18s;box-shadow:0 8px 24px rgba(32,30,76,.14),inset 0 1px 0 rgba(255,255,255,.82);flex-shrink:0}
+.icon-btn:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.4);background:rgba(41,38,95,.9);color:white;box-shadow:0 6px 16px rgba(41,38,95,.25)}
+.icon-btn:focus-visible{outline:2px solid var(--portal-gold);outline-offset:3px}
 .icon-btn svg{width:16px;height:16px}
-.leaflet-popup-content-wrapper{border-radius:12px!important;box-shadow:0 8px 32px rgba(0,0,0,.15)!important;padding:0!important;overflow:hidden}
+.map-filter-toggle{display:inline-flex;align-items:center;gap:7px;width:auto;border-radius:18px;padding:0 12px;font:600 12px Montserrat,system-ui,sans-serif}
+.map-filter-toggle svg{width:15px;height:15px}
+.filter-drawer{position:absolute;top:58px;left:16px;z-index:1200;display:grid;gap:14px;width:min(370px,calc(100vw - 32px));max-height:min(78vh,740px);overflow:auto;border:1px solid rgba(255,255,255,.82);border-radius:16px;background:rgba(255,255,255,.95);padding:18px;box-shadow:0 18px 48px rgba(22,21,61,.2),inset 0 1px 0 rgba(255,255,255,.9);backdrop-filter:blur(16px)}
+.filter-drawer[hidden]{display:none!important}
+.filter-drawer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border-bottom:1px solid var(--portal-line);padding-bottom:12px}
+.filter-drawer-head h3{margin:0;color:var(--portal-deep);font-size:15px;font-weight:700}
+.filter-drawer-head p{margin:4px 0 0;color:var(--portal-muted);font-size:11px;line-height:1.4}
+.filter-close{width:30px;height:30px;flex:none;border:1px solid var(--portal-line);border-radius:50%;background:rgba(255,255,255,.8);color:var(--portal-indigo);font-size:18px;line-height:1;cursor:pointer}
+.filter-section{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.filter-section h4{grid-column:1/-1;margin:0;color:var(--portal-indigo);font-size:12px;font-weight:700}
+.filter-field{display:grid;gap:5px;color:var(--portal-muted);font-size:11px;font-weight:600}
+.filter-field--wide{grid-column:1/-1}
+.filter-control{width:100%;min-width:0;border:1px solid #d4d8e5;border-radius:8px;background:rgba(255,255,255,.88);padding:8px 9px;color:var(--portal-deep);font:500 12px Montserrat,system-ui,sans-serif;outline:none}
+.filter-control:focus{border-color:var(--portal-indigo);box-shadow:0 0 0 3px rgba(41,38,95,.12)}
+.filter-advanced{border-top:1px solid var(--portal-line);padding-top:11px}
+.filter-advanced summary{color:var(--portal-indigo);font-size:12px;font-weight:700;cursor:pointer}
+.filter-advanced .filter-section{padding-top:12px}
+.filter-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--portal-line);padding-top:12px}
+.filter-clear{border:1px solid rgba(41,38,95,.18);border-radius:8px;background:rgba(255,255,255,.82);padding:8px 10px;color:var(--portal-indigo);font:600 11px Montserrat,system-ui,sans-serif;cursor:pointer}
+.filter-clear:hover{border-color:var(--portal-indigo);background:#fff}
+.filter-results{color:var(--portal-muted);font-size:11px;font-weight:600}
+.map-summary{position:absolute;right:62px;bottom:18px;z-index:1000;display:flex;align-items:center;gap:16px;border:1px solid rgba(255,255,255,.82);border-radius:12px;background:rgba(255,255,255,.9);padding:8px 13px;box-shadow:var(--portal-shadow);backdrop-filter:blur(12px)}
+.summary-item{display:grid;gap:2px}
+.summary-value{color:var(--portal-indigo);font-size:13px;font-weight:750;font-variant-numeric:tabular-nums}
+.summary-label{color:var(--portal-muted);font-size:9px;font-weight:600}
+.map-empty{position:absolute;top:50%;left:50%;z-index:900;display:grid;gap:7px;max-width:min(330px,calc(100% - 32px));transform:translate(-50%,-50%);border:1px solid rgba(255,255,255,.86);border-radius:14px;background:rgba(255,255,255,.94);padding:18px 20px;text-align:center;box-shadow:0 14px 34px rgba(32,30,76,.16);backdrop-filter:blur(14px)}
+.map-empty[hidden]{display:none!important}
+.map-empty strong{color:var(--portal-deep);font-size:14px}
+.map-empty span{color:var(--portal-muted);font-size:12px;line-height:1.45}
+.map-legend{position:absolute;top:68px;right:18px;z-index:950;display:grid;gap:7px;border:1px solid rgba(255,255,255,.82);border-radius:11px;background:rgba(255,255,255,.9);padding:10px 12px;box-shadow:var(--portal-shadow);backdrop-filter:blur(12px)}
+.map-legend[hidden]{display:none!important}
+.map-legend-title{margin:0 0 2px;color:var(--portal-deep);font-size:11px;font-weight:700}
+.map-legend-row{display:flex;align-items:center;gap:8px;color:var(--portal-muted);font-size:10px;font-weight:550}
+.legend-swatch{width:9px;height:9px;flex:none;border:1px solid rgba(32,30,76,.22);border-radius:2px}
+.legend-swatch--dii{background:var(--service-dii)}
+.legend-swatch--adult{background:var(--service-adult)}
+.legend-swatch--disability{background:var(--service-disability)}
+.legend-swatch--protection{background:var(--service-protection)}
+.map-detail{position:absolute;top:68px;right:18px;z-index:1100;width:min(330px,calc(100vw - 36px));border:1px solid rgba(255,255,255,.85);border-radius:14px;background:rgba(255,255,255,.95);padding:16px;box-shadow:0 18px 45px rgba(32,30,76,.2);backdrop-filter:blur(16px)}
+.map-detail[hidden]{display:none!important}
+.map-detail-close{float:right;width:26px;height:26px;border:1px solid var(--portal-line);border-radius:50%;background:#fff;color:var(--portal-indigo);cursor:pointer}
+.map-detail h3{margin:0 32px 6px 0;color:var(--portal-deep);font-size:15px;line-height:1.35}
+.map-detail-meta{margin:0 0 12px;color:var(--portal-muted);font-size:11px;line-height:1.45}
+.map-detail-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;border-top:1px solid var(--portal-line);padding-top:11px}
+.map-detail-stat{display:grid;gap:2px}
+.map-detail-stat strong{color:var(--portal-indigo);font-size:13px}
+.map-detail-stat span{color:var(--portal-muted);font-size:10px}
+.map-detail-link{display:inline-flex;margin-top:12px;border-radius:7px;background:var(--portal-indigo);padding:8px 11px;color:#fff;text-decoration:none;font-size:11px;font-weight:650}
+.map-detail-link:hover{background:var(--portal-deep)}
+@media(max-width:760px){.filter-drawer{top:58px;left:10px;width:min(390px,calc(100vw - 20px));max-height:calc(100vh - 78px);padding:15px}.map-summary{right:12px;bottom:12px;gap:10px;padding:7px 10px}.summary-value{font-size:11px}.summary-label{font-size:8px}.map-legend{top:auto;right:12px;bottom:82px}.map-detail{top:auto;right:12px;bottom:82px}.source-chip{left:10px;bottom:12px;max-width:calc(100% - 24px);font-size:9px}.dpa-seg{max-width:48vw;overflow:auto}.topbar{gap:7px;padding:8px}.topbar-brand h2{font-size:13px}}
+@media(max-width:480px){.dpa-seg{display:none}.map-summary{left:10px;right:auto;bottom:56px}.source-chip{bottom:10px}.filter-section{grid-template-columns:1fr 1fr}.map-legend{bottom:115px}}
+.leaflet-popup-content-wrapper{border:1px solid rgba(41,38,95,.12)!important;border-radius:12px!important;box-shadow:0 12px 34px rgba(32,30,76,.18)!important;padding:0!important;overflow:hidden}
 .leaflet-popup-content{margin:0!important}
 .leaflet-popup-content.cluster-popup{min-width:0!important;width:auto!important}
 .leaflet-popup-tip{box-shadow:0 4px 12px rgba(0,0,0,.1)!important}
@@ -41,27 +91,29 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:#f0f2f5}
 .cluster-pin{transition:transform .2s}
 .cluster-pin:hover{transform:scale(1.1)}
 .cluster-pin:hover{transform:scale(1.1)}
-.popup-card{font-family:'Nunito',sans-serif}
-.popup-header{padding:14px 16px 10px;background:linear-gradient(135deg,#5B2A86,#3D1A6E);color:white}
+.popup-card{font-family:Montserrat,system-ui,-apple-system,'Segoe UI',sans-serif}
+.popup-header{padding:14px 16px 10px;background:linear-gradient(135deg,var(--portal-indigo),var(--portal-deep));color:white}
 .popup-header h3{font-size:14px;font-weight:600;line-height:1.3;margin:0}
 .popup-header .popup-tag{display:inline-block;background:rgba(255,255,255,.25);padding:2px 8px;border-radius:4px;font-size:11px;margin-top:6px;font-weight:500}
 .popup-body{padding:12px 16px}
 .popup-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f5f5f5;font-size:12px}
 .popup-row:last-child{border-bottom:none}
-.popup-row .label{color:#888;font-weight:500}
-.popup-row .value{color:#1a1a2e;font-weight:600;text-align:right;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.popup-row .label{color:var(--portal-muted);font-weight:500}
+.popup-row .value{color:var(--portal-deep);font-weight:600;text-align:right;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .popup-link{display:inline-block;padding:8px 20px;text-align:center;color:white;text-decoration:none;font-size:12px;font-weight:700;transition:opacity .2s;border:none;border-radius:6px;cursor:pointer;font-family:inherit}
 .popup-link:hover{opacity:.85}
 .popup-cluster{padding:0;overflow:hidden}
-.popup-cluster-header{background:linear-gradient(135deg,#5B2A86,#3D1A6E);padding:14px 16px 10px;color:white;text-align:center}
+.popup-cluster-header{background:linear-gradient(135deg,var(--portal-indigo),var(--portal-deep));padding:14px 16px 10px;color:white;text-align:center}
 .popup-cluster-count{font-size:36px;font-weight:700;line-height:1;color:white}
 .popup-cluster-label{font-size:13px;font-weight:600;opacity:.9;margin-top:4px}
 .popup-cluster-body{padding:12px 16px;text-align:center}
-.popup-cluster-hint{font-size:11px;color:#888;line-height:1.4}
-.dpa-legend{position:absolute;right:20px;top:20px;z-index:1000;background:rgba(255,255,255,.88);border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.1);padding:8px 12px;font-family:'Nunito',sans-serif;font-size:12px;color:#444;pointer-events:none;opacity:0;transition:opacity .15s;backdrop-filter:blur(12px)}
+.popup-cluster-hint{font-size:11px;color:var(--portal-muted);line-height:1.4}
+.dpa-legend{position:absolute;right:20px;top:20px;z-index:1000;background:rgba(255,255,255,.9);border:1px solid rgba(41,38,95,.12);border-radius:12px;box-shadow:var(--portal-shadow);padding:9px 13px;font-family:Montserrat,system-ui,-apple-system,'Segoe UI',sans-serif;font-size:12px;color:var(--portal-deep);pointer-events:none;opacity:0;transition:opacity .18s;backdrop-filter:blur(12px)}
 .dpa-legend.visible{opacity:1}
-.dpa-legend .dpa-legend-label{font-size:9px;font-weight:700;color:#a5a5c0;text-transform:uppercase;letter-spacing:.6px}
-.dpa-legend .dpa-legend-value{font-size:12px;font-weight:700;color:#1a1a2e;margin-top:1px}
+.dpa-legend .dpa-legend-label{font-size:10px;font-weight:600;color:var(--portal-muted)}
+.dpa-legend .dpa-legend-value{font-size:12px;font-weight:700;color:var(--portal-indigo);margin-top:2px}
+.dpa-legend{top:auto;bottom:70px;right:18px}
+.source-chip{position:absolute;bottom:20px;left:20px;z-index:1000;max-width:min(620px,calc(100% - 40px));border:1px solid rgba(41,38,95,.1);border-left:3px solid var(--portal-gold);border-radius:9px;background:rgba(255,255,255,.88);padding:8px 12px;color:var(--portal-muted);font:500 11px/1.45 Montserrat,system-ui,-apple-system,'Segoe UI',sans-serif;box-shadow:0 5px 16px rgba(32,30,76,.1);backdrop-filter:blur(10px)}
 </style>
 </head>
 <body>
@@ -86,20 +138,73 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:#f0f2f5}
         <div class="brand-loading" id="brandLoading"></div>
     </div>
     <div class="dpa-seg">
-        <label class="dpa-pill active"><span class="region-dot" style="background:#5C9EFF"></span>Provincias<input type="radio" name="dpaLevel" value="provincias" checked></label>
-        <label class="dpa-pill"><span class="region-dot" style="background:#18B2A2"></span>Cantones<input type="radio" name="dpaLevel" value="cantones"></label>
-        <label class="dpa-pill"><span class="region-dot" style="background:#FFCD56"></span>Parroquias<input type="radio" name="dpaLevel" value="parroquias"></label>
+        <label class="dpa-pill active">Provincias<input type="radio" name="dpaLevel" value="provincias" checked></label>
+        <label class="dpa-pill">Cantones<input type="radio" name="dpaLevel" value="cantones"></label>
+        <label class="dpa-pill">Parroquias<input type="radio" name="dpaLevel" value="parroquias"></label>
     </div>
-    <button class="icon-btn" onclick="reloadData()" title="Recargar datos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.3"/><path d="M21 3v6h-6"/></svg></button>
+    <button class="icon-btn map-filter-toggle" id="filterToggle" type="button" aria-label="Abrir filtros" aria-expanded="false" aria-controls="filterDrawer" title="Filtros">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M7 12h10m-7 6h4"/><circle cx="8" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg>
+        <span>Filtros</span>
+    </button>
+    <button class="icon-btn" onclick="resetMapView()" title="Restablecer filtros y vista" aria-label="Restablecer filtros y vista"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.3"/><path d="M21 3v6h-6"/></svg></button>
 </div>
+<aside class="filter-drawer" id="filterDrawer" aria-labelledby="filterTitle" hidden>
+    <div class="filter-drawer-head">
+        <div><h3 id="filterTitle">Filtros del mapa</h3><p id="filterResults">Cargando unidades…</p></div>
+        <button class="filter-close" id="filterClose" type="button" aria-label="Cerrar filtros">×</button>
+    </div>
+    <label class="filter-field filter-field--wide">Buscar unidad
+        <input class="filter-control" id="filterSearch" type="search" placeholder="Nombre, servicio o código" autocomplete="off">
+    </label>
+    <section class="filter-section" aria-labelledby="territoryFiltersTitle">
+        <h4 id="territoryFiltersTitle">Territorio</h4>
+        <label class="filter-field">Región<select class="filter-control" id="filterRegion"><option value="">Todas</option></select></label>
+        <label class="filter-field">Provincia<select class="filter-control" id="filterProvince"><option value="">Todas</option></select></label>
+        <label class="filter-field">Cantón<select class="filter-control" id="filterCanton"><option value="">Todos</option></select></label>
+        <label class="filter-field">Parroquia<select class="filter-control" id="filterParish"><option value="">Todas</option></select></label>
+    </section>
+    <section class="filter-section" aria-labelledby="serviceFiltersTitle">
+        <h4 id="serviceFiltersTitle">Servicios</h4>
+        <label class="filter-field filter-field--wide">Servicio<select class="filter-control" id="filterService"><option value="">Todos</option></select></label>
+        <label class="filter-field filter-field--wide">Modalidad<select class="filter-control" id="filterModality"><option value="">Todas</option></select></label>
+        <label class="filter-field">Área<select class="filter-control" id="filterArea"><option value="">Todas</option></select></label>
+        <label class="filter-field">Tipo de atención<select class="filter-control" id="filterType"><option value="">Todos</option></select></label>
+    </section>
+    <label class="filter-field">Visualización del mapa
+        <select class="filter-control" id="filterMapMode">
+            <option value="points">Ubicaciones</option>
+            <option value="units">Unidades por territorio</option>
+            <option value="users">Usuarios registrados</option>
+        </select>
+    </label>
+    <details class="filter-advanced">
+        <summary>Más criterios</summary>
+        <div class="filter-section">
+            <label class="filter-field">Administración<select class="filter-control" id="filterAdmin"><option value="">Todas</option></select></label>
+            <label class="filter-field">Entidad cooperante<select class="filter-control" id="filterCooperator"><option value="">Todas</option></select></label>
+        </div>
+    </details>
+    <div class="filter-actions">
+        <span class="filter-results" id="filterUserTotal">—</span>
+        <button class="filter-clear" id="clearFilters" type="button">Limpiar filtros</button>
+    </div>
+</aside>
+<div class="map-legend" id="mapLegend" aria-live="polite"></div>
+<div class="map-summary" id="mapSummary" aria-live="polite">
+    <div class="summary-item"><span class="summary-value" id="summaryUnits">—</span><span class="summary-label">Unidades</span></div>
+    <div class="summary-item"><span class="summary-value" id="summaryUsers">—</span><span class="summary-label">Usuarios</span></div>
+    <div class="summary-item"><span class="summary-value" id="summaryArea">—</span><span class="summary-label">Urbano / rural</span></div>
+</div>
+<div class="map-empty" id="mapEmpty" hidden><strong>No hay unidades con estos filtros</strong><span>Prueba otra combinación o limpia los filtros.</span><button class="filter-clear" type="button" onclick="clearMapFilters()">Limpiar filtros</button></div>
 <div id="map"></div>
 <div class="dpa-legend" id="dpaLegend">
     <div class="dpa-legend-label" id="dpaLegendLabel">Zona</div>
     <div class="dpa-legend-value" id="dpaLegendValue">—</div>
 </div>
-<div style="position:absolute;bottom:20px;left:20px;z-index:1000;background:rgba(255,255,255,.85);padding:6px 12px;border-radius:8px;font-size:11px;color:#888;font-family:Nunito,sans-serif;backdrop-filter:blur(4px);box-shadow:0 2px 8px rgba(0,0,0,.08)">Datos: Ministerio de Trabajo y Desarrollo Humano · Servicios de Desarrollo Infantil · Mapas: Google</div>
+<div class="source-chip">Datos: Ministerio de Trabajo y Desarrollo Humano · Unidades de Atención</div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" onerror="window.MapLoading.fail('No se pudo cargar la librería cartográfica.')"></script>
 <script src="https://unpkg.com/@turf/turf@7/turf.min.js"></script>
+<script src="https://unpkg.com/supercluster@8/dist/supercluster.min.js" onerror="window.MapLoading.fail('No se pudo cargar la agrupación de puntos.')"></script>
 <script>
 const ROOT=window.location.pathname.replace(/\/(?:unidades_infancia|demo)\/?$/,'').replace(/\/$/,'');
 const API=ROOT+"/unidades";
@@ -155,6 +260,15 @@ let activeDpa='provincias';
 function getDpaStyle(feature){
     const region=provinceRegion[feature.properties.province_id||feature.properties.id];
     const colors=region?regionColors[region]:regionColors.sierra;
+    const mode=document.getElementById('filterMapMode').value;
+    if(mode!=='points'){
+        const field=activeDpa==='provincias'?'dpa_despro':activeDpa==='cantones'?'dpa_descan':'dpa_despar';
+        const name=String(feature.properties.name||'').trim().toLocaleLowerCase('es');
+        const values=filteredFeatures.filter(function(f){return fieldValue(f,field).toLocaleLowerCase('es')===name});
+        const metric=mode==='users'?values.reduce(function(total,f){return total+(Number(f.properties.total)||0)},0):values.length;
+        const intensity=Math.min(1,metric/(activeDpa==='provincias'?50000:activeDpa==='cantones'?10000:2000));
+        return {fillColor:metric?'#29265f':'#e7e8ef',fillOpacity:0.2+intensity*.65,color:'white',weight:activeDpa==='parroquias'?1:activeDpa==='cantones'?2:3,opacity:.9};
+    }
     return {
         fillColor:colors.fill,
         fillOpacity:0.4,
@@ -282,7 +396,79 @@ function buildOutline(){
 
 let stickyMarker=null;
 let currentPopup=null;
-let clusterRequest=0;
+let allFeatures=[];
+let filteredFeatures=[];
+let index=new Supercluster({radius:80,maxZoom:14});
+
+const filterFields={search:'filterSearch',region:'filterRegion',province:'filterProvince',canton:'filterCanton',parish:'filterParish',service:'filterService',modality:'filterModality',area:'filterArea',type:'filterType',admin:'filterAdmin',cooperator:'filterCooperator'};
+const filterDefaults={region:'Todas',province:'Todas',canton:'Todos',parish:'Todas',service:'Todos',modality:'Todas',area:'Todas',type:'Todos',admin:'Todas',cooperator:'Todas'};
+function fieldValue(feature,key){return String(feature.properties[key]??'').trim()}
+function uniqueValues(features,key){return Array.from(new Set(features.map(function(f){return fieldValue(f,key)}).filter(Boolean))).sort(function(a,b){return a.localeCompare(b,'es')})}
+function fillSelect(id,values,first){const el=document.getElementById(id);const previous=el.value;el.replaceChildren(new Option(first,''));values.forEach(function(v){el.add(new Option(v,v))});if(values.includes(previous))el.value=previous}
+function populateFilters(){
+    fillSelect('filterRegion',Object.keys(regionNames).map(function(k){return regionNames[k]}),'Todas');
+    fillSelect('filterProvince',uniqueValues(allFeatures,'dpa_despro'),'Todas');
+    fillSelect('filterCanton',uniqueValues(allFeatures,'dpa_descan'),'Todos');
+    fillSelect('filterParish',uniqueValues(allFeatures,'dpa_despar'),'Todas');
+    [['filterService','servicio','Todos'],['filterModality','mod','Todas'],['filterArea','area','Todas'],['filterType','tipo','Todos'],['filterAdmin','tipo_admin','Todas'],['filterCooperator','cooperante','Todas']].forEach(function(item){fillSelect(item[0],uniqueValues(allFeatures,item[1]),item[2])});
+}
+function selected(id){return document.getElementById(id).value}
+function applyFilters(){
+    const q=selected('filterSearch').trim().toLocaleLowerCase('es');
+    const region=selected('filterRegion'),province=selected('filterProvince'),canton=selected('filterCanton');
+    filteredFeatures=allFeatures.filter(function(feature){
+        const p=feature.properties;
+        if(region&&String(p.region||regionNames[getRegionKey(p.dpa_prov)]||'').toLocaleLowerCase('es')!==region.toLocaleLowerCase('es'))return false;
+        if(province&&fieldValue(feature,'dpa_despro')!==province)return false;
+        if(canton&&fieldValue(feature,'dpa_descan')!==canton)return false;
+        if(selected('filterParish')&&fieldValue(feature,'dpa_despar')!==selected('filterParish'))return false;
+        if(selected('filterService')&&fieldValue(feature,'servicio')!==selected('filterService'))return false;
+        if(selected('filterModality')&&fieldValue(feature,'mod')!==selected('filterModality'))return false;
+        if(selected('filterArea')&&fieldValue(feature,'area')!==selected('filterArea'))return false;
+        if(selected('filterType')&&fieldValue(feature,'tipo')!==selected('filterType'))return false;
+        if(selected('filterAdmin')&&fieldValue(feature,'tipo_admin')!==selected('filterAdmin'))return false;
+        if(selected('filterCooperator')&&fieldValue(feature,'cooperante')!==selected('filterCooperator'))return false;
+        if(q&&!['nombre','servicio','ruc','codigo'].some(function(key){return fieldValue(feature,key).toLocaleLowerCase('es').includes(q)}))return false;
+        return true;
+    });
+    const mapMode=document.getElementById('filterMapMode').value;
+    if(dpaLayers[activeDpa])dpaLayers[activeDpa].eachLayer(function(layer){if(layer.feature)layer.setStyle(getDpaStyle(layer.feature))});
+    index=new Supercluster({radius:80,maxZoom:14});index.load(filteredFeatures);
+    const users=filteredFeatures.reduce(function(total,f){return total+(Number(f.properties.total)||0)},0);
+    const urban=filteredFeatures.filter(function(f){return fieldValue(f,'area').toLocaleLowerCase('es').includes('urb')}).length;
+    document.getElementById('summaryUnits').textContent=filteredFeatures.length.toLocaleString('es');
+    document.getElementById('summaryUsers').textContent=users.toLocaleString('es');
+    document.getElementById('summaryArea').textContent=urban.toLocaleString('es')+' / '+(filteredFeatures.length-urban).toLocaleString('es');
+    document.getElementById('filterResults').textContent=filteredFeatures.length.toLocaleString('es')+' unidades encontradas';
+    document.getElementById('filterUserTotal').textContent=users.toLocaleString('es')+' usuarios';
+    document.getElementById('mapEmpty').hidden=filteredFeatures.length>0;
+    updateClusters();
+}
+function clearMapFilters(){document.querySelectorAll('#filterDrawer select').forEach(function(el){el.value=''});document.getElementById('filterSearch').value='';populateFilters();applyFilters()}
+function resetMapView(){clearMapFilters();map.setView([-1.83,-78.18],7)}
+document.getElementById('filterToggle').addEventListener('click',function(){const drawer=document.getElementById('filterDrawer');drawer.hidden=!drawer.hidden;this.setAttribute('aria-expanded',String(!drawer.hidden))});
+document.getElementById('filterClose').addEventListener('click',function(){document.getElementById('filterDrawer').hidden=true;document.getElementById('filterToggle').setAttribute('aria-expanded','false')});
+document.getElementById('clearFilters').addEventListener('click',clearMapFilters);
+document.getElementById('filterMapMode').addEventListener('change',function(){
+    document.getElementById('mapLegend').innerHTML=this.value==='points'?'<p class="map-legend-title">Servicios</p><div class="map-legend-row"><span class="legend-swatch legend-swatch--dii"></span>Desarrollo infantil</div><div class="map-legend-row"><span class="legend-swatch legend-swatch--adult"></span>Personas adultas mayores</div><div class="map-legend-row"><span class="legend-swatch legend-swatch--disability"></span>Discapacidad y protección</div>':'<p class="map-legend-title">'+(this.value==='users'?'Usuarios registrados':'Unidades por territorio')+'</p><div class="map-legend-row"><span class="legend-swatch" style="background:#29265f"></span>Mayor concentración</div>';
+    applyFilters();
+});
+Object.keys(filterFields).forEach(function(key){const el=document.getElementById(filterFields[key]);el.addEventListener(key==='search'?'input':'change',function(){
+    if(key==='region'){document.getElementById('filterProvince').value='';document.getElementById('filterCanton').value='';document.getElementById('filterParish').value=''}
+    if(key==='province'){document.getElementById('filterCanton').value='';document.getElementById('filterParish').value=''}
+    if(key==='canton')document.getElementById('filterParish').value='';
+    if(['region','province','canton'].includes(key))refreshTerritoryOptions();
+    applyFilters();
+})});
+function refreshTerritoryOptions(){
+    const region=selected('filterRegion'),province=selected('filterProvince'),canton=selected('filterCanton');
+    const inRegion=allFeatures.filter(function(f){return !region||String(f.properties.region||regionNames[getRegionKey(f.properties.dpa_prov)]||'').toLocaleLowerCase('es')===region.toLocaleLowerCase('es')});
+    fillSelect('filterProvince',uniqueValues(inRegion,'dpa_despro'),'Todas');
+    const inProvince=inRegion.filter(function(f){return !province||fieldValue(f,'dpa_despro')===province});
+    fillSelect('filterCanton',uniqueValues(inProvince,'dpa_descan'),'Todos');
+    const inCanton=inProvince.filter(function(f){return !canton||fieldValue(f,'dpa_descan')===canton});
+    fillSelect('filterParish',uniqueValues(inCanton,'dpa_despar'),'Todas');
+}
 
 function openPopupFor(marker,feature){
     closePopup();
@@ -309,11 +495,13 @@ function closePopup(){
     if(currentPopup){map.closePopup(currentPopup);currentPopup=null}
 }
 
-function createMarkerIcon(){
+function createMarkerIcon(feature){
+    const service=String(feature.properties.servicio||'').toLocaleLowerCase('es');
+    const color=service.includes('adult')?'#d6a21d':service.includes('discap')?'#5453a6':service.includes('protecci')?'#dd7666':'#168f86';
     return L.divIcon({
         className:"marker-pin",
         iconSize:[80,80],iconAnchor:[40,40],popupAnchor:[0,-42],
-        html:'<div style="display:flex;align-items:flex-start;justify-content:center;width:80px;height:80px;padding-top:40px"><svg pointer-events="none" width="28" height="38" viewBox="0 0 28 38" fill="none"><path d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 24 14 24s14-13.5 14-24C28 6.268 21.732 0 14 0z" fill="#5B2A86"/><circle cx="14" cy="13" r="7" fill="white"/><path d="M14 9v8M10 13h8" stroke="#5B2A86" stroke-width="2" stroke-linecap="round"/></svg></div>'
+        html:'<div style="display:flex;align-items:flex-start;justify-content:center;width:80px;height:80px;padding-top:40px"><svg pointer-events="none" width="28" height="38" viewBox="0 0 28 38" fill="none"><path d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 24 14 24s14-13.5 14-24C28 6.268 21.732 0 14 0z" fill="'+color+'"/><circle cx="14" cy="13" r="7" fill="white"/><path d="M14 9v8M10 13h8" stroke="#f5c842" stroke-width="2" stroke-linecap="round"/></svg></div>'
     });
 }
 
@@ -323,25 +511,24 @@ function createClusterIcon(count,size){
     return L.divIcon({
         className:"cluster-pin",
         iconSize:[r*2,r*2],iconAnchor:[r,r],
-        html:'<div style="width:'+r*2+'px;height:'+r*2+'px;background:linear-gradient(135deg,#5B2A86,#3D1A6E);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:'+fs+'px;border:2px solid white;box-shadow:0 1px 8px rgba(91,42,134,.3);font-family:Nunito,sans-serif">'+count+'</div>'
+        html:'<div style="width:'+r*2+'px;height:'+r*2+'px;background:linear-gradient(135deg,#29265f,#201e4c);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:'+fs+'px;border:2px solid #f5c842;box-shadow:0 2px 10px rgba(32,30,76,.3);font-family:Montserrat,sans-serif">'+count+'</div>'
     });
 }
 
 function popup(feature){
     const p=feature.properties;
-    const clusterCount=Number(p.cluster_count||0);
-    if(clusterCount>1){
-        return '<div class="popup-card"><div class="popup-cluster"><div class="popup-cluster-header"><div class="popup-cluster-count">'+clusterCount+'</div><div class="popup-cluster-label">unidades</div></div><div class="popup-cluster-body"><div class="popup-cluster-hint">Click para acercar</div></div></div></div>';
+    if(p.cluster){
+        return '<div class="popup-card"><div class="popup-cluster"><div class="popup-cluster-header"><div class="popup-cluster-count">'+p.point_count+'</div><div class="popup-cluster-label">unidades</div></div><div class="popup-cluster-body"><div class="popup-cluster-hint">Click para acercar</div></div></div></div>';
     }
     const regionKey=getRegionKey(p.dpa_prov);
     const region=regionKey?regionNames[regionKey]:'';
-    const headerBg=regionKey?'background:'+regionColors[regionKey].fill:'background:linear-gradient(135deg,#5B2A86,#3D1A6E)';
+    const headerBg=regionKey?'background:'+regionColors[regionKey].fill:'background:linear-gradient(135deg,#29265f,#201e4c)';
     const headerColor=regionKey?regionColors[regionKey].text:'white';
     let rows='';
     [['RUC',p.ruc],['Modalidad',p.mod],['Servicio',p.servicio],['Provincia',p.dpa_despro],['Cantón',p.dpa_descan],['Área',p.area],['Tipo',p.tipo],['Dirigido a',p.corte]].forEach(function(f){
         if(f[1]) rows+='<div class="popup-row"><span class="label">'+f[0]+'</span><span class="value">'+f[1]+'</span></div>';
     });
-    const btnBg=regionKey?regionColors[regionKey].fill:'#5B2A86';
+    const btnBg=regionKey?regionColors[regionKey].fill:'#29265f';
     const dataHref=p.link_ubi?p.link_ubi.replace(/"/g,'&quot;'):'';
     let link=dataHref?('<div style="padding:8px 16px 12px;text-align:center"><button class="popup-link" data-href="'+dataHref+'" style="background:'+btnBg+'">Abrir en Google Maps</button></div>'):'';
     const regionBadge=region?('<span class="popup-tag" style="background:rgba(255,255,255,.25);color:'+regionColors[regionKey].text+';font-weight:600">'+region+'</span>'):'';
@@ -350,72 +537,88 @@ function popup(feature){
 
 function getBBox(){const b=map.getBounds();return[b.getWest(),b.getSouth(),b.getEast(),b.getNorth()]}
 
-async function updateClusters(){
-    const requestId=++clusterRequest;
+function updateClusters(){
+    if(!allFeatures.length)return;
+    closePopup();stickyMarker=null;
+    markersLayer.clearLayers();
+    if(!filteredFeatures.length)return;
+    const clusters=index.getClusters(getBBox(),Math.floor(map.getZoom()));
+    clusters.forEach(function(feature){
+        const coordinates=feature.geometry.coordinates;
+        const latLng=[coordinates[1],coordinates[0]];
+        let marker;
+        if(feature.properties.cluster){
+            const count=feature.properties.point_count;
+            const size=count>50?'large':count>10?'medium':'small';
+            marker=L.marker(latLng,{icon:createClusterIcon(count,size)});
+            marker.on('mouseover',function(){marker.openPopup()});
+            marker.on('mouseout',function(){marker.closePopup()});
+            marker.on('click',function(){
+                const zoom=index.getClusterExpansionZoom(feature.properties.cluster_id);
+                map.setView(latLng,zoom);
+            });
+            marker.bindPopup(popup(feature),{maxWidth:320,minWidth:0});
+            marker.on('popupopen',function(){
+                const element=marker.getElement();
+                const content=element&&element.querySelector('.leaflet-popup-content');
+                if(content)content.classList.add('cluster-popup');
+            });
+        }else{
+            marker=L.marker(latLng,{icon:createMarkerIcon(feature)});
+            marker.on('mouseover',function(){
+                if(stickyMarker!==marker)openPopupFor(marker,feature);
+            });
+            marker.on('mouseout',function(){
+                if(stickyMarker!==marker)closePopup();
+            });
+            marker.on('click',function(event){
+                L.DomEvent.stopPropagation(event);
+                L.DomEvent.preventDefault(event);
+                if(stickyMarker===marker){
+                    closePopup();
+                    stickyMarker=null;
+                }else{
+                    stickyMarker=marker;
+                    openPopupFor(marker,feature);
+                }
+            });
+        }
+        markersLayer.addLayer(marker);
+    });
+}
+
+async function loadAllData(){
     const loading=document.getElementById('brandLoading');
     loading.style.display='block';
-    closePopup();stickyMarker=null;
-    const params=new URLSearchParams({cluster:'true',bbox:getBBox().join(','),zoom:String(Math.floor(map.getZoom()))});
     try{
-        const response=await fetch(API+'?'+params.toString());
+        const response=await fetch(API+'?limit=0');
         if(!response.ok)throw new Error('HTTP '+response.status);
         const collection=await response.json();
-        if(requestId!==clusterRequest)return;
-        markersLayer.clearLayers();
-        const icon=createMarkerIcon();
-        collection.features.forEach(function(feature){
-            const coordinates=feature.geometry.coordinates;
-            const latLng=[coordinates[1],coordinates[0]];
-            const count=Number(feature.properties.cluster_count||1);
-            let marker;
-            if(count>1){
-                const size=count>50?'large':count>10?'medium':'small';
-                marker=L.marker(latLng,{icon:createClusterIcon(count,size)});
-                marker.on('mouseover',function(){marker.openPopup()});
-                marker.on('mouseout',function(){marker.closePopup()});
-                marker.on('click',function(){map.setView(latLng,Math.min(map.getZoom()+2,map.getMaxZoom()))});
-                marker.bindPopup(popup(feature),{maxWidth:320,minWidth:0});
-                marker.on('popupopen',function(){
-                    const element=marker.getElement();
-                    const content=element&&element.querySelector('.leaflet-popup-content');
-                    if(content)content.classList.add('cluster-popup');
-                });
-            }else{
-                marker=L.marker(latLng,{icon:icon});
-                marker.on('mouseover',function(){
-                    if(stickyMarker!==marker)openPopupFor(marker,feature);
-                });
-                marker.on('mouseout',function(){
-                    if(stickyMarker!==marker)closePopup();
-                });
-                marker.on('click',function(event){
-                    L.DomEvent.stopPropagation(event);
-                    L.DomEvent.preventDefault(event);
-                    if(stickyMarker===marker){
-                        closePopup();
-                        stickyMarker=null;
-                    }else{
-                        stickyMarker=marker;
-                        openPopupFor(marker,feature);
-                    }
-                });
-            }
-            markersLayer.addLayer(marker);
-        });
+        if(collection.type!=='FeatureCollection'||!Array.isArray(collection.features)){
+            throw new Error('La API no devolvió una FeatureCollection');
+        }
+        allFeatures=collection.features;
+        filteredFeatures=allFeatures;
+        populateFilters();
+        applyFilters();
         return true;
     }catch(error){
-        if(requestId===clusterRequest)console.error('Error loading map clusters:',error);
+        console.error('Error loading unit data:',error);
         return false;
     }finally{
-        if(requestId===clusterRequest)loading.style.display='none';
+        loading.style.display='none';
     }
 }
 
 async function reloadData(){
-    await updateClusters();
+    markersLayer.clearLayers();
+    allFeatures=[];
+    filteredFeatures=[];
+    index=new Supercluster({radius:80,maxZoom:14});
+    if(await loadAllData())updateClusters();
 }
 
-map.on('moveend',updateClusters);
+map.on('moveend zoomend',updateClusters);
 map.on('click',function(){
     if(stickyMarker){closePopup();stickyMarker=null}
 });
@@ -424,8 +627,13 @@ map.on('click',function(){
     ['provincias','cantones','parroquias'].forEach(function(k){dpaLayers[k]=L.layerGroup()});
     loadEcuadorGeo().then(function(){buildMask();buildOutline()});
     try{
-        const ready=await Promise.all([setDpaLevel('provincias'),updateClusters(),baseTilesReady]);
-        if(ready[0]&&ready[1])window.MapLoading.finish();
+        const ready=await Promise.all([setDpaLevel('provincias'),loadAllData(),baseTilesReady]);
+        if(ready[0]&&ready[1]){
+            updateClusters();
+            applyFilters();
+            document.getElementById('filterMapMode').dispatchEvent(new Event('change'));
+            window.MapLoading.finish();
+        }
         else window.MapLoading.fail('No se pudieron cargar las capas de unidades.');
     }catch(error){
         console.error('Error initializing map:',error);
