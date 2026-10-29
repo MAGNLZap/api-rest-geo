@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="portal/assets/ecuador_hero.svg">
 <title>Plan de Activación Fenómeno de El Niño · Geoportal MTDH</title>
 <link rel="stylesheet" href="portal/assets/map-loading.css">
 <style>
@@ -456,8 +457,8 @@ select:disabled{background:#f1f2f6;color:#9aa0b0}
 <body>
 <div class="map-loading-screen" id="mapLoading" role="status" aria-live="polite" aria-busy="true">
   <div class="map-loading-panel">
-    <p class="map-loading-heading"><span class="map-loading-dot" aria-hidden="true"></span><span id="mapLoadingTitle">Preparando el mapa</span></p>
-    <p class="map-loading-detail" id="mapLoadingDetail">Cargando información geográfica y capas.</p>
+    <div class="map-loading-visual" aria-hidden="true"><img class="map-loading-map" src="portal/assets/ecuador_hero.svg" alt=""></div>
+    <p class="map-loading-detail" id="mapLoadingDetail">Cargando el mapa y sus capas geográficas…</p>
     <div class="map-loading-track" aria-hidden="true"><span></span></div>
     <button class="map-loading-retry" id="mapLoadingRetry" type="button" hidden>Reintentar</button>
   </div>

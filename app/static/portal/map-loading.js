@@ -2,7 +2,6 @@
   const screen = document.getElementById("mapLoading");
   if (!screen) return;
 
-  const title = document.getElementById("mapLoadingTitle");
   const detail = document.getElementById("mapLoadingDetail");
   const retry = document.getElementById("mapLoadingRetry");
 
@@ -19,8 +18,7 @@
       }, 350);
     },
     fail: function (message) {
-      title.textContent = "No se pudo cargar el mapa";
-      detail.textContent = message || "Comprueba la conexión e inténtalo de nuevo.";
+      detail.textContent = "No se pudo cargar el mapa. " + (message || "Comprueba la conexión e inténtalo de nuevo.");
       retry.hidden = false;
       screen.classList.add("is-error");
       screen.setAttribute("aria-busy", "false");

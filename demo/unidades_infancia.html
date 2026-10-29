@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Unidades de Atención - Ecuador</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="portal/assets/ecuador_hero.svg">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="portal/assets/map-loading.css">
@@ -119,8 +120,8 @@ html,body{height:100%;font-family:Montserrat,system-ui,-apple-system,'Segoe UI',
 <body>
 <div class="map-loading-screen" id="mapLoading" role="status" aria-live="polite" aria-busy="true">
     <div class="map-loading-panel">
-        <p class="map-loading-heading"><span class="map-loading-dot" aria-hidden="true"></span><span id="mapLoadingTitle">Preparando el mapa</span></p>
-        <p class="map-loading-detail" id="mapLoadingDetail">Cargando información geográfica y capas.</p>
+        <div class="map-loading-visual" aria-hidden="true"><img class="map-loading-map" src="portal/assets/ecuador_hero.svg" alt=""></div>
+        <p class="map-loading-detail" id="mapLoadingDetail">Cargando el mapa y sus capas geográficas…</p>
         <div class="map-loading-track" aria-hidden="true"><span></span></div>
         <button class="map-loading-retry" id="mapLoadingRetry" type="button" hidden>Reintentar</button>
     </div>
