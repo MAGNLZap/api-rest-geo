@@ -80,7 +80,7 @@
 <path d="M221.3,30.0 L232.9,30.0 L232.9,41.6 L221.3,41.6 Z" fill="#f5c842" fill-opacity=".96" stroke="#29265f" stroke-width="1.1"/>
 <path d="M209.1,166.4 L220.7,166.4 L220.7,178.0 L209.1,178.0 Z" fill="#f5c842" fill-opacity=".96" stroke="#29265f" stroke-width="1.1"/>
 <path d="M392 69 L397 74 L392 79 L387 74 Z" fill="#147c83" stroke="#fff" stroke-width="1"/>
-<text x="405" y="78" fill="#485267" font-family="Arial,sans-serif" font-size="11" font-weight="600">DCI</text>
+<text x="405" y="78" fill="#485267" font-family="Arial,sans-serif" font-size="11" font-weight="600">CDI</text>
 <path d="M388 91 H396 V99 H388 Z" fill="#f5c842" stroke="#29265f" stroke-width=".9"/>
 <text x="405" y="99" fill="#485267" font-family="Arial,sans-serif" font-size="11" font-weight="600">CNH</text>
 </svg>

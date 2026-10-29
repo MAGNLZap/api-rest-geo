@@ -93,19 +93,19 @@ def _group_unit_points(
         cell[1] += y
         cell[2] += 1
     grouped: dict[str, list[tuple[float, float, int, str]]] = defaultdict(list)
-    offsets = {"DCI": -2.2, "CNH": 2.2}
+    offsets = {"CDI": -2.2, "CNH": 2.2}
     for (category, _, _), (sum_x, sum_y, count) in cells.items():
         grouped[category].append((sum_x / count + offsets[category], sum_y / count, int(count), category))
     return [
         point
-        for category in ("DCI", "CNH")
+        for category in ("CDI", "CNH")
         for point in sorted(grouped[category], key=lambda item: (-item[2], item[1], item[0]))[:limit]
     ]
 
 
 def _append_unit_links(svg: list[str], markers: list[tuple[float, float, int, str]]) -> None:
-    colors = {"DCI": "#147c83", "CNH": "#b38c21"}
-    for category in ("DCI", "CNH"):
+    colors = {"CDI": "#147c83", "CNH": "#b38c21"}
+    for category in ("CDI", "CNH"):
         points = [(x, y) for x, y, _, marker_category in markers if marker_category == category]
         links: set[tuple[int, int]] = set()
         for index, (x, y) in enumerate(points):
@@ -264,7 +264,7 @@ async def _read_map_data() -> tuple[list[dict[str, Any]], list[tuple[float, floa
             )
         )
         unit_points = [
-            (float(row[0]), float(row[1]), "CNH" if "CNH" in row[2].upper() else "DCI")
+            (float(row[0]), float(row[1]), "CNH" if "CNH" in row[2].upper() else "CDI")
             for row in units_result
         ]
     return province_features, unit_points
@@ -291,7 +291,7 @@ async def main() -> None:
     _append_unit_links(units_svg, unit_markers)
     for x, y, count, category in unit_markers:
         size = min(5.8, 3.7 + math.log2(count + 1) * 0.32)
-        if category == "DCI":
+        if category == "CDI":
             path = f"M{x:.1f},{y - size:.1f} L{x + size:.1f},{y:.1f} L{x:.1f},{y + size:.1f} L{x - size:.1f},{y:.1f} Z"
             fill = UNIT_COLOR
             stroke = "#fff"
@@ -309,7 +309,7 @@ async def main() -> None:
         [
             '<path d="M392 69 L397 74 L392 79 L387 74 Z" fill="#147c83" stroke="#fff" stroke-width="1"/>',
             '<text x="405" y="78" fill="#485267" font-family="Arial,sans-serif" '
-            'font-size="11" font-weight="600">DCI</text>',
+            'font-size="11" font-weight="600">CDI</text>',
             '<path d="M388 91 H396 V99 H388 Z" fill="#f5c842" stroke="#29265f" stroke-width=".9"/>',
             '<text x="405" y="99" fill="#485267" font-family="Arial,sans-serif" '
             'font-size="11" font-weight="600">CNH</text>',
@@ -367,7 +367,7 @@ async def main() -> None:
     (OUTPUT_DIR / "ecuador_hero.svg").write_text(
         _hero_svg(provinces, hero_main_project, hero_island_project, topographic_paths), encoding="utf-8"
     )
-    print(f"Previews generados: {len(unit_markers)} grupos DCI/CNH y cuatro capas de amenazas.")
+    print(f"Previews generados: {len(unit_markers)} grupos CDI/CNH y cuatro capas de amenazas.")
     await engine.dispose()
 
 

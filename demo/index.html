@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#29265f">
-  <meta name="description" content="Portal de mapas e información territorial del Ministerio de Trabajo y Desarrollo Humano.">
-  <title>Geoportal Territorial · MTDH</title>
+  <meta name="description" content="Insumos cartográficos institucionales a nivel nacional.">
+  <title>Geoportal del Ministerio de Trabajo y Desarrollo Humano</title>
   <style>
     :root {
       color-scheme: light;
@@ -32,8 +32,11 @@
     * { box-sizing: border-box; }
 
     body {
+      display: flex;
+      flex-direction: column;
       min-width: 320px;
       min-height: 100vh;
+      min-height: 100svh;
       margin: 0;
       background-color: var(--paper);
       color: var(--ink);
@@ -45,6 +48,7 @@
 
     .masthead {
       position: relative;
+      flex: 0 0 auto;
       overflow: hidden;
       min-height: 380px;
       padding: 20px max(28px, calc((100vw - 1180px) / 2));
@@ -121,9 +125,9 @@
     }
 
     .hero h1 {
-      max-width: 730px;
+      max-width: 790px;
       margin: 0;
-      font-size: clamp(42px, 5.3vw, 68px);
+      font-size: clamp(40px, 4.6vw, 54px);
       font-weight: 680;
       letter-spacing: -.05em;
       line-height: 1.01;
@@ -160,6 +164,9 @@
 
     main {
       position: relative;
+      display: flex;
+      flex: 1 0 auto;
+      flex-direction: column;
       isolation: isolate;
       width: 100%;
       padding-block: 38px 64px;
@@ -182,6 +189,10 @@
     }
 
     .main-content {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      justify-content: center;
       width: min(100% - 48px, 1360px);
       margin-inline: auto;
     }
@@ -281,7 +292,7 @@
     .card-art {
       position: relative;
       display: grid;
-      height: clamp(200px, 18vw, 240px);
+      height: clamp(200px, 24vh, 320px);
       place-items: center;
       overflow: hidden;
       background: linear-gradient(135deg, #e9e8f4, #f6f7fb);
@@ -379,6 +390,8 @@
     }
 
     .footer {
+      flex: 0 0 auto;
+      min-height: 132px;
       border-top: 3px solid var(--gold);
       background: var(--indigo-deep);
       color: var(--white);
@@ -470,7 +483,7 @@
       .masthead::before { opacity: .52; }
       .hero { min-height: 315px; padding-block: 40px 34px; }
       .ecuador-visual { top: 50%; right: -100px; width: 310px; height: 320px; opacity: .19; }
-      .hero h1 { max-width: 540px; font-size: clamp(38px, 9vw, 50px); }
+      .hero h1 { max-width: 540px; font-size: clamp(32px, 7.5vw, 44px); }
       main { padding-block: 27px 46px; }
       .main-content { width: min(100% - 36px, 560px); }
       .section-intro { margin-bottom: 18px; }
@@ -483,7 +496,7 @@
 
     @media (max-width: 420px) {
       .hero { min-height: 295px; padding-top: 34px; }
-      .hero h1 { font-size: 38px; }
+      .hero h1 { font-size: 32px; }
       .ecuador-visual { right: -112px; width: 280px; height: 290px; opacity: .16; }
       .card-body { padding: 20px 20px 22px; }
       .footer-brand img { width: min(250px, 78vw); }
@@ -499,9 +512,9 @@
   <header class="masthead">
     <div class="hero">
       <div class="hero-copy">
-        <p class="hero-institution"><span class="hero-chip-dot" aria-hidden="true"></span>Ministerio de Desarrollo Humano</p>
-        <h1>Geoportal Territorial</h1>
-        <p>Mapas e información geográfica para explorar el territorio ecuatoriano.</p>
+        <p class="hero-institution"><span class="hero-chip-dot" aria-hidden="true"></span>Consulta geográfica</p>
+        <h1>Geoportal del Ministerio de Trabajo y Desarrollo Humano</h1>
+        <p>Insumos cartográficos institucionales a nivel nacional.</p>
       </div>
       <img class="ecuador-visual" src="portal/assets/ecuador_hero.svg" alt="" aria-hidden="true">
     </div>
@@ -534,7 +547,7 @@
             <div class="card-body">
               <span class="card-kicker">Planificación y amenazas</span>
               <h3 id="hazards-title">Plan de Activación Fenómeno de El Niño</h3>
-              <p>Consulta la exposición a inundaciones, movimientos en masa, sequías e incendios forestales, con filtros y reportes.</p>
+              <p>Consulta las Unidades de Atención que se encuentran en zonas susceptibles a amenazas asociadas al Evento El Niño.</p>
               <span class="card-cue" id="hazards-cue">Explorar mapa</span>
             </div>
           </a>

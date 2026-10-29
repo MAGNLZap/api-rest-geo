@@ -30,6 +30,14 @@ async def ua_amenazas_asset(asset_name: str) -> FileResponse:
 async def portal_asset(asset_name: str) -> FileResponse:
     if asset_name == "patron-topografico.svg":
         return FileResponse(TOPOGRAPHIC_PATTERN, media_type="image/svg+xml")
+    if asset_name == "map-loading.css":
+        return FileResponse(PORTAL_ASSETS / asset_name, media_type="text/css")
+    if asset_name == "map-loading.js":
+        return FileResponse(PORTAL_ASSETS / asset_name, media_type="application/javascript")
+    if asset_name == "map-loading.css":
+        return FileResponse(PORTAL_ASSETS / asset_name, media_type="text/css")
+    if asset_name == "map-loading.js":
+        return FileResponse(PORTAL_ASSETS / asset_name, media_type="application/javascript")
     if asset_name not in {
         "preview_unidades.svg",
         "preview_amenazas.svg",

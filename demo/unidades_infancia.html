@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="portal/assets/map-loading.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Nunito',sans-serif;background:#f0f2f5}
@@ -64,6 +65,15 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:#f0f2f5}
 </style>
 </head>
 <body>
+<div class="map-loading-screen" id="mapLoading" role="status" aria-live="polite" aria-busy="true">
+    <div class="map-loading-panel">
+        <p class="map-loading-heading"><span class="map-loading-dot" aria-hidden="true"></span><span id="mapLoadingTitle">Preparando el mapa</span></p>
+        <p class="map-loading-detail" id="mapLoadingDetail">Cargando información geográfica y capas.</p>
+        <div class="map-loading-track" aria-hidden="true"><span></span></div>
+        <button class="map-loading-retry" id="mapLoadingRetry" type="button" hidden>Reintentar</button>
+    </div>
+</div>
+<script src="portal/assets/map-loading.js"></script>
 <div class="topbar">
     <a class="icon-btn" href="." title="Volver a la vista principal" aria-label="Volver a la vista principal">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M9 20v-6h6v6"/></svg>
@@ -87,15 +97,22 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:#f0f2f5}
     <div class="dpa-legend-label" id="dpaLegendLabel">Zona</div>
     <div class="dpa-legend-value" id="dpaLegendValue">—</div>
 </div>
-<div style="position:absolute;bottom:20px;left:20px;z-index:1000;background:rgba(255,255,255,.85);padding:6px 12px;border-radius:8px;font-size:11px;color:#888;font-family:Nunito,sans-serif;backdrop-filter:blur(4px);box-shadow:0 2px 8px rgba(0,0,0,.08)">Datos: Ministerio de Desarrollo Humano · Servicios de Desarrollo Infantil · Mapas: Google</div>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<div style="position:absolute;bottom:20px;left:20px;z-index:1000;background:rgba(255,255,255,.85);padding:6px 12px;border-radius:8px;font-size:11px;color:#888;font-family:Nunito,sans-serif;backdrop-filter:blur(4px);box-shadow:0 2px 8px rgba(0,0,0,.08)">Datos: Ministerio de Trabajo y Desarrollo Humano · Servicios de Desarrollo Infantil · Mapas: Google</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" onerror="window.MapLoading.fail('No se pudo cargar la librería cartográfica.')"></script>
 <script src="https://unpkg.com/@turf/turf@7/turf.min.js"></script>
 <script>
 const ROOT=window.location.pathname.replace(/\/(?:unidades_infancia|demo)\/?$/,'').replace(/\/$/,'');
 const API=ROOT+"/unidades";
 const map=L.map("map",{zoomControl:false,minZoom:6,maxZoom:20});
 L.control.zoom({position:'bottomright'}).addTo(map);
-L.tileLayer("https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",{maxZoom:20,attribution:'© Google'}).addTo(map);
+const baseLayer=L.tileLayer("https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",{maxZoom:20,attribution:'© Google'});
+const baseTilesReady=new Promise(function(resolve){
+    let settled=false;
+    function finish(){if(!settled){settled=true;resolve()}}
+    baseLayer.once('load',finish);
+    window.setTimeout(finish,5000);
+});
+baseLayer.addTo(map);
 map.setView([-1.83,-78.18],7);
 
 const maskLayer=L.layerGroup().addTo(map);
@@ -175,17 +192,24 @@ async function loadDpaLayer(level){
     }).addTo(dpaLayers[level]);
 }
 
-function setDpaLevel(level){
+async function setDpaLevel(level){
     activeDpa=level;
     Object.keys(dpaLayers).forEach(function(k){map.removeLayer(dpaLayers[k])});
     document.querySelectorAll('.dpa-pill').forEach(function(opt){
         opt.classList.toggle('active',opt.querySelector('input').value===level);
     });
-    document.getElementById('brandLoading').style.display='block';
-    loadDpaLayer(level).then(function(){
+    const loading=document.getElementById('brandLoading');
+    loading.style.display='block';
+    try{
+        await loadDpaLayer(level);
         if(activeDpa===level)map.addLayer(dpaLayers[level]);
-        document.getElementById('brandLoading').style.display='none';
-    });
+        return true;
+    }catch(error){
+        console.error('Error loading DPA layer:',error);
+        return false;
+    }finally{
+        loading.style.display='none';
+    }
 }
 
 document.querySelectorAll('input[name="dpaLevel"]').forEach(function(input){
@@ -378,8 +402,10 @@ async function updateClusters(){
             }
             markersLayer.addLayer(marker);
         });
+        return true;
     }catch(error){
         if(requestId===clusterRequest)console.error('Error loading map clusters:',error);
+        return false;
     }finally{
         if(requestId===clusterRequest)loading.style.display='none';
     }
@@ -396,11 +422,15 @@ map.on('click',function(){
 
 (async function init(){
     ['provincias','cantones','parroquias'].forEach(function(k){dpaLayers[k]=L.layerGroup()});
-    await loadEcuadorGeo();
-    buildMask();
-    buildOutline();
-    setDpaLevel('provincias');
-    await updateClusters();
+    loadEcuadorGeo().then(function(){buildMask();buildOutline()});
+    try{
+        const ready=await Promise.all([setDpaLevel('provincias'),updateClusters(),baseTilesReady]);
+        if(ready[0]&&ready[1])window.MapLoading.finish();
+        else window.MapLoading.fail('No se pudieron cargar las capas de unidades.');
+    }catch(error){
+        console.error('Error initializing map:',error);
+        window.MapLoading.fail('Comprueba la conexión e inténtalo de nuevo.');
+    }
 })();
 </script>
 </body>
