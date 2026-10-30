@@ -211,7 +211,7 @@ const ROOT=window.location.pathname.replace(/\/(?:unidades_infancia|demo)\/?$/,'
 const API=ROOT+"/unidades";
 const map=L.map("map",{zoomControl:false,minZoom:6,maxZoom:20});
 L.control.zoom({position:'bottomright'}).addTo(map);
-const baseLayer=L.tileLayer("https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",{maxZoom:20,attribution:'© Google'});
+const baseLayer=L.tileLayer("https://mt1.google.com/vt/lyrs=m&hl=es&gl=EC&x={x}&y={y}&z={z}",{maxZoom:20,attribution:'© Google'});
 const baseTilesReady=new Promise(function(resolve){
     let settled=false;
     function finish(){if(!settled){settled=true;resolve()}}

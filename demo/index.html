@@ -212,12 +212,9 @@
 
     .map-grid {
       display: grid;
-      grid-template-columns: minmax(0, 760px);
-      justify-content: center;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 24px;
     }
-
-    .map-grid .map-card--units { display: none; }
 
     .map-card {
       position: relative;
@@ -235,11 +232,14 @@
     }
 
     .map-card--units {
-      --card-accent: var(--teal);
-      --card-border: #77a9a2;
-      --card-hover-border: #55b4a6;
-      --card-hover-bg: #0d555c;
-      --card-hover-glow: rgb(13 85 92 / 25%);
+      --card-accent: var(--gold);
+      --card-border: #55b4a6;
+      --card-hover-border: #87e0d2;
+      --card-hover-bg: #08434a;
+      --card-hover-glow: rgb(8 67 74 / 34%);
+      border-color: var(--card-border);
+      background: #0d555c;
+      box-shadow: 0 14px 32px rgb(13 85 92 / 22%), 0 0 0 3px rgb(20 124 131 / 14%);
     }
 
     .map-card--hazards {
@@ -329,6 +329,14 @@
     }
 
     .map-card--hazards .card-body { border-top-color: var(--gold); }
+
+    .map-card--units .card-body { border-top-color: var(--gold); }
+
+    .map-card--units .card-kicker { color: #ffe28a; }
+
+    .map-card--units .card-body h3 { color: var(--white); }
+
+    .map-card--units .card-body p { color: rgb(255 255 255 / 82%); }
 
     .map-card--hazards .card-cue {
       border: 1px solid rgb(245 200 66 / 55%);
