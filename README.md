@@ -1,6 +1,6 @@
 # ApiRestGeo
 
-API REST para información geográfica con unidades de atención. Sirve datos GeoJSON de ubicaciones de servicios de desarrollo infantil en Ecuador, con límites DPA (División Político-Administrativa) y clustering.
+API REST para información geográfica de Unidades de Atención en Ecuador. Sirve datos GeoJSON de distintos servicios de atención, límites DPA (División Político-Administrativa) y herramientas de consulta territorial mediante un geoportal web.
 
 ## Requisitos
 
@@ -101,7 +101,7 @@ El export genera GeoJSON RFC 7946 comprimido, con cuatro decimales y propiedades
 | `GET` | `/health` | JSON | Estado de la API + conexión a BD |
 | `GET` | `/ua_amenazas` | HTML | Mapa de amenazas conectado a la API |
 | `GET` | `/unidades_infancia` | HTML | Mapa de unidades de atención |
-| `GET` | `/portal/assets/{asset_name}` | SVG | Miniaturas geográficas de la portada |
+| `GET` | `/portal/assets/{asset_name}` | SVG/CSS/JS | Ilustraciones, recursos visuales y componentes compartidos del geoportal |
 | `GET` | `/ua_amenazas/data` | `application/geo+json` | Dataset completo UA-Amenazas; admite filtros y bbox |
 | `GET` | `/unidades` | `application/geo+json` | Unidades (GeoJSON FeatureCollection, con clustering) |
 | `GET` | `/unidades/raw` | JSON | Unidades (JSON plano, sin GeoJSON wrapper) |
@@ -113,7 +113,7 @@ El export genera GeoJSON RFC 7946 comprimido, con cuatro decimales y propiedades
 | `GET` | `/docs` | HTML | Swagger UI (solo en development) |
 | `GET` | `/redoc` | HTML | ReDoc (solo en development) |
 
-El mapa de amenazas solicita el dataset completo una vez para conservar los filtros, estadísticas, selección poligonal y exportación Excel. Los filtros DPA usan códigos oficiales como texto, sin FK; los polígonos se solicitan a `/dpa/*`.
+El mapa de amenazas solicita el dataset completo una vez para conservar los filtros, estadísticas, selección poligonal y exportación Excel. El mapa de Unidades también carga el GeoJSON una vez y aplica sus filtros y agrupación de puntos en el navegador. Los filtros DPA usan códigos oficiales como texto, sin FK; los polígonos se solicitan a `/dpa/*`.
 
 Las rutas web HTML inexistentes redirigen a `/`; las rutas de API desconocidas conservan su respuesta `404` JSON.
 
@@ -163,10 +163,15 @@ Cada celda retorna el punto más cercano al centro con `cluster_count` y `cell_i
 
 ## Mapa de unidades de atención
 
-Acceder en `http://localhost:8001/unidades_infancia`. Mapa Leaflet con:
+Acceder en `http://localhost:8001/unidades_infancia`. El mapa Leaflet permite explorar todas las Unidades de Atención, no solo los servicios de Desarrollo Infantil, e incluye:
 
-- **Base:** Google Maps tiles, centrado en Ecuador (zoom 6-20)
-- **Markers:** Supercluster para clustering client-side (radius: 80, maxZoom: 14)
+- **Base:** Google Maps tiles, centrado en Ecuador (zoom 6-20), solicitando etiquetas en español (`hl=es`) y contexto de Ecuador (`gl=EC`)
+- **Markers:** carga todos los puntos una vez y usa Supercluster client-side (radius: 80, maxZoom: 14); al mover o acercar el mapa, el clustering se calcula localmente
+- **Filtros:** búsqueda por nombre, servicio o RUC; filtros territoriales en cascada para región, provincia, cantón y parroquia; servicio, modalidad, área y tipo de atención
+- **Filtros avanzados:** tipo de administración y entidad cooperante
+- **Resumen:** unidades, usuarios registrados y distribución urbano/rural para la selección actual
+- **Visualización territorial:** ubicaciones, unidades por territorio o usuarios registrados
+- **Marcadores:** color por categoría de servicio; el popup aparece al pasar el cursor y permanece abierto al seleccionar una unidad
 - **DPA:** 3 niveles (Provincias/Cantones/Parroquias) con colores por región:
   - Costa: `#FFCD56`
   - Sierra: `#5C9EFF`
@@ -175,8 +180,8 @@ Acceder en `http://localhost:8001/unidades_infancia`. Mapa Leaflet con:
 - **Hover:** Resalta polígono (fillOpacity 0.75), muestra nombre en leyenda
 - **Click:** Zoom al polígono (fitBounds, maxZoom: 14)
 - **Outline:** Borde blanco de Ecuador (weight: 9, smoothFactor: 1)
-- **Popups:** Nombre, RUC, modalidad, servicio, provincia, cantón, área, tipo, dirigido a
-- **Topbar:** Pills flotantes estilo Uber con backdrop-filter:blur, loading bar
+- **Detalle:** Nombre, RUC, modalidad, servicio, provincia, cantón, área, tipo, campo «Dirigido a» y enlace a Google Maps
+- **Loader:** componente visual compartido con el mapa de amenazas, ilustración SVG reutilizable, animación de carga, barra de progreso y opción de reintento ante errores
 
 ## Rate Limiting
 
@@ -227,7 +232,7 @@ ApiRestGeo/
 │   │   ├── cantones.json.gz
 │   │   └── parroquias.json.gz
 │   ├── static/ua_amenazas/   # Logo y banner de reportes
-│   ├── static/portal/        # Miniaturas geográficas de la portada
+│   ├── static/portal/        # Ilustraciones, miniaturas y recursos compartidos del geoportal
 │   ├── middleware/
 │   │   ├── cors.py           # CORS dinámico (auto-detecta IP local)
 │   │   └── rate_limit.py     # Rate limiting (slowapi, per-IP)
