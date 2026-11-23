@@ -38,3 +38,10 @@ data/*.xlsx
 app/data/*.json
 app/data/*.bak
 app/data/*.tmp
+
+# Frontend
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+.env.development.local
+.env.production.local

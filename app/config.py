@@ -17,7 +17,7 @@ def _get_local_ip() -> str:
 
 class Settings(BaseSettings):
     ENVIRONMENT: Literal["development", "production"] = "development"
-    DATABASE_URL: str = "sqlite+aiosqlite:///./test.db"
+    DATABASE_URL: str
     ALLOWED_ORIGINS: str = ""
     ALLOW_LOCAL_NETWORK: bool = True
     HOST: str = "0.0.0.0"

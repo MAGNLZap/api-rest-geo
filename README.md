@@ -7,6 +7,29 @@ API REST para información geográfica de Unidades de Atención en Ecuador. Sirv
 - Python 3.12+
 - pip
 
+## Frontend Vue y entornos
+
+La API REST sigue siendo independiente. La presentación nueva está en
+`frontend/` (Vue 3 + TypeScript + Vite) y conserva la portada y ambos mapas.
+Los HTML de `demo/` permanecen disponibles en FastAPI para la transición;
+la versión Vue se sirve con Vite en desarrollo y Nginx en producción.
+
+```powershell
+docker compose --env-file .env -f compose.dev.yaml up -d --build
+```
+
+Portal Vue: `http://127.0.0.1:5173/`. API: `http://127.0.0.1:8001/`.
+Ambos servicios aparecen en Docker Desktop bajo `apirestgeo-dev`.
+La API usa el PostgreSQL externo del `.env` existente, sin modificarlo.
+No se ejecutan migraciones ni creación automática de tablas al arrancar.
+
+- [Desarrollo local, Docker dev y estructura frontend](frontend/README.md)
+- [Producción, transición sin Docker y reversión](deploy/README.md)
+
+No es necesario desplegar la API en Docker para publicar Vue. El Compose
+de producción incorpora API y web separados; no migra la BD ni modifica
+automáticamente la instalación existente.
+
 ## Instalación
 
 ```bash
@@ -40,7 +63,7 @@ cp .env.example .env
 | Variable | Default | Descripción |
 |---|---|---|
 | `ENVIRONMENT` | `development` | `development` o `production` |
-| `DATABASE_URL` | `sqlite+aiosqlite:///./test.db` | SQLite dev / PostgreSQL prod |
+| `DATABASE_URL` | obligatorio | PostgreSQL/PostGIS externo con driver asyncpg |
 | `ALLOWED_ORIGINS` | (vacío) | Orígenes CORS externos (separados por coma) |
 | `ALLOW_LOCAL_NETWORK` | `true` | Permitir acceso desde redes locales |
 | `HOST` | `0.0.0.0` | Host del servidor |
@@ -257,8 +280,8 @@ ApiRestGeo/
 
 ## Base de datos
 
-- **Desarrollo:** SQLite async (`sqlite+aiosqlite:///./test.db`, se crea automáticamente al iniciar)
-- **Producción:** PostgreSQL/PostGIS async (`postgresql+asyncpg://...`, incluido en `requirements.txt`)
+- **Desarrollo y producción:** PostgreSQL/PostGIS externo (`postgresql+asyncpg://...`)
+- **Conexión:** `DATABASE_URL` obligatorio; no hay fallback local ni creación de tablas al arrancar
 - **Modelo:** `UnidadAtencion` con 39 campos y 7 índices (incluyendo compuesto `longitude, latitude`)
 - **Tests:** Base de datos SQLite en memoria, recreada para cada test
 

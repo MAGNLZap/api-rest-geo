@@ -19,6 +19,7 @@ COPY --chown=app:app app/ ./app/
 COPY --chown=app:app demo/index.html ./demo/index.html
 COPY --chown=app:app demo/ua_amenazas.html ./demo/ua_amenazas.html
 COPY --chown=app:app demo/unidades_infancia.html ./demo/unidades_infancia.html
+COPY --chown=app:app demo/patron-topografico.svg ./demo/patron-topografico.svg
 USER app
 
 EXPOSE 8001

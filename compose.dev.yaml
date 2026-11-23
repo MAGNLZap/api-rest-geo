@@ -1,0 +1,49 @@
+name: apirestgeo-dev
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      ENVIRONMENT: development
+      HOST: 0.0.0.0
+      PORT: "8001"
+      ROOT_PATH: ""
+      ALLOW_LOCAL_NETWORK: "false"
+      FORWARDED_ALLOW_IPS: 127.0.0.1
+      WATCHFILES_FORCE_POLLING: "true"
+    command: python -m uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload --reload-dir app
+    ports:
+      - "127.0.0.1:8001:8001"
+    volumes:
+      - ./app:/app/app:ro
+      - ./demo:/app/demo:ro
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      target: development
+    environment:
+      API_PROXY_TARGET: http://api:8001
+      VITE_PUBLIC_BASE: /
+      VITE_API_BASE: ""
+      CHOKIDAR_USEPOLLING: "true"
+    ports:
+      - "127.0.0.1:5173:5173"
+    volumes:
+      - ./frontend:/workspace/frontend
+      - node-modules:/workspace/frontend/node_modules
+      - ./app/static:/workspace/app/static:ro
+      - ./demo/patron-topografico.svg:/workspace/demo/patron-topografico.svg:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  node-modules:

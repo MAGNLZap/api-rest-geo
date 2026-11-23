@@ -17,7 +17,6 @@ from app.config import VERSION, settings
 from app.middleware.cors import setup_cors
 from app.middleware.rate_limit import limiter
 from app.models import UnidadAtencion  # noqa: F401
-from app.models.base import Base
 from app.routers.demo import router as demo_router
 from app.routers.dpa import router as dpa_router
 from app.routers.dpa import warmup_cache
@@ -36,9 +35,6 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     )
     logger.info("Starting ApiRestGeo API v%s [%s]", VERSION, settings.ENVIRONMENT)
     try:
-        async with database.engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-        logger.info("Database tables created/verified")
         warmup_cache()
         yield
     finally:
