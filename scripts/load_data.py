@@ -48,14 +48,6 @@ DPA_SPECS = (
 )
 
 
-def _backend() -> str:
-    if settings.DATABASE_URL.startswith("sqlite"):
-        return "sqlite"
-    if settings.DATABASE_URL.startswith("postgresql"):
-        return "pg"
-    raise SystemExit(f"DATABASE_URL no soportado: {settings.DATABASE_URL.split('://')[0]}://")
-
-
 def _mask_url(url: str) -> str:
     return re.sub(r"://[^@]+@", "://***@", url)
 
@@ -67,10 +59,9 @@ async def _run_statements(conn: Any, sql: str) -> None:
 
 
 async def run_migrations() -> None:
-    backend = _backend()
-    paths = sorted(MIGRATIONS_DIR.glob(f"*.{backend}.sql"))
+    paths = sorted(MIGRATIONS_DIR.glob("*.pg.sql"))
     if not paths:
-        raise SystemExit(f"No hay migraciones para el backend {backend}")
+        raise SystemExit("No hay migraciones para PostgreSQL")
 
     async with engine.begin() as conn:
         await conn.execute(
@@ -97,7 +88,7 @@ async def run_migrations() -> None:
             print(f"Migracion aplicada: {path.name}")
 
     if pending == 0:
-        print(f"Migraciones al dia ({backend})")
+        print("Migraciones al dia (PostgreSQL)")
 
 
 def _polygonal(geometry: Any) -> MultiPolygon:
@@ -198,13 +189,9 @@ def _read_seed() -> dict[str, dict[str, Any]]:
     return collections
 
 
-def _upsert_sql(spec: dict[str, Any], backend: str) -> str:
+def _upsert_sql(spec: dict[str, Any]) -> str:
     columns = (*spec["columns"], "geom")
-    geom = (
-        "ST_Multi(ST_CollectionExtract(ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON(:geom), 4326)), 3))"
-        if backend == "pg"
-        else ":geom"
-    )
+    geom = "ST_Multi(ST_CollectionExtract(ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON(:geom), 4326)), 3))"
     values = ", ".join(geom if column == "geom" else f":{column}" for column in columns)
     updates = ", ".join(f"{column} = EXCLUDED.{column}" for column in columns if column != "id")
     return (
@@ -214,13 +201,10 @@ def _upsert_sql(spec: dict[str, Any], backend: str) -> str:
 
 async def load_dpa(clear: bool = False) -> None:
     await run_migrations()
-    backend = _backend()
     collections = _read_seed()
-    print(f"Backend: {backend} ({_mask_url(settings.DATABASE_URL)})")
+    print(f"Backend: PostgreSQL ({_mask_url(settings.DATABASE_URL)})")
 
     async with engine.begin() as conn:
-        if backend == "sqlite":
-            await conn.execute(text("PRAGMA foreign_keys = ON"))
         if clear:
             for spec in reversed(DPA_SPECS):
                 await conn.execute(text(f"DELETE FROM {spec['table']}"))
@@ -233,7 +217,7 @@ async def load_dpa(clear: bool = False) -> None:
                 row = dict(feature["properties"])
                 row["geom"] = json.dumps(feature["geometry"], separators=(",", ":"))
                 rows.append(row)
-            await conn.execute(text(_upsert_sql(spec, backend)), rows)
+            await conn.execute(text(_upsert_sql(spec)), rows)
             total += len(rows)
             print(f"{spec['table']}: {len(rows)} upserts")
 
@@ -242,33 +226,30 @@ async def load_dpa(clear: bool = False) -> None:
 
 
 async def validate_database() -> None:
-    backend = _backend()
     async with async_session() as session:
         print("Validacion:")
         for spec in DPA_SPECS:
             count = (await session.execute(text(f"SELECT count(*) FROM {spec['table']}"))).scalar_one()
             print(f"  {spec['table']}: {count}")
 
-            if backend == "pg":
-                invalid = (
-                    await session.execute(
-                        text(
-                            f"SELECT count(*) FROM {spec['table']} "
-                            "WHERE ST_SRID(geom) <> 4326 "
-                            "OR GeometryType(geom) <> 'MULTIPOLYGON' "
-                            "OR NOT ST_IsValid(geom)"
-                        )
+            invalid = (
+                await session.execute(
+                    text(
+                        f"SELECT count(*) FROM {spec['table']} "
+                        "WHERE ST_SRID(geom) <> 4326 "
+                        "OR GeometryType(geom) <> 'MULTIPOLYGON' "
+                        "OR NOT ST_IsValid(geom)"
                     )
-                ).scalar_one()
-                if invalid:
-                    raise ValueError(f"{spec['table']} tiene {invalid} geometrías invalidas")
-                print("    geometria: OK")
+                )
+            ).scalar_one()
+            if invalid:
+                raise ValueError(f"{spec['table']} tiene {invalid} geometrías invalidas")
+            print("    geometria: OK")
 
 
 async def _collection_from_database(spec: dict[str, Any]) -> dict[str, Any]:
-    backend = _backend()
     columns = ", ".join(spec["columns"])
-    geom = "ST_AsGeoJSON(geom, 4) AS geom" if backend == "pg" else "geom"
+    geom = "ST_AsGeoJSON(geom, 4) AS geom"
     query = text(f"SELECT {columns}, {geom} FROM {spec['table']} ORDER BY id")
     async with async_session() as session:
         result = await session.execute(query)

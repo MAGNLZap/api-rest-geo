@@ -1,6 +1,7 @@
 import socket
 from typing import Literal
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 VERSION = "0.1.0"
@@ -29,6 +30,13 @@ class Settings(BaseSettings):
     RATE_LIMIT: str = "120/minute"
     LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
 
+    @field_validator("DATABASE_URL")
+    @classmethod
+    def validate_database_url(cls, value: str) -> str:
+        if not value.startswith("postgresql+asyncpg://"):
+            raise ValueError("DATABASE_URL debe utilizar PostgreSQL con el driver postgresql+asyncpg.")
+        return value
+
     @property
     def origins(self) -> list[str]:
         external = [o.strip() for o in self.ALLOWED_ORIGINS.split(",") if o.strip()]
@@ -51,7 +59,7 @@ class Settings(BaseSettings):
     def is_dev(self) -> bool:
         return self.ENVIRONMENT == "development"
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "hide_input_in_errors": True}
 
 
 settings = Settings()

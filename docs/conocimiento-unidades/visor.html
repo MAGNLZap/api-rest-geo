@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Mesa de revisión · Orientación de servicios</title>
+  <style>:root{color-scheme:light;--ink:#182c47;--muted:#52657a;--paper:#edf3fa;--line:#c6d2df;--blue:#315fb0;--teal:#14676b;--amber:#a15b13;--amber-bg:#fff4df;font:15px/1.5 "Segoe UI",Calibri,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink)}
+button,input,select,textarea{font:inherit}
+button,a,input,select,textarea{touch-action:manipulation}
+button{cursor:pointer;color:var(--ink);background:white;border:1px solid var(--line);border-radius:6px;padding:9px 12px;min-height:42px}
+button:hover{border-color:var(--blue);background:#f2f6fe}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #2d6fd0;outline-offset:3px}
+a{color:#234f93;text-underline-offset:3px;overflow-wrap:anywhere}
+h1,h2,h3,h4,p{margin:0}
+h1{font-size:21px;letter-spacing:-.5px}
+h2{font-size:28px;line-height:1.2;letter-spacing:-.6px}
+h3{font-size:19px;line-height:1.3}
+h4{font-size:16px}
+p+p{margin-top:10px}
+strong{font-weight:650}
+.skip{position:fixed;left:12px;top:-100px;background:white;padding:12px;z-index:50}
+.skip:focus{top:12px}
+.header{display:flex;align-items:center;justify-content:space-between;gap:20px;background:white;border-bottom:1px solid var(--line);padding:16px 26px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-sign{font-size:32px;line-height:1;color:var(--teal);border:2px solid var(--teal);border-radius:8px;width:43px;height:43px;text-align:center}
+.brand p{color:var(--muted);font-size:13px}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.primary{background:var(--teal);color:white;border-color:var(--teal)}
+.primary:hover{background:#10575b;color:white;border-color:#10575b}
+.scope{padding:11px 26px;background:#e2eafa;color:#29486e;font-size:13px;border-bottom:1px solid var(--line)}
+.workspace{display:grid;grid-template-columns:235px minmax(0,1fr) 310px;min-height:calc(100vh - 135px)}
+.sidebar{padding:22px 15px;background:#f7faff;border-right:1px solid var(--line)}
+.nav-title{font-weight:650;margin:0 10px 12px}
+.navigation{display:grid;gap:5px}
+.navigation button{border-color:transparent;background:transparent;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.navigation button[aria-pressed=true]{background:var(--ink);color:white}
+.nav-number{font-size:12px;border:1px solid currentColor;border-radius:4px;padding:0 5px;opacity:.85}
+.search-label{display:block;font-size:12px;color:var(--muted);margin:24px 0 6px}
+input,select,textarea{border:1px solid #aebed0;border-radius:5px;background:white;color:var(--ink);width:100%;padding:9px}
+textarea{resize:vertical;min-height:100px;line-height:1.5}
+.items{display:grid;gap:4px;margin-top:12px}
+.items button{text-align:left;background:transparent;border-color:transparent;padding:10px 9px;line-height:1.35;font-size:14px}
+.items button[aria-current=true]{border-color:#b1c4df;background:#e6eefb;color:#1e447d;font-weight:650}
+.items .empty{font-size:13px;padding:10px}
+.sidebar-foot{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.sidebar-foot a{display:block;margin:8px 0}
+.content{padding:28px 28px 60px;min-width:0}
+.content:focus{outline:none}
+.content-head{margin-bottom:22px}
+.section-label{font-size:13px;color:var(--teal);font-weight:650;margin-bottom:7px}
+#content-description{margin-top:10px;color:var(--muted);max-width:76ch}
+.review{background:#fff;border-left:1px solid var(--line);padding:24px 20px;align-self:start;position:sticky;top:0;max-height:100vh;overflow-y:auto}
+.review-head{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.review-head h2{font-size:19px}
+.review-mark{color:var(--teal);font-size:23px}
+.review-target{font-size:14px;font-weight:650;padding:10px 0 16px;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+#review-form label{display:block;font-size:13px;font-weight:650;margin:18px 0 6px}
+.save-status{font-size:12px;color:var(--teal);margin-top:15px}
+.review-help{font-size:12px;color:var(--muted);margin-top:14px}
+.message{font-size:13px;color:#8f392d;margin-top:16px;white-space:pre-wrap}
+.badge{display:inline-block;border-radius:4px;padding:3px 8px;background:#e7effc;color:#294f8c;font-size:12px;font-weight:650}
+.badge.pending{background:var(--amber-bg);color:#874d10}
+.notice{border-left:4px solid #b87a24;background:var(--amber-bg);padding:13px 16px;margin:18px 0;font-size:14px;line-height:1.55}
+.notice.info{border-left-color:var(--blue);background:#e8effc}
+.source{font-size:12px;color:var(--muted);margin:14px 0 22px}
+.source a+a{margin-left:12px}
+.route-root{background:var(--ink);color:white;padding:17px 20px;border-radius:7px;max-width:430px;position:relative;margin-bottom:28px}
+.route-root small{display:block;color:#cbd9ef;margin-bottom:4px}
+.route-root h3{font-size:21px}
+.route-root::after{content:"";position:absolute;left:22px;top:100%;height:28px;border-left:2px solid #9bb1ce}
+.branches{border-left:2px solid #9bb1ce;margin-left:22px;padding-left:24px}
+.branch{position:relative;padding:0 0 22px}
+.branch::before{content:"";position:absolute;left:-26px;top:24px;width:24px;border-top:2px solid #9bb1ce}
+.branch-columns{display:grid;grid-template-columns:minmax(145px,.85fr) minmax(150px,1fr);gap:26px;align-items:start}
+.need{position:relative;text-align:left;border:1px solid #aabedb;border-radius:6px;padding:13px;width:100%;background:white}
+.need::after{content:"";position:absolute;left:100%;top:23px;width:27px;border-top:2px solid #9bb1ce}
+.need[aria-pressed=true]{border:2px solid var(--teal);background:#eef8f7;padding:12px}
+.need small{display:block;font-size:11px;color:var(--muted);margin-top:5px}
+.service-nodes{display:flex;gap:6px;flex-wrap:wrap;padding-top:3px}
+.service-node{font-size:13px;text-align:left;border-color:#b9cadf;background:#f9fbff;min-height:38px}
+.route-review{font-size:12px;color:var(--teal);padding-top:7px}
+.diagram-labels{display:grid;grid-template-columns:.85fr 1fr;gap:26px;margin:0 0 10px 48px;color:var(--muted);font-size:12px}
+.fact{background:white;border:1px solid var(--line);padding:22px;margin-top:14px;border-radius:7px}
+.fact>h3{margin-bottom:12px}
+.fact-section{border-top:1px solid #dde5ef;padding-top:15px;margin-top:15px}
+.fact-section h4{margin-bottom:7px}
+.fact-section p,.fact-section li{white-space:pre-wrap;overflow-wrap:anywhere}
+.fact-section ul{margin:5px 0;padding-left:20px}
+.fact-section li+li{margin-top:8px}
+.fact-section dl{margin:0}
+.fact-section dt{font-weight:650}
+.fact-section dd{margin:3px 0 12px}
+.back-link{display:block;margin-bottom:16px;font-size:13px}
+.list-entry{display:block;text-align:left;width:100%;padding:18px;margin-bottom:9px;border-radius:6px}
+.list-entry strong{display:block;font-size:16px}
+.list-entry span{display:block;font-size:13px;color:var(--muted);margin-top:5px}
+.compare{border-left:3px solid #b87a24;padding-left:14px;margin-top:20px}
+.compare button{display:block;text-align:left;width:100%;margin-top:8px;font-size:13px}
+details{margin-top:16px}
+summary{cursor:pointer;font-weight:650}
+.step{background:white;border:1px solid var(--line);border-radius:6px;padding:19px;margin:0 0 25px;position:relative}
+.step+.step::before{content:"↓";position:absolute;left:25px;bottom:100%;height:25px;color:var(--blue)}
+.step>p{margin-top:8px;color:var(--muted)}
+.age-options{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.empty{color:var(--muted);padding:18px 0}
+.document-links{display:flex;gap:15px;flex-wrap:wrap;font-size:13px;margin-top:18px}
+.mono-label{color:var(--muted);font-size:12px;margin-top:10px}
+.inventory-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:18px}
+.inventory-summary p+p{margin-top:0}
+.inventory-summary strong{display:block;font-size:25px;color:var(--ink);font-variant-numeric:tabular-nums}
+.inventory-summary span{display:block;font-size:12px;color:var(--muted)}
+@media(min-width:1650px){.workspace{grid-template-columns:260px minmax(0,1fr) 360px}.content{padding:35px 48px 60px}}
+@media(max-width:1150px){.workspace{grid-template-columns:210px minmax(0,1fr)}.review{grid-column:2;position:static;max-height:none;border-top:1px solid var(--line)}.content{padding:24px 20px}.sidebar{grid-row:1/3}.header{align-items:flex-start}.tools{justify-content:flex-end}.brand p{max-width:160px}}
+@media(max-width:720px){.header{padding:16px;display:block}.tools{justify-content:flex-start;margin-top:15px}.tools button{font-size:12px}.scope{padding:12px 16px}.workspace{display:block}.sidebar{border-right:0;border-bottom:1px solid var(--line);padding:16px}.navigation{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.items{max-height:200px;overflow:auto}.sidebar-foot{display:none}.content{padding:23px 16px}.review{border-left:0}.branch-columns{grid-template-columns:1fr;gap:12px}.need::after{display:none}.service-nodes{border-left:2px solid #9bb1ce;margin-left:13px;padding-left:12px}.diagram-labels{display:none}.inventory-summary{grid-template-columns:repeat(2,minmax(0,1fr))}h2{font-size:25px}}
+@media print{.header .tools,.sidebar,.review,.scope{display:none}.workspace{display:block}.content{padding:0}.fact,.branch,.step{break-inside:avoid}body{background:white}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+  <a class="skip" href="#content">Ir al contenido</a>
+  <header class="header">
+    <div class="brand"><span class="brand-sign" aria-hidden="true">↳</span><div><h1>Mesa de revisión</h1><p>Orientación de servicios de atención</p></div></div>
+    <div class="tools" aria-label="Borradores de revisión">
+      <button id="export-md" class="primary" type="button">Exportar revisión .md</button>
+      <button id="export-json" type="button">Guardar borrador .json</button>
+      <button id="import-button" type="button">Importar borrador</button>
+      <input id="import-file" type="file" accept=".json,application/json" hidden>
+    </div>
+  </header>
+  <div class="scope"><strong>Documento de trabajo independiente.</strong> No es el formulario de la app, no decide elegibilidad y no se conecta a la base de datos. Cada fuente y el inventario indican su fecha de captura.</div>
+  <div class="workspace">
+    <aside class="sidebar" aria-label="Explorar conocimiento">
+      <p class="nav-title">Contenido para revisar</p>
+      <nav id="navigation" class="navigation" aria-label="Secciones"></nav>
+      <label class="search-label" for="search">Buscar en esta sección</label>
+      <input id="search" type="search" placeholder="Nombre o necesidad…" autocomplete="off">
+      <div id="items" class="items" aria-label="Elementos de la sección"></div>
+      <div class="sidebar-foot"><p id="review-count"></p><a href="README.md" target="_blank" rel="noopener">Abrir base documental</a><p>Las observaciones son tuyas; las fuentes se mantienen sin cambios.</p></div>
+    </aside>
+    <main id="content" class="content" tabindex="-1">
+      <div class="content-head"><p id="section-label" class="section-label"></p><h2 id="content-title"></h2><p id="content-description"></p></div>
+      <div id="stage"></div>
+    </main>
+    <aside class="review" aria-labelledby="review-heading">
+      <div class="review-head"><span class="review-mark" aria-hidden="true">✎</span><h2 id="review-heading">Tu revisión</h2></div>
+      <p id="review-target" class="review-target"></p>
+      <form id="review-form">
+        <label for="review-status">Estado de revisión</label>
+        <select id="review-status"><option value="sin-revisar">Sin revisar</option><option value="observaciones">Con observaciones</option><option value="revisado">Revisado en mesa</option></select>
+        <label for="review-notes">Observaciones o dudas</label>
+        <textarea id="review-notes" rows="7" maxlength="8000" placeholder="¿Qué falta confirmar? ¿Qué asociación debe corregirse?"></textarea>
+        <label for="review-proposal">Redacción o cambio propuesto</label>
+        <textarea id="review-proposal" rows="7" maxlength="8000" placeholder="Escribe una propuesta. No reemplaza el contenido fuente."></textarea>
+      </form>
+      <p id="save-status" class="save-status" role="status" aria-live="polite"></p>
+      <p class="review-help">«Revisado en mesa» no significa aprobado por la institución. No incluyas cédulas, nombres de usuarios ni datos de casos reales.</p>
+      <div id="message" class="message" role="status" aria-live="polite"></div>
+    </aside>
+  </div>
+  <noscript>Activa JavaScript para explorar el visor. Los documentos Markdown originales siguen disponibles en esta carpeta.</noscript>
+  <script id="knowledge" type="application/json">{"datasetId":"e59c52665bb37d0dd9efdde3c8db25769a6ff411306d9f7043cd726422b6c420","date":"2026-11-24","commit":"36eec6664f38af0eb1dcd3c1f17aa79c65480468","pilot":{"services":[{"id":"cdi","title":"Centros de Desarrollo Infantil","short":"Cuidado y desarrollo de niñas y niños de 1 a 3 años.","who":"Familias con niñas y niños pequeños, según los criterios de acceso del servicio.","access":"Solicita orientación para el ingreso. La institución verificará requisitos y disponibilidad.","map":true},{"id":"cnh","title":"Creciendo con Nuestros Hijos","short":"Acompañamiento familiar para gestantes y niñas y niños de 0 a 3 años.","who":"Gestantes y familias con niñas y niños pequeños.","access":"Consulta cómo recibir acompañamiento en tu territorio."},{"id":"adulto","title":"Atención a personas adultas mayores","short":"Atención residencial, diurna, domiciliaria y espacios de encuentro.","who":"Personas de 65 años o más, según las condiciones de acceso.","access":"Consulta la modalidad más adecuada y el punto de orientación correspondiente."},{"id":"discapacidad","title":"Atención a personas con discapacidad","short":"Atención en centros diurnos, acogida inclusiva y en el hogar y comunidad.","who":"Personas con discapacidad que cumplen los criterios de atención.","access":"Solicita información sobre la modalidad y valoración correspondiente."},{"id":"proteccion","title":"Protección especial","short":"Atención especializada ante situaciones de vulneración de derechos.","who":"Niñas, niños, adolescentes y otras personas en situación de vulnerabilidad.","access":"Busca orientación institucional; algunos casos requieren derivación o medidas de protección."},{"id":"adopcion","title":"Adopciones","short":"Orientación sobre los procesos de adopción nacional e internacional.","who":"Personas interesadas en iniciar el proceso de adopción.","access":"Consulta los requisitos y las instancias de adopciones; el proceso requiere evaluación de idoneidad."},{"id":"credito","title":"Crédito de Desarrollo Humano","short":"Acceso a financiamiento para emprendimientos, conforme a requisitos.","who":"Personas usuarias de determinadas transferencias monetarias que cumplen las condiciones del programa.","access":"Consulta si cumples los requisitos y cómo iniciar la solicitud; no es una aprobación automática."},{"id":"bonos","title":"Bonos y pensiones","short":"Información sobre transferencias monetarias no contributivas.","who":"Personas y familias que cumplen los criterios establecidos para cada transferencia.","access":"Solicita información sobre condiciones y mecanismos de atención; no todas las transferencias se solicitan directamente."},{"id":"contingencia","title":"Cobertura de contingencias","short":"Orientación ante calamidades que afectan el sustento o vivienda familiar.","who":"Familias afectadas, sujetas a valoración y normativa vigente.","access":"Consulta el procedimiento de solicitud y verificación del caso."},{"id":"jovenes","title":"Atención y formación para jóvenes","short":"Procesos de formación y desarrollo dirigidos a jóvenes.","who":"Jóvenes de 18 a 29 años, conforme a criterios de acceso.","access":"Consulta convocatorias y mecanismos de inscripción vigentes."},{"id":"emprendimiento","title":"Formación y apoyo para emprendimientos","short":"Fortalecimiento de capacidades y vinculación productiva.","who":"Población objetivo de los programas de inclusión económica.","access":"Consulta opciones de formación y participación."},{"id":"orfandad","title":"Bono de orfandad","short":"Orientación sobre la prestación para niñas, niños y adolescentes en los casos previstos.","who":"Niñas, niños y adolescentes que cumplen los requisitos específicos.","access":"Consulta la solicitud y documentos requeridos; la aprobación está sujeta a verificación."},{"id":"sustituto","title":"Certificación de sustituto por solidaridad humana","short":"Información sobre la certificación prevista para el cuidado de personas con discapacidad.","who":"Personas que cumplen las condiciones legales del procedimiento.","access":"Consulta requisitos y trámite de certificación."},{"id":"bjl","title":"Bono Joaquín Gallegos Lara","short":"Orientación sobre acceso y acompañamiento técnico para beneficiarios.","who":"Personas que cumplen las condiciones específicas del programa.","access":"Consulta el proceso de solicitud y valoración."},{"id":"ciudadania","title":"Atención ciudadana y certificaciones","short":"Acceso a información pública y certificación de documentos institucionales.","who":"Ciudadanía y organizaciones que requieren información o documentos.","access":"Presenta la solicitud mediante los canales institucionales vigentes."},{"id":"organizaciones","title":"Organizaciones sociales","short":"Asesoría, legalización y registro de organizaciones sociales sin fines de lucro.","who":"Organizaciones sociales y sus representantes.","access":"Consulta el trámite específico y la documentación necesaria."},{"id":"permisos","title":"Permisos de funcionamiento","short":"Información sobre permisos para unidades de atención.","who":"Responsables de unidades de atención sujetas a permisos.","access":"Consulta los requisitos del procedimiento correspondiente."},{"id":"acompanamiento","title":"Acompañamiento familiar","short":"Acompañamiento a familias usuarias del Bono de Desarrollo Humano con componente variable.","who":"Familias vinculadas al programa.","access":"La modalidad de vinculación debe confirmarse institucionalmente."}],"paths":[{"id":"infancia","label":"Una niña o niño","needs":[["cuidado","Cuidado y desarrollo infantil",["cdi","cnh"]],["proteccion","Necesita protección",["proteccion","orfandad"]],["otra","Quiero conocer otras ayudas",["cdi","cnh","proteccion"]]]},{"id":"mayor","label":"Una persona mayor","needs":[["atencion","Cuidado y actividades",["adulto"]],["dinero","Apoyo económico",["bonos"]],["otra","Quiero conocer opciones",["adulto","bonos"]]]},{"id":"discapacidad","label":"Una persona con discapacidad","needs":[["atencion","Atención y acompañamiento",["discapacidad"]],["bono","Información sobre bonos",["bjl","bonos"]],["otra","Otros apoyos",["discapacidad","sustituto"]]]},{"id":"familia","label":"Mi familia","needs":[["credito","Empezar un negocio",["credito","emprendimiento"]],["emergencia","Una emergencia o calamidad",["contingencia"]],["bonos","Bonos y pensiones",["bonos"]],["otra","Apoyo familiar",["acompanamiento","cnh"]]]},{"id":"proteccion","label":"Alguien necesita protección","needs":[["derechos","Se vulneraron sus derechos",["proteccion"]],["orfandad","Bono de orfandad",["orfandad"]],["otra","Necesito orientación",["proteccion"]]]},{"id":"otros","label":"Otra ayuda","needs":[["adopcion","Quiero adoptar",["adopcion"]],["joven","Formación para jóvenes",["jovenes","emprendimiento"]],["tramite","Información o documentos",["ciudadania","organizaciones","permisos"]],["otra","Ver todo el catálogo",[]]]}]},"asesor":[{"id":"bono-joaquin-gallegos","nombre":"Bono Joaquín Gallegos Lara","resumen":"Ayuda económica mensual de USD 240 para personas con discapacidad que requieren cuidador.","categoria":"inclusion","modalidad":"Mixta (en línea y presencial)","consiste":"Es una ayuda económica de USD 240 mensuales dirigida a personas con discapacidad que cumplen las condiciones establecidas y requieren un cuidador.","dirigido":"Personas interesadas en información sobre el bono Joaquín Gallegos Lara","beneficio":"Recibir una ayuda económica mensual de USD 240 para contribuir a la atención y cuidado de la persona con discapacidad que requiere asistencia permanente.","requisitos":["Cumplir el porcentaje de discapacidad establecido.","Tener la discapacidad certificada por el Ministerio de Salud Pública.","Tener un puntaje del Registro Social 2018 menor o igual a 59.54804 puntos.","Realizar personalmente la inscripción del beneficio."],"pasos":[{"titulo":"Verificación de condiciones.","detalle":"Verificar que cumple las condiciones de discapacidad y Registro Social."},{"titulo":"Atención presencial.","detalle":"Acercarse personalmente al Balcón de Servicio más cercano."},{"titulo":"Documento de identidad.","detalle":"Presentar la cédula de identidad original."},{"titulo":"Inscripción de beneficio.","detalle":"Realizar la inscripción del beneficio."}],"canales":[{"tipo":"oficina","nombre":"Oficinas MTDH.","horario":"Lunes a viernes de 8:00 a 16:45"},{"tipo":"web","nombre":"Portal Contacto Ciudadano Digital","enlace":"https://www.contactociudadano.gob.ec/","textoBoton":"Contacto Ciudadano Digital","horario":"24 horas."}],"tiempo":"30 días","tiempoValor":30,"tiempoUnidad":"dias","horarios":"Depende del canal. Presencial: lunes a viernes de 08:00 a 16:45. En línea: 24 horas.","normativa":"Para atención presencial: cédula de identidad y documentos que respalden la hoja de vida.","activo":true},{"id":"bono-desarrollo-humano","nombre":"Bono de Desarrollo Humano (BDH)","resumen":"Transferencia mensual de USD 55 para hogares en pobreza o vulnerabilidad.","categoria":"inclusion","modalidad":"En línea","consiste":"Es una transferencia monetaria mensual de 55 dólares que entrega el Estado ecuatoriano a los hogares en situación de pobreza, pobreza extrema o vulnerabilidad","dirigido":"Núcleos familiares en situación de pobreza o extrema pobreza, según el índice del Registro Social vigente.","beneficio":"Recibir una transferencia monetaria mensual de USD 55 para contribuir al sostenimiento económico del hogar beneficiario.","requisitos":["Cédula de identidad ecuatoriana (o doble nacionalidad)."],"pasos":[{"titulo":"Tener actualizado el Registro Social.","detalle":"Pobreza extrema: hasta 10,52257 puntos. Pobreza: hasta 29,13091 puntos."},{"titulo":"Cumplir los requisitos.","detalle":"Sin afiliación contributiva al IESS* ni servidor público con ingreso mayor a 1 RBU. *Excepto Seguro Social Campesino y Trabajo No Remunerado en el Hogar."},{"titulo":"Esperar la habilitación.","detalle":"La incorporación depende del presupuesto disponible y del orden de prelación por puntaje."},{"titulo":"Recordar:","detalle":"Un solo representante de cobro por hogar."}],"canales":[{"tipo":"web","nombre":"Acreditación bancaria.","horario":"Lunes a viernes de 8:00 a 16:45"}],"horarios":"Canales electrónicos: 24 horas. BanEcuador: lun–vie 08:00 –16:00. Banco del Pacífico: lun–vie 08:30–16:00.","normativa":"Acuerdo Ministerial Nro. MIES-2022-037 (22 jun. 2022): art. 18 (definición), art. 6 (orden de prelación), art. 10 lit. g) (exclusión por IESS), art. 23 (exclusión por servidor público en el hogar), art. 9 (requisito de cédula ecuatoriana)\n Reforma art. 7 — Acuerdo Nro. MIES-MIES-2024-0026-A (25 sept. 2024): inclusión progresiva de nuevos usuarios\n Decreto Ejecutivo No. 228 (20 oct. 2021): Registro Social como base\n Resolución Nro. URS-DEJ-2025-0009-R (07 nov. 2025): líneas de corte vigentes","activo":true},{"id":"bono-desarrollo-humano-variable","nombre":"Bono de Desarrollo Humano componente variable (BDHV)","resumen":"Beneficio para madres en pobreza con hijos menores de 18 años, con montos según edad y número de hijos.","categoria":"inclusion","modalidad":"En línea","consiste":"Es un beneficio que se entrega a madres de familia, con hijos menores de 18 años, que se encuentren en condición de pobreza  y pobreza extrema.\nHijos/as menores de 5 años: primer hijo USD30,00, segundo hijo USD27,00, tercer hijo USD 24,00, cuarto hijo USD 10,00\nHijos/as igual o mayores a 5 años y menores de 18 años: primer hijo USD 10,00, segundo hijo USD 9,00, tercer hijo USD 8,00","dirigido":"Núcleos familiares en extrema pobreza del sistema.\nOcupa el 3er lugar en el orden de prelación del art. 6 (antes que el BDH).\nSe excluye si un integrante del núcleo es servidor/a público/a con remuneración mayor a una RBU (art. 23, igual que el BDH).","beneficio":"Recibir una transferencia monetaria variable para contribuir al sostenimiento económico de hogares en situación de pobreza o pobreza extrema con hijos menores de 18 años.","requisitos":["Cédula de identidad ecuatoriana (o doble nacionalidad)."],"pasos":[{"titulo":"Revisar su Registro Social.","detalle":"Debe pertenecer a un hogar en situación de extrema pobreza."},{"titulo":"Verificar su puntaje.","detalle":"Extrema pobreza: hasta 10,52257 puntos.\nPobreza: hasta 29,13091 puntos.\nSegún la metodología del Registro Social 2025."},{"titulo":"Tener hijos menores de 18 años.","detalle":"El valor adicional depende de la edad y número de hijos."},{"titulo":"Cumplir las condiciones.","detalle":"No debe existir en el hogar un servidor/a público/a con ingresos superiores a 1 RBU."},{"titulo":"Esperar la habilitación.","detalle":"La selección se realiza de acuerdo con el orden de prioridad establecido por el Estado. El BDHV ocupa el 3er lugar de prioridad, antes que el BDH."}],"canales":[{"tipo":"web","nombre":"Acreditación bancaria.","horario":"Lunes a viernes de 8:00 a 16:45"}],"horarios":"Canales electrónicos: 24 horas. BanEcuador: lun–vie 08:00–16:00. Banco del Pacífico: lun–vie 08:30–16:00.","normativa":"Acuerdo Ministerial Nro. MIES-2022-037 (22 jun. 2022): mencionado en el listado de transferencias del art. 1, en el orden de prelación (art. 6) y en la exclusión por servidor público (art. 23), junto con el BDH","activo":true},{"id":"bono-mil-dias","nombre":"Bono 1000 días","resumen":"Ayuda económica para madres y niños durante el embarazo y primeros dos años de vida.","categoria":"inclusion","modalidad":"En línea","consiste":"Es una ayuda económica para acompañar a la madre y al niño o niña durante el embarazo y sus primeros dos años de vida, contribuyendo a la prevención de la desnutrición crónica infantil.","dirigido":"A mujeres embarazadas y niños y niñas menores de 2 años que pertenecen a hogares en situación de pobreza o extrema pobreza, según el Registro Social vigente.","beneficio":"Recibir una ayuda económica que contribuya al cuidado y bienestar de la madre y del niño o niña durante el embarazo y sus primeros dos años de vida.","requisitos":["Pertenecer a un hogar registrado en el Registro Social.","Encontrarse en situación de pobreza o extrema pobreza.","En caso de embarazo, encontrarse en gestación; o tener un niño o niña menor de 2 años.","No tener un integrante del hogar con afiliación contributiva al IESS, salvo Seguro Social Campesino y Trabajo No Remunerado en el Hogar.","No tener un integrante del hogar que sea servidor/a público/a con remuneración mayor a 1 RBU.","Existir un solo representante de cobro por núcleo familiar."],"pasos":[{"titulo":"Revise su Registro Social.","detalle":"Debe pertenecer a un hogar en situación de pobreza o extrema pobreza."},{"titulo":"Verifique su puntaje.","detalle":"Según la metodología del Registro Social 2025: extrema pobreza hasta 10,52257 puntos y pobreza hasta 29,13091 puntos."},{"titulo":"Cumpla las condiciones.","detalle":"Debe tratarse de una mujer gestante o de un niño/a menor de 2 años y cumplir las condiciones establecidas para la transferencia."},{"titulo":"Cumpla los controles.","detalle":"Para recibir los valores condicionados debe cumplir los controles de salud establecidos."},{"titulo":"Espere la habilitación.","detalle":"La selección se realiza con base en la información del Registro Social y el proceso establecido por la entidad responsable."}],"canales":[{"tipo":"web","nombre":"Acreditación bancaria.","horario":"Lunes a viernes de 8:00 a 16:45"}],"horarios":"Acreditación en cuenta: 24 horas, según disponibilidad del sistema financiero.","normativa":"Acuerdo Ministerial Nro. MIES-2022-037:Decreto Ejecutivo No. 435 del 01 de junio de 2022, se crea el “Bono 1000 días”, como una transferencia monetaria condicionada de sesenta dólares de los Estados Unidos de América (USD\n60,00)","activo":true},{"id":"pension-mejores-an","nombre":"Pensión Mis Mejores Años","resumen":"Ayuda mensual de USD 100 para adultos mayores en situación de pobreza.","categoria":"inclusion","modalidad":"En línea","consiste":"Es una ayuda económica de USD 100 mensuales para adultos mayores que se encuentran en situación de pobreza o pobreza extrema, según el Registro Social vigente.","dirigido":"A adultos mayores en situación de pobreza o pobreza extrema, según su información en el Registro Social.","beneficio":"Recibir una ayuda económica mensual de USD 100 para contribuir al sostenimiento económico de las personas adultas mayores en situación de pobreza o pobreza extrema.","requisitos":["Ser adulto mayor.","Pertenecer a un hogar en situación de pobreza o pobreza extrema según el Registro Social.","Tener un solo representante de cobro por núcleo familiar.","No tener un integrante del hogar con seguridad social contributiva en el IESS, excepto Seguro Social Campesino o Trabajo No Remunerado en el Hogar.","No tener un integrante del hogar que sea servidor/a público/a con remuneración mayor a 1 RBU."],"pasos":[{"titulo":"Revise su Registro Social.","detalle":"Debe constar en el Registro Social y encontrarse en situación de pobreza o pobreza extrema."},{"titulo":"Verifique su puntaje.","detalle":"Según la metodología del Registro Social 2025: extrema pobreza hasta 10,52257 puntos y pobreza hasta 29,13091 puntos."},{"titulo":"Espere la habilitación.","detalle":"La incorporación de nuevos beneficiarios depende de la disponibilidad presupuestaria y del orden de prioridad establecido."},{"titulo":"Reciba el beneficio.","detalle":"Una vez habilitado, recibirá USD 100 mensuales."}],"canales":[{"tipo":"web","nombre":"Acreditación bancaria.","horario":"Lunes a viernes de 8:00 a 16:45"}],"horarios":"Cobro por ventanilla: de acuerdo con el horario de atención del punto de pago autorizado.","normativa":"Acuerdo Ministerial Nro. MIES-2022-037 (22 jun. 2022): art. 31 (definición), art. 6 (orden de prelación)\nReforma art. 7 — Acuerdo Nro. MIES-MIES-2024-0026-A (25 sept. 2024): inclusión progresiva\nDecreto Ejecutivo No. 228 (20 oct. 2021): Registro Social como base\nResolución Nro. URS-DEJ-2025-0009-R (07 nov. 2025): líneas de corte vigentes","activo":true},{"id":"pension-toda-una-vida","nombre":"Pensión Toda Una Vida","resumen":"Ayuda de USD 100 mensuales para personas con discapacidad en situación de pobreza.","categoria":"inclusion","modalidad":"En línea","consiste":"Es una ayuda económica de USD 100 mensuales para personas con discapacidad que se encuentran en situación de pobreza o pobreza extrema, de acuerdo con el Registro Social vigente.","dirigido":"A personas menores de 65 años con discapacidad igual o superior al 40%, registrada ante el Ministerio de Salud Pública, que se encuentren en situación de pobreza o extrema pobreza según el Registro Social.","beneficio":"Contar con una ayuda económica mensual de USD 100 para apoyar el sostenimiento económico de la persona con discapacidad beneficiaria.","requisitos":["Ser menor de 65 años.","Tener una discapacidad igual o superior al 40%, registrada ante el Ministerio de Salud Pública.","Encontrarse en situación de pobreza o extrema pobreza según el Registro Social vigente.","Cumplir las condiciones establecidas para la habilitación del beneficio."],"pasos":[{"titulo":"Revise su Registro Social.","detalle":"Debe encontrarse en situación de pobreza o extrema pobreza."},{"titulo":"Verifique su puntaje.","detalle":"Según la metodología del Registro Social 2025: extrema pobreza hasta 10,52257 puntos y pobreza hasta 29,13091 puntos."},{"titulo":"Verifique su discapacidad.","detalle":"Debe tener una discapacidad igual o superior al 40% registrada ante el Ministerio de Salud Pública."},{"titulo":"Espere la habilitación.","detalle":"La incorporación de nuevos beneficiarios depende de la disponibilidad presupuestaria y del orden de prioridad establecido."},{"titulo":"Reciba el beneficio.","detalle":"Una vez habilitado, recibirá USD 100 mensuales."}],"canales":[{"tipo":"web","nombre":"Acreditación bancaria.","horario":"Lunes a viernes de 8:00 a 16:45"}],"horarios":"Acreditación en cuenta: 24 h, según sistema financiero. Ventanilla: según horario del punto autorizado.","normativa":"Acuerdo Ministerial Nro. MIES-2022-037 (22 jun. 2022): art. 35 (definición), art. 36 (titularidad — edad y % discapacidad), art. 6 (orden de prelación)\nReforma art. 7 — Acuerdo Nro. MIES-MIES-2024-0026-A (25 sept. 2024): inclusión progresiva\nDecreto Ejecutivo No. 228 (20 oct. 2021): Registro Social como base\nResolución Nro. URS-DEJ-2025-0009-R (07 nov. 2025): líneas de corte vigentes","activo":true},{"id":"otorgamiento-de-permisos-de-funcionamiento-para-centros-de-desar","nombre":"Permisos de Funcionamiento para Centros de Desarrollo Infantil (CDI)","resumen":"Consiste en obtener el permiso de funcionamiento para brindar servicios de desarrollo infantil a niñas y niños de 1 a 3 años en Centros de Desarrollo Infantil (CDI).","categoria":"inclusion","modalidad":"Presencial","consiste":"Consiste en obtener el permiso de funcionamiento emitido por el Ministerio de Desarrollo Humano para brindar servicios de atención de Desarrollo Infantil Integral a niñas y niños de 1 a 3 años, en Centros de Desarrollo Infantil (CDI) bajo las modalidades de administración directa, por convenio, privados y fiscomisionales, conforme a la normativa vigente.","dirigido":"Persona Jurídica - Privada, Persona Jurídica - Pública, Persona Natural - Ecuatoriana, Persona Natural - Extranjera","beneficio":"Permiso de funcionamiento del Centro de Desarrollo Infantil (CDI)","requisitos":["1. Formulario de Registro de Solicitud de Permiso de Funcionamiento.","2. Proyecto de Funcionamiento con enfoque de derechos, que determine la capacidad técnica para los servicios según la modalidad, que incluya una propuesta de articulación interinstitucional con actores públicos, privados y comunitarios.","3. Permiso o autorización vigente del Cuerpo de Bomberos conforme a la normativa de la jurisdicción correspondiente y de renovación anual.","4. Nómina de usuarios de la unidad de atención de acuerdo al formato establecido para cada unidad (en caso de que se encuentre funcionando).","5. Nómina del Talento Humano que opera en la unidad de atención (en caso de que se encuentre funcionando).","6. Plano o croquis del local donde funciona la Unidad de Atención, con georreferenciación.","7. En los casos de las unidades de atención Intra-mural, se deberá presentar copia simple del título o escritura pública, que avale el tipo de vinculación que se tiene con el inmueble en el que se ofertará el servicio institucionalizado"],"pasos":[{"titulo":"1. Ingresar a la página WEB del Ministerio de Trabajo y+ Desarrollo Humano para descargar y llenar el formulario de soli","detalle":"Reunir la documentación habilitante; para su posterior entrega en la Direcciones Distritales del MDH, a nivel nacional."},{"titulo":"2. Recibir la visita de inspección del Técnico Distrital MDH","detalle":"Previamente coordinada para la aplicación de la ficha de evaluación de calidad."},{"titulo":"3. Retirar Permiso de Funcionamiento","detalle":"En las Direcciones Distritales o Coordinación Zonal respectiva"}],"canales":[{"tipo":"oficina","nombre":"Puntos de atención a nivel nacional","horario":"Lunes a viernes de 08h00 a 16h45","direccion":"A nivel nacional"}],"horarios":"Lunes a viernes de 08h00 a 16h45","normativa":"Acuerdo Ministerial Nro. MIES-2021-020, que expide el instructivo para el otorgamiento de permisos de funcionamiento de unidades de atención públicas y privadas, incluidos los servicios de desarrollo infantil. \nAcuerdo Ministerial Nro. MIES-2023-038, que expide la Norma Técnica del Servicio de Centros de Desarrollo Infantil (CDI). \nAcuerdo Ministerial Nro. 116, publicado en el Registro Oficial, Ed","documentos":"1. Formulario de Registro de Solicitud de Permiso de Funcionamiento.","activo":true},{"id":"solicitud-de-adopcion-nacional-de-ninas-ninos-y-adolescentes-con","nombre":"Solicitud de adopción nacional de niñas, niños y adolescentes con declaratoria de adoptabilidad","resumen":"Consiste en presentar una solicitud para iniciar el proceso de adopción nacional de una niña, niño o adolescente que cuente con declaratoria de adoptabilidad","categoria":"inclusion","modalidad":"Presencial","consiste":"Consiste en presentar una solicitud para iniciar el proceso de adopción nacional de una niña, niño o adolescente que cuente con declaratoria de adoptabilidad, a fin de evaluar la idoneidad de las personas o parejas solicitantes y, conforme a las etapas administrativas y legales correspondientes, procurar la asignación de una familia idónea que garantice su protección integral y el ejercicio de sus derechos.","dirigido":"Persona Natural - Ecuatoriana","beneficio":"Evaluación de idoneidad para el proceso de adopción nacional y, de corresponder, asignación de una niña, niño o adolescente.","requisitos":["1. Ficha de Solicitud de Adopción Nacional","2. Cédula de identidad y/o ciudadanía, o Pasaporte ordinario.","3. Certificado de votación","4. Partida Integra de Nacimiento","5. Documento que acredite estado civil: en caso de matrimonio certificado de matrimonio, en caso de divorcio la partida integra de matrimonio con la sentencia de divorcio marginada, en caso de viudez el certificado de defunción del cónyuge, en caso de unión de hecho el certificado de unión de hecho.","6. Certificado de trabajo e ingresos económicos","7. Certificado de antecedentes penales","8. Certificado médico general","9. Certificado de participación en el curso de formación a padres adoptivos","10. Fotografías actualizadas y rotuladas del entorno familiar y social de los solicitantes","11. Declaración juramentada notariada con compromisos y acuerdos","12. Autobiografía o historia de vida de cada persona solicitante.","13. Carta de Aceptación de Asignación de Niñas, Niños y Adolescentes","14. Informe de Emparentamiento"],"pasos":[{"titulo":"1. Acercarse o contactarse con una de las Unidades Técnicas de Adopciones Zonales","detalle":"Acercarse o comunicarse con una de las Unidades Técnicas de Adopciones Zonales para recibir información y orientación sobre los requisitos, las etapas y el procedimiento para iniciar el proceso de adopción nacional."},{"titulo":"2. Asistir a la entrevista inicial con los técnicos de adopción.","detalle":"Asistir a la entrevista inicial con los técnicos de adopción, en la fecha y hora coordinadas, para recibir orientación sobre el proceso, conocer sus etapas y resolver inquietudes relacionadas con la adopción nacional.encial"},{"titulo":"3. Participar en los cursos de formación continua.","detalle":"Participar en los cursos de formación continua establecidos para las personas solicitantes de adopción, con el fin de fortalecer sus conocimientos y habilidades para asumir la responsabilidad de la adopción y garantizar el bienestar integral de la niña, niño o adolescente."},{"titulo":"4. Presentar la solicitud y los documentos de verificación","detalle":"Presentar la solicitud de adopción nacional junto con los documentos requeridos para verificar el cumplimiento de los requisitos establecidos en la normativa vigente. La documentación será revisada por los técnicos de adopción para continuar con el proceso."},{"titulo":"5. Participar en la evaluación psico-social individual y de pareja de ser el caso.","detalle":"Participar en las entrevistas y evaluaciones psicológicas y sociales realizadas por los profesionales de adopción, con el propósito de valorar la idoneidad de las personas solicitantes para asumir la responsabilidad de la adopción. La evaluación se realizará de forma individual y, cuando corresponda, en pareja."},{"titulo":"6. Participar de la visita domiciliaria, que es ejecutada por los técnicos de adopciones.","detalle":"Facilitar la visita domiciliaria realizada por los técnicos de adopción, proporcionando la información necesaria para conocer las condiciones del entorno familiar y habitacional de las personas solicitantes, como parte de la evaluación de idoneidad."},{"titulo":"7. Recibir la declaratoria de idoneidad o no idoneidad.","detalle":"Recibir la notificación del resultado de la evaluación de idoneidad, mediante la cual se informa si las personas solicitantes cumplen con las condiciones y requisitos para continuar con el proceso de adopción nacional."},{"titulo":"8. Recibir la asignación de la niña, niño o adolescente de ser el caso.","detalle":"Una vez concluida la evaluación de idoneidad y conforme al procedimiento legal vigente, las personas solicitantes reciben la notificación de la asignación de la niña, niño o adolescente, cuando corresponda, y las indicaciones para continuar con las siguientes etapas del proceso de adopción."},{"titulo":"9. Participar en el proceso de apego y vinculación afectiva (emparentamiento).","detalle":"Participar en el proceso de emparentamiento, siguiendo las orientaciones y el acompañamiento de los técnicos de adopción, con el propósito de favorecer el conocimiento mutuo y la construcción progresiva de vínculos afectivos entre la niña, niño o adolescente y la familia asignada."},{"titulo":"10. Realizar  Fase Judicial de la Adopción.","detalle":"Iniciar y continuar la fase judicial de la adopción mediante la presentación de la demanda correspondiente ante la autoridad judicial competente, con el patrocinio legal requerido y el cumplimiento de las diligencias y requisitos establecidos en la normativa vigente, hasta obtener la sentencia de adopción"},{"titulo":"11. Participar en el seguimiento Postadoptivo.","detalle":"Participar en el seguimiento postadoptivo mediante entrevistas, visitas domiciliarias y otras actividades de acompañamiento realizadas por los técnicos de adopción, con el propósito de evaluar la adaptación familiar, fortalecer los vínculos afectivos y verificar el bienestar integral de la niña, niño o adolescente adoptado."}],"canales":[{"tipo":"oficina","nombre":"Oficinas a nivel nacional","direccion":"Oficinas a nivel nacional"}],"horarios":"Lunes a viernes de 08h00 a 16h45","normativa":"Constitución de la República del Ecuador: artículos 35, 44, 45 y 69, numeral 6, relativos a la protección prioritaria de niñas, niños y adolescentes, el interés superior y la adopción.\nCódigo de la Niñez y Adolescencia: artículos 151 al 189, referentes a la adopción; especialmente, artículos 152, 153, 158, 159, 165 al 168.","documentos":"Ficha de Solicitud de Adopción Nacional","activo":true}],"inventory":{"format":"ua-service-modality-inventory","version":1,"capturedAt":"2026-11-24T17:52:16.877971+00:00","transactionReadOnly":true,"source":{"table":"unidades_atencion","query":"SELECT servicio, mod, mod_abv, count(*) AS unidades\nFROM unidades_atencion\nGROUP BY servicio, mod, mod_abv\nORDER BY servicio NULLS FIRST, mod NULLS FIRST, mod_abv NULLS FIRST"},"totals":{"units":10332,"combinations":22,"services":4,"modalities":20,"abbreviations":20},"quality":{"servicio":0,"mod":0,"mod_abv":0},"rows":[{"servicio":"DESARROLLO INFANTIL INTEGRAL","mod":"ACOMPAÑAMIENTO FAMILIAR","mod_abv":"1.- ACOMPAÑAMIENTO FAMILIAR","unidades":176},{"servicio":"DESARROLLO INFANTIL INTEGRAL","mod":"CENTROS DE DESARROLLO INFANTIL - CDI","mod_abv":"1.- EMBLEMATICO","unidades":75},{"servicio":"DESARROLLO INFANTIL INTEGRAL","mod":"CENTROS DE DESARROLLO INFANTIL - CDI","mod_abv":"2.- CDI DIRECTOS","unidades":51},{"servicio":"DESARROLLO INFANTIL INTEGRAL","mod":"CENTROS DE DESARROLLO INFANTIL - CDI","mod_abv":"3.- CDI CONVENIOS","unidades":1772},{"servicio":"DESARROLLO INFANTIL INTEGRAL","mod":"CNH altamente dispersa","mod_abv":"6.- CNH altamente dispersa","unidades":23},{"servicio":"DESARROLLO INFANTIL INTEGRAL","mod":"CNH - Misión Ternura","mod_abv":"4.- CNH - Misión Ternura","unidades":4389},{"servicio":"PERSONAS ADULTOS MAYORES - PEJ","mod":"ATENCIÓN DOMICILIARIA","mod_abv":"3.- DOMICILIAR","unidades":2042},{"servicio":"PERSONAS ADULTOS MAYORES - PEJ","mod":"CENTRO GERONTOLÓGICOS DE ATENCIÓN DIURNA","mod_abv":"1.- DIURNOS","unidades":71},{"servicio":"PERSONAS ADULTOS MAYORES - PEJ","mod":"CENTRO GERONTOLÓGICOS RESIDENCIALES","mod_abv":"2.- RESIDENCIALES","unidades":56},{"servicio":"PERSONAS ADULTOS MAYORES - PEJ","mod":"ESPACIOS DE SOCIALIZACIÓN Y ENCUENTRO","mod_abv":"4.- ACTIVOS","unidades":268},{"servicio":"PERSONAS CON DISCAPACIDAD","mod":"ATENCIÓN EN EL HOGAR Y LA COMUNIDAD","mod_abv":"3.- DOMICILIAR","unidades":1024},{"servicio":"PERSONAS CON DISCAPACIDAD","mod":"CENTROS DE REFERENCIA Y ACOGIDA INCLUSIVOS","mod_abv":"2.- REFERENCIA","unidades":13},{"servicio":"PERSONAS CON DISCAPACIDAD","mod":"CENTROS DIURNOS DE DESARROLLO INTEGRAL PARA PERSONAS CON DISCAPACIDAD","mod_abv":"1.- DIURNOS","unidades":39},{"servicio":"PROTECCION ESPECIAL","mod":"ACOGIMIENTO FAMILIAR","mod_abv":"2.- FAMILIAR","unidades":3},{"servicio":"PROTECCION ESPECIAL","mod":"ACOGIMIENTO INSTITUCIONAL","mod_abv":"1.- INSTITUCIONAL","unidades":65},{"servicio":"PROTECCION ESPECIAL","mod":"APOYO FAMILIAR Y CUSTODIA FAMILIAR","mod_abv":"6.- CUSTODIA","unidades":65},{"servicio":"PROTECCION ESPECIAL","mod":"ATENCIÓN Y PROTECCIÓN EMERGENTE - ABRIGO TEMPORAL","mod_abv":"11.- APE ABRIGO TEMPORAL","unidades":2},{"servicio":"PROTECCION ESPECIAL","mod":"ERRADICACIÓN DEL TRABAJO INFANTIL","mod_abv":"3.- ETI","unidades":137},{"servicio":"PROTECCION ESPECIAL","mod":"ERRADICACIÓN PROGRESIVA DE LA MENDICIDAD","mod_abv":"4.- MENDICIDAD","unidades":27},{"servicio":"PROTECCION ESPECIAL","mod":"HABITANTES DE LA CALLE","mod_abv":"8.- HABITANTES DE LA CALLE","unidades":3},{"servicio":"PROTECCION ESPECIAL","mod":"INTERVENCIÓN PSICOSOCIAL PARA LA PREVENCIÓN DE VULNERACIÓNDE DERECHOS DE NNA EN EL ÁMBITOFAMILIAR Y COMUNITARIO–SI","mod_abv":"9.- INTERVENCIÓN PSICOSOCIAL–SIPS","unidades":8},{"servicio":"PROTECCION ESPECIAL","mod":"MOVILIDAD HUMANA - CIUDADES DE ACOGIDA","mod_abv":"7.- CIUDADES DE ACOGIDA","unidades":23}]}}</script>
+  <script>(() => {
+  'use strict';
+  const data = JSON.parse(document.getElementById('knowledge').textContent);
+  const $ = id => document.getElementById(id);
+  const services = new Map(data.pilot.services.map(item => [item.id, item]));
+  const asesor = new Map(data.asesor.map(item => [item.id, item]));
+  const inventory = data.inventory;
+  const inventoryGroups = [];
+  const groupMap = new Map();
+  const formatCount = value => value.toLocaleString('es-EC');
+  const rawLabel = value => value === null ? '(NULL)' : value === '' ? '(cadena vacía)' : value;
+  const inventoryKey = (kind, values) => `inventario/${kind}/${encodeURIComponent(JSON.stringify(values))}`;
+  const isInventoryKey = key => key === 'inventario' || key.startsWith('inventario/');
+  for (const row of inventory.rows) {
+    if (!groupMap.has(row.servicio)) {
+      const group = { service: row.servicio, total: 0, modalities: new Map() };
+      groupMap.set(row.servicio, group);
+      inventoryGroups.push(group);
+    }
+    const group = groupMap.get(row.servicio);
+    group.total += row.unidades;
+    if (!group.modalities.has(row.mod)) group.modalities.set(row.mod, []);
+    group.modalities.get(row.mod).push(row);
+  }
+  const pilotSource = `https://github.com/sgde-mtdh/Geoportal-MTDH/blob/${data.commit}/servicios/index.html`;
+  const cdiSource = `https://github.com/sgde-mtdh/Geoportal-MTDH/blob/${data.commit}/servicios/cdi/index.html`;
+  const statusLabels = { 'sin-revisar': 'Sin revisar', observaciones: 'Con observaciones', revisado: 'Revisado en mesa' };
+  const issues = [
+    ['Inventario propio', 'Ya se capturaron las combinaciones reales en una consulta de solo lectura. Falta homologar sus denominaciones con el catálogo del piloto y validar el significado de mod_abv. Ver «Servicios y modalidades».'],
+    ['Alcance del mapa', 'Decidir cuáles de los 18 grupos tendrán unidades en el mapa y cuáles tendrán únicamente orientación o enlaces.'],
+    ['Diferencias entre modalidades', 'Validar qué distingue cada modalidad y qué preguntas pueden orientarla sin sustituir una valoración profesional.'],
+    ['Límites de edad', 'Validar los extremos de edad de CDI/CNH y su expresión en años o meses. Los avisos del piloto no resuelven el límite exacto de 3 años.'],
+    ['Ingreso familiar a CDI', 'Obtener los requisitos vigentes de ingreso. Los requisitos del permiso de funcionamiento no corresponden a las familias.'],
+    ['Condiciones de transferencias', 'Validar montos, puntajes y metodologías de Registro Social por prestación, sin trasladar condiciones de una a otra.'],
+    ['Contenido del BJGL', 'Confirmar porcentaje de discapacidad y corregir el metadato de normativa que menciona documentos de hoja de vida.'],
+    ['Liquidaciones y focalización', 'Confirmar fórmula completa del BDHV, valores condicionados de 1000 días y diferencias de focalización.'],
+    ['Documentos por etapa', 'Confirmar documentos de adopción según fase y completar textos truncados de permisos sin reconstruirlos por inferencia.'],
+    ['Canales competentes', 'Verificar oficinas, direcciones, contactos y horarios. No asociar una oficina con una unidad solo porque esté cerca.'],
+    ['Orientación o derivación', 'Decidir si el producto solo informa y ubica o si registrará/enviará una derivación formal. Las fuentes no prueban integración de casos.'],
+    ['Recepción y capacidad', 'Definir quién recibe y sigue una derivación, y si existe información verificable de cupos o capacidad.'],
+    ['Situaciones urgentes', 'Acordar un protocolo institucional de atención urgente y vulneración de derechos, sin inventar canales o prioridades.'],
+    ['Respuestas y privacidad', 'Acordar qué se conservaría, con qué propósito y consentimiento. Los pilotos no justifican recoger cédulas.'],
+  ].map(([title, text], index) => ({ id: `P${String(index + 1).padStart(2, '0')}`, title, text }));
+  const ages = [
+    ['under', 'Menos de 1 año', 'El piloto avisa que los centros públicos atienden desde 1 año y que para menores se requiere orientación sobre otros servicios. No cambia el filtro de centros.'],
+    ['1', '1 año', 'No hay un aviso específico para esta selección. La edad no participa en la función que filtra centros.'],
+    ['2', '2 años', 'No hay un aviso específico para esta selección. La edad no participa en la función que filtra centros.'],
+    ['3', '3 años o más', 'El piloto avisa que los centros atienden principalmente de 1 a 3 años y recomienda consultar opciones correspondientes a la edad. No excluye centros ni resuelve el límite exacto de 3 años.'],
+  ];
+  const comparisons = {
+    cdi: { ids: ['otorgamiento-de-permisos-de-funcionamiento-para-centros-de-desar'], text: 'No equivalente: permiso para operar una unidad, no requisitos de ingreso de una familia.' },
+    cnh: { ids: ['bono-mil-dias'], text: 'Solo coincidencia de públicos. Bono 1000 días es una transferencia; no sustituye el acompañamiento CNH.' },
+    adulto: { ids: ['pension-mejores-an'], text: 'Complemento económico posible, no equivalencia con cuidado residencial, diurno o domiciliario.' },
+    discapacidad: { ids: ['pension-toda-una-vida', 'bono-joaquin-gallegos'], text: 'Complementos económicos posibles. No equivalen a atención en centros, acogida, hogar o comunidad.' },
+    adopcion: { ids: ['solicitud-de-adopcion-nacional-de-ninas-ninos-y-adolescentes-con'], text: 'Correspondencia parcial: esta ficha cubre adopción nacional, no internacional.' },
+    bonos: { ids: ['bono-desarrollo-humano', 'bono-desarrollo-humano-variable', 'bono-mil-dias', 'pension-mejores-an', 'pension-toda-una-vida', 'bono-joaquin-gallegos'], text: 'Grupo amplio frente a prestaciones distintas. Este desglose es una correspondencia candidata, no una recomendación automática.' },
+    bjl: { ids: ['bono-joaquin-gallegos'], text: 'Coincide la denominación y finalidad. Los requisitos publicados aún necesitan validación institucional.' },
+    permisos: { ids: ['otorgamiento-de-permisos-de-funcionamiento-para-centros-de-desar'], text: 'Correspondencia parcial: la ficha no cubre permisos de todas las unidades o modalidades.' },
+    acompanamiento: { ids: ['bono-desarrollo-humano-variable'], text: 'Relación contextual de población usuaria, no equivalencia entre acompañamiento y transferencia.' },
+  };
+  const metadata = new Map([
+    ['catalogo', 'Catálogo completo del piloto'],
+    ['asesor', 'Fichas complementarias de Asesor593'],
+    ['cdi', 'Flujo CDI independiente'],
+    ['cdi/territorio', 'CDI: selección territorial'],
+    ['cdi/resultados', 'CDI: resultados y límites'],
+    ['cdi/todos', 'CDI: ver todos los centros'],
+    ['pendientes', 'Decisiones pendientes de validación'],
+    ['inventario', 'Inventario observado: servicios y modalidades'],
+  ]);
+  for (const population of data.pilot.paths) {
+    for (const [id, title] of population.needs) metadata.set(`ruta/${population.id}/${id}`, `${population.label}: ${title}`);
+  }
+  for (const item of services.values()) metadata.set(`servicio/${item.id}`, item.title);
+  for (const item of asesor.values()) metadata.set(`asesor/${item.id}`, item.nombre);
+  for (const [id, title] of ages) metadata.set(`cdi/edad/${id}`, `CDI: ${title}`);
+  for (const item of issues) metadata.set(`pendiente/${item.id}`, `${item.id}: ${item.title}`);
+  for (const group of inventoryGroups) {
+    metadata.set(inventoryKey('servicio', [group.service]), `Servicio observado: ${rawLabel(group.service)}`);
+    for (const [modality, rows] of group.modalities) {
+      metadata.set(inventoryKey('modalidad', [group.service, modality]), `${rawLabel(group.service)}: ${rawLabel(modality)}`);
+      for (const row of rows) metadata.set(
+        inventoryKey('combinacion', [row.servicio, row.mod, row.mod_abv]),
+        `${rawLabel(row.servicio)} / ${rawLabel(row.mod)} / ${rawLabel(row.mod_abv)}`,
+      );
+    }
+  }
+
+  let state = { mode: 'routes', population: data.pilot.paths[0].id, need: data.pilot.paths[0].needs[0][0], selected: null };
+  let currentKey = '';
+  let notes = Object.create(null);
+  let persistent = true;
+  let externalChange = false;
+  let storedVersion = null;
+  const storageKey = `ua-content-review-v1-${data.datasetId}`;
+
+  function validateDraft(draft) {
+    if (!draft || draft.format !== 'ua-content-review' || draft.version !== 1 || draft.datasetId !== data.datasetId) {
+      throw new Error('El borrador no pertenece a esta captura. No se ha importado.');
+    }
+    if (!draft.notes || typeof draft.notes !== 'object' || Array.isArray(draft.notes)) throw new Error('El borrador no contiene observaciones válidas.');
+    const clean = Object.create(null);
+    for (const [key, value] of Object.entries(draft.notes)) {
+      if (!metadata.has(key) || !value || !Object.hasOwn(statusLabels, value.status) ||
+          typeof value.notes !== 'string' || typeof value.proposal !== 'string' ||
+          value.notes.length > 8000 || value.proposal.length > 8000 ||
+          typeof value.updatedAt !== 'string' || !Number.isFinite(Date.parse(value.updatedAt))) {
+        throw new Error('Hay elementos o campos no válidos en el borrador. No se ha importado.');
+      }
+      if (value.evidenceRevision !== undefined &&
+          (typeof value.evidenceRevision !== 'string' || !Number.isFinite(Date.parse(value.evidenceRevision)))) {
+        throw new Error('La fecha de evidencia de una observación no es válida.');
+      }
+      clean[key] = { status: value.status, notes: value.notes, proposal: value.proposal, updatedAt: value.updatedAt,
+        ...(value.evidenceRevision ? { evidenceRevision: value.evidenceRevision } : {}) };
+    }
+    return clean;
+  }
+  try {
+    storedVersion = localStorage.getItem(storageKey);
+    if (storedVersion) notes = validateDraft(JSON.parse(storedVersion));
+  } catch (error) {
+    persistent = false;
+    $('message').textContent = 'No se pudo recuperar el guardado local. Puedes trabajar en memoria y exportar tu revisión.';
+  }
+
+  function el(tag, text, className) {
+    const node = document.createElement(tag);
+    if (text !== undefined && text !== null) node.textContent = String(text);
+    if (className) node.className = className;
+    return node;
+  }
+  function button(text, action, className) {
+    const node = el('button', text, className);
+    node.type = 'button';
+    node.addEventListener('click', action);
+    return node;
+  }
+  function link(text, href, parent) {
+    const node = el('a', text);
+    node.href = href;
+    node.target = '_blank';
+    node.rel = 'noopener noreferrer';
+    parent.append(node);
+    return node;
+  }
+  function notice(parent, text, info = false) { parent.append(el('p', text, `notice${info ? ' info' : ''}`)); }
+  function source(parent, title, url, documentPath) {
+    const line = el('p', undefined, 'source');
+    link(title, url, line);
+    if (documentPath) link('Ver documento de análisis', documentPath, line);
+    line.append(document.createTextNode(' · Consulta: 24/11/2026'));
+    parent.append(line);
+  }
+  function section(parent, title, content) {
+    const box = el('section', undefined, 'fact-section');
+    box.append(el('h4', title));
+    if (Array.isArray(content)) {
+      const list = el('ul');
+      for (const item of content) list.append(el('li', item));
+      box.append(list);
+    } else box.append(el('p', content || 'No publicado en esta captura.'));
+    parent.append(box);
+    return box;
+  }
+  function header(label, title, description) {
+    $('section-label').textContent = label;
+    $('content-title').textContent = title;
+    $('content-description').textContent = description;
+    $('stage').replaceChildren();
+    $('message').textContent = '';
+  }
+  function envelope() {
+    return { format: 'ua-content-review', version: 1, datasetId: data.datasetId, sourceDate: data.date,
+      inventoryCapturedAt: inventory.capturedAt, commit: data.commit, exportedAt: new Date().toISOString(), notes };
+  }
+  function updateSaveStatus() {
+    $('save-status').textContent = externalChange
+      ? 'Otra ventana cambió el borrador. No se sobrescribirá: tus notas están en memoria. Expórtalas antes de recargar para recuperar el otro borrador.'
+      : persistent
+      ? 'Notas guardadas en este navegador. Exporta una copia para conservarlas o compartirlas.'
+      : 'Trabajo en memoria: el navegador no permite guardar. Exporta antes de cerrar.';
+    $('review-count').textContent = `${Object.keys(notes).length} elementos con revisión guardada.`;
+  }
+  function persist() {
+    if (externalChange) { persistent = false; updateSaveStatus(); return; }
+    try {
+      if (localStorage.getItem(storageKey) !== storedVersion) {
+        externalChange = true;
+        persistent = false;
+      } else {
+        const serialized = JSON.stringify(envelope());
+        localStorage.setItem(storageKey, serialized);
+        storedVersion = serialized;
+        persistent = true;
+      }
+    }
+    catch { persistent = false; }
+    updateSaveStatus();
+  }
+  function showEditor(key) {
+    currentKey = key;
+    const item = notes[key] || { status: 'sin-revisar', notes: '', proposal: '' };
+    $('review-target').textContent = metadata.get(key);
+    if (isInventoryKey(key) && notes[key] && notes[key].evidenceRevision !== inventory.capturedAt) {
+      $('review-target').textContent += ' — Nota de otra captura: revisar los conteos antes de reutilizarla.';
+    }
+    $('review-status').value = item.status;
+    $('review-notes').value = item.notes;
+    $('review-proposal').value = item.proposal;
+    updateSaveStatus();
+  }
+  function saveEditor() {
+    if (!metadata.has(currentKey)) return;
+    const status = $('review-status').value;
+    const text = $('review-notes').value;
+    const proposal = $('review-proposal').value;
+    if (status === 'sin-revisar' && !text.trim() && !proposal.trim()) delete notes[currentKey];
+    else notes[currentKey] = { status, notes: text, proposal, updatedAt: new Date().toISOString(),
+      ...(isInventoryKey(currentKey) ? { evidenceRevision: inventory.capturedAt } : {}) };
+    persist();
+  }
+  function normalize(value) { return String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(); }
+  function matches(text) { return normalize(text).includes(normalize($('search').value.trim())); }
+
+  const modes = [
+    ['routes', 'Rutas del piloto', '20'],
+    ['inventory', 'Servicios y modalidades', String(inventoryGroups.length)],
+    ['catalogue', 'Catálogo del piloto', '18'],
+    ['asesor', 'Complemento Asesor593', '8'],
+    ['cdi', 'Flujo CDI separado', ''],
+    ['issues', 'Pendientes de validación', '14'],
+  ];
+  function renderNavigation() {
+    $('navigation').replaceChildren(...modes.map(([id, title, count]) => {
+      const node = button(title, () => { state.mode = id; state.selected = null; $('search').value = ''; render(); });
+      node.setAttribute('aria-pressed', String(state.mode === id));
+      if (count) node.append(el('span', count, 'nav-number'));
+      return node;
+    }));
+    let items;
+    if (state.mode === 'routes') items = data.pilot.paths.map(p => ({
+      id: p.id, title: p.label, search: `${p.label} ${p.needs.map(n => `${n[1]} ${n[2].map(id => services.get(id).title).join(' ')}`).join(' ')}`,
+      action: () => { state.population = p.id; state.need = p.needs[0][0]; render(); },
+      active: state.population === p.id,
+    }));
+    else if (state.mode === 'catalogue') items = [...services.values()].map(item => ({
+      id: item.id, title: item.title, search: `${item.title} ${item.short}`, active: state.selected === item.id,
+      action: () => { state.selected = item.id; render(); },
+    }));
+    else if (state.mode === 'asesor') items = [...asesor.values()].map(item => ({
+      id: item.id, title: item.nombre, search: `${item.nombre} ${item.resumen}`, active: state.selected === item.id,
+      action: () => { state.selected = item.id; render(); },
+    }));
+    else if (state.mode === 'inventory') items = inventoryGroups.map(group => ({
+      id: inventoryKey('servicio', [group.service]), title: rawLabel(group.service),
+      search: `${rawLabel(group.service)} ${[...group.modalities].map(([modality, rows]) => `${rawLabel(modality)} ${rows.map(row => rawLabel(row.mod_abv)).join(' ')}`).join(' ')}`,
+      active: state.selected === inventoryKey('servicio', [group.service]),
+      action: () => { state.selected = inventoryKey('servicio', [group.service]); render(); },
+    }));
+    else if (state.mode === 'issues') items = issues.map(item => ({
+      id: item.id, title: `${item.id} · ${item.title}`, search: `${item.title} ${item.text}`, active: state.selected === item.id,
+      action: () => { state.selected = item.id; render(); },
+    }));
+    else items = [{ title: 'Edad, territorio y resultados', search: 'CDI edad territorio resultados', active: true, action: () => { render(); } }];
+    const filtered = items.filter(item => matches(item.search));
+    $('items').replaceChildren(...filtered.map(item => {
+      const node = button(item.title, item.action);
+      node.setAttribute('aria-current', String(item.active));
+      return node;
+    }));
+    if (!filtered.length) $('items').append(el('p', 'No hay coincidencias en esta sección.', 'empty'));
+  }
+  function openService(id) { state.mode = 'catalogue'; state.selected = id; $('search').value = ''; render(); }
+  function openAsesor(id) { state.mode = 'asesor'; state.selected = id; $('search').value = ''; render(); }
+
+  function renderRoutes() {
+    const population = data.pilot.paths.find(item => item.id === state.population);
+    header('Lógica observada en el piloto', '¿Para quién buscas ayuda?', 'Selecciona un público a la izquierda. Cada rama conserva la pregunta y los resultados del piloto; selecciona una necesidad para anotar tu revisión.');
+    const stage = $('stage');
+    const root = el('div', undefined, 'route-root');
+    root.append(el('small', 'Pregunta 1 · Público seleccionado'), el('h3', population.label));
+    stage.append(root);
+    const labels = el('div', undefined, 'diagram-labels');
+    labels.append(el('span', 'Pregunta 2 · ¿Qué necesitas?'), el('span', 'Servicios que muestra el piloto'));
+    stage.append(labels);
+    const branches = el('div', undefined, 'branches');
+    for (const [id, title, results] of population.needs) {
+      const row = el('div', undefined, 'branch');
+      const columns = el('div', undefined, 'branch-columns');
+      const need = button(title, () => { state.need = id; renderRoutes(); }, 'need');
+      need.setAttribute('aria-pressed', String(state.need === id));
+      need.append(el('small', 'Seleccionar para revisar esta asociación'));
+      const resultNodes = el('div', undefined, 'service-nodes');
+      for (const serviceId of results) resultNodes.append(button(services.get(serviceId).title, () => openService(serviceId), 'service-node'));
+      if (!results.length) resultNodes.append(button('Abre el catálogo completo', () => { state.mode = 'catalogue'; state.selected = null; render(); }, 'service-node'));
+      columns.append(need, resultNodes);
+      row.append(columns);
+      branches.append(row);
+    }
+    stage.append(branches);
+    notice(stage, 'Son asociaciones fijas del piloto. No verifican edad, discapacidad, Registro Social, requisitos o disponibilidad.', true);
+    if (population.id === 'infancia') notice(stage, 'Revisar: «Necesita protección» también devuelve Bono de orfandad, aunque el piloto no pregunta si existe orfandad.');
+    source(stage, 'Fuente: paths y showMatches', pilotSource, '01-piloto.md');
+    showEditor(`ruta/${population.id}/${state.need}`);
+  }
+  function renderCatalogue() {
+    const item = services.get(state.selected);
+    if (!item) {
+      header('Texto del catálogo del piloto', 'Los 18 servicios', 'Explora las fichas sin completar el cuestionario. El contenido fuente es de solo lectura.');
+      const entries = [...services.values()].filter(s => matches(`${s.title} ${s.short}`));
+      for (const service of entries) {
+        const node = button('', () => openService(service.id), 'list-entry');
+        node.append(el('strong', service.title), el('span', service.short));
+        $('stage').append(node);
+      }
+      if (!entries.length) $('stage').append(el('p', 'No hay coincidencias. Prueba otro término.', 'empty'));
+      showEditor('catalogo');
+      return;
+    }
+    header('Ficha del piloto · Contenido observado', item.title, 'Puedes proponer cambios en el panel de revisión sin modificar el texto original.');
+    const stage = $('stage');
+    stage.append(button('Volver al diagrama de rutas', () => { state.mode = 'routes'; state.selected = null; render(); }, 'back-link'));
+    const fact = el('article', undefined, 'fact');
+    fact.append(el('span', 'Publicado en el piloto', 'badge'));
+    section(fact, 'Qué ofrece', item.short);
+    section(fact, '¿Para quién?', item.who);
+    section(fact, '¿Cómo acceder?', item.access);
+    notice(fact, item.map
+      ? 'Solo esta ficha abre un mapa en el catálogo original. La presencia de un punto no demuestra vacantes.'
+      : 'En el piloto, el punto de atención de este servicio está pendiente de validación. No habilita un mapa.');
+    stage.append(fact);
+    const comparison = comparisons[item.id];
+    const box = el('section', undefined, 'compare');
+    box.append(el('h3', 'Complemento para comparar, no equivalencia aprobada'));
+    box.append(el('p', comparison?.text || 'No se encontró una ficha específica en las ocho fichas de inclusión capturadas. Esto no significa que el servicio no exista.'));
+    for (const id of comparison?.ids || []) {
+      if (asesor.has(id)) box.append(button(`Leer: ${asesor.get(id).nombre}`, () => openAsesor(id)));
+    }
+    stage.append(box);
+    source(stage, 'Fuente: catálogo del piloto', pilotSource, '03-cruce-y-pendientes.md');
+    showEditor(`servicio/${item.id}`);
+  }
+  function renderAsesor() {
+    const item = asesor.get(state.selected);
+    if (!item) {
+      header('Complemento publicado · No es un cuestionario', 'Fichas de Asesor593', 'Ocho fichas activas de inclusión en la captura. Requisitos y cifras son contenido publicado, pendiente de comprobar institucionalmente.');
+      const entries = [...asesor.values()].filter(s => matches(`${s.nombre} ${s.resumen}`));
+      for (const service of entries) {
+        const node = button('', () => openAsesor(service.id), 'list-entry');
+        node.append(el('strong', service.nombre), el('span', service.resumen));
+        $('stage').append(node);
+      }
+      if (!entries.length) $('stage').append(el('p', 'No hay coincidencias. Prueba otro término.', 'empty'));
+      showEditor('asesor');
+      return;
+    }
+    header('Asesor593 · Ficha publicada en la captura', item.nombre, 'No usar automáticamente estos textos como reglas de admisión o aprobación de un beneficio.');
+    const stage = $('stage');
+    const fact = el('article', undefined, 'fact');
+    fact.append(el('span', 'Fuente publicada, no validación jurídica', 'badge pending'));
+    if (item.id.startsWith('otorgamiento-de-permisos')) notice(fact, 'Trámite para operar una unidad. No son requisitos para ingresar a una niña o niño a CDI.');
+    if (item.id === 'bono-joaquin-gallegos') notice(fact, 'Falta el porcentaje concreto de discapacidad y el metadato normativa menciona hoja de vida. No completar por suposición.');
+    section(fact, 'Resumen', item.resumen);
+    section(fact, '¿En qué consiste?', item.consiste);
+    section(fact, '¿A quién está dirigido?', item.dirigido);
+    section(fact, '¿Qué obtienes?', item.beneficio);
+    section(fact, 'Requisitos publicados', item.requisitos || []);
+    const steps = section(fact, 'Pasos publicados', '');
+    steps.lastChild.remove();
+    for (const step of item.pasos || []) {
+      const block = el('div', undefined, 'fact-section');
+      block.append(el('h4', step.titulo), el('p', step.detalle));
+      steps.append(block);
+    }
+    section(fact, 'Modalidad', item.modalidad);
+    section(fact, 'Horarios publicados', item.horarios);
+    section(fact, 'Tiempo estimado publicado', item.tiempo);
+    const channels = section(fact, 'Canales publicados', '');
+    channels.lastChild.remove();
+    for (const channel of item.canales || []) {
+      const block = el('div', undefined, 'fact-section');
+      block.append(el('h4', channel.nombre));
+      for (const [key, value] of Object.entries(channel)) {
+        if (key !== 'nombre') block.append(el('p', `${key}: ${value}`));
+      }
+      channels.append(block);
+    }
+    const details = el('details');
+    details.append(el('summary', 'Metadatos API: conservar sin inferir requisitos'));
+    notice(details, 'Estos campos no aparecen como secciones en la plantilla pública consultada. Se muestran aquí como evidencia, incluidas sus erratas.');
+    section(details, 'normativa', item.normativa);
+    section(details, 'documentos', item.documentos);
+    fact.append(details);
+    stage.append(fact);
+    source(stage, 'Abrir ficha en Asesor593', `https://asesor593.trabajo.gob.ec/servicios/${encodeURIComponent(item.id)}`, '02-asesor593.md');
+    showEditor(`asesor/${item.id}`);
+  }
+  function renderCdi() {
+    header('Flujo observado independiente del cuestionario general', 'CDI: edad, territorio y resultados', 'Este diagrama explica la segunda página CDI del piloto. No filtra centros ni simula la admisión de una persona.');
+    const stage = $('stage');
+    const ageStep = el('section', undefined, 'step');
+    ageStep.append(el('h3', '1. ¿Qué edad tiene tu niña o niño?'), el('p', 'Las opciones solo cambian avisos informativos; no cambian los centros filtrados.'));
+    const options = el('div', undefined, 'age-options');
+    for (const [id, title, text] of ages) options.append(button(title, () => {
+      $('age-explanation').textContent = text;
+      showEditor(`cdi/edad/${id}`);
+    }));
+    ageStep.append(options, el('p', 'Selecciona una opción para leer y revisar su comportamiento.', 'notice info'));
+    ageStep.lastChild.id = 'age-explanation';
+    stage.append(ageStep);
+    const territory = el('section', undefined, 'step');
+    territory.append(el('h3', '2. ¿Dónde buscas un centro?'), el('p', 'Provincia requerida para continuar; cantón y parroquia filtran en cascada. No se solicita dirección escrita.'));
+    territory.append(button('Revisar selección territorial', () => showEditor('cdi/territorio')));
+    stage.append(territory);
+    const results = el('section', undefined, 'step');
+    results.append(el('h3', '3. Centros por territorio'), el('p', 'Resultado con mapa, listado, administración y enlace «Cómo llegar». El filtro usa únicamente provincia, cantón y parroquia.'));
+    notice(results, 'El resultado no confirma cupos, horarios actuales ni aceptación de solicitudes. La edad no es un filtro.');
+    results.append(button('Revisar resultados', () => showEditor('cdi/resultados')));
+    stage.append(results);
+    const alternative = el('section', undefined, 'fact');
+    alternative.append(el('h3', 'Alternativa: Ver todos los centros'), el('p', 'Omite la selección de edad y utiliza los filtros territoriales que haya en pantalla.'));
+    alternative.append(button('Revisar esta alternativa', () => showEditor('cdi/todos')));
+    stage.append(alternative);
+    notice(stage, 'No confundir con el localizador integrado del catálogo general: aquel permite provincia y radio de geolocalización. Son dos flujos distintos.');
+    source(stage, 'Fuente: página CDI del piloto', cdiSource, '01-piloto.md');
+    showEditor('cdi');
+  }
+  function renderIssues() {
+    const selected = issues.find(item => item.id === state.selected);
+    header('Pendientes identificados en la investigación', selected ? `${selected.id} · ${selected.title}` : 'Decisiones antes de diseñar', 'Estas dudas no se resuelven por inferencia. Anota acuerdos propuestos y la validación que falta; el estado de revisión no convierte una propuesta en norma.');
+    const stage = $('stage');
+    if (selected) {
+      notice(stage, selected.text);
+      source(stage, 'Ver cruce y pendientes documentados', '03-cruce-y-pendientes.md', '00-fuentes.md');
+      showEditor(`pendiente/${selected.id}`);
+    } else {
+      for (const item of issues.filter(i => matches(`${i.title} ${i.text}`))) {
+        const node = button('', () => { state.selected = item.id; render(); }, 'list-entry');
+        node.append(el('strong', `${item.id} · ${item.title}`), el('span', item.text));
+        stage.append(node);
+      }
+      showEditor('pendientes');
+    }
+  }
+  function renderInventory() {
+    const selected = inventoryGroups.find(group => inventoryKey('servicio', [group.service]) === state.selected);
+    header('Relación observada en PostgreSQL · No es una taxonomía aprobada',
+      selected ? rawLabel(selected.service) : 'Servicio, modalidad y valores de mod_abv',
+      'Captura agregada de unidades_atencion. Los textos se conservan sin normalizar. Selecciona un servicio y después una modalidad o combinación para registrar observaciones.');
+    const stage = $('stage');
+    const totals = el('div', undefined, 'inventory-summary');
+    for (const [label, value] of [
+      ['Servicios no vacíos', inventory.totals.services], ['Modalidades no vacías', inventory.totals.modalities],
+      ['Combinaciones exactas', inventory.totals.combinations], ['Filas de unidades', inventory.totals.units],
+    ]) {
+      const item = el('p');
+      item.append(el('strong', formatCount(value)), el('span', label));
+      totals.append(item);
+    }
+    stage.append(totals);
+    notice(stage, 'Cada conexión significa «aparece en esos registros», no «regla oficial de pertenencia» ni «cumple requisitos». Los conteos no son cupos, personas ni códigos institucionales distintos.', true);
+    if (!selected) {
+      for (const group of inventoryGroups.filter(group => matches(`${rawLabel(group.service)} ${[...group.modalities.keys()].map(rawLabel).join(' ')} ${[...group.modalities.values()].flat().map(row => rawLabel(row.mod_abv)).join(' ')}`))) {
+        const node = button('', () => { state.selected = inventoryKey('servicio', [group.service]); render(); }, 'list-entry');
+        node.append(el('strong', rawLabel(group.service)),
+          el('span', `${group.modalities.size} modalidades observadas · ${formatCount(group.total)} filas de unidades`));
+        stage.append(node);
+      }
+      const shared = new Map();
+      for (const row of inventory.rows) {
+        if (!shared.has(row.mod_abv)) shared.set(row.mod_abv, new Set());
+        shared.get(row.mod_abv).add(row.servicio);
+      }
+      const repeated = [...shared].filter(([, serviceSet]) => serviceSet.size > 1);
+      if (repeated.length) {
+        const box = el('section', undefined, 'fact');
+        box.append(el('h3', 'Valores de mod_abv compartidos entre servicios'));
+        for (const [value, serviceSet] of repeated) {
+          section(box, rawLabel(value), [...serviceSet].map(rawLabel));
+        }
+        notice(box, 'No usar mod_abv como identificador único ni enlazar modalidades de servicios distintos por compartir esa etiqueta.');
+        stage.append(box);
+      }
+      showEditor('inventario');
+    } else {
+      stage.append(button('Ver todos los servicios observados', () => { state.selected = null; render(); }, 'back-link'));
+      const root = el('div', undefined, 'route-root');
+      root.append(el('small', 'Servicio exacto en la base'), el('h3', rawLabel(selected.service)),
+        el('p', `${formatCount(selected.total)} filas de unidades`));
+      stage.append(root);
+      const labels = el('div', undefined, 'diagram-labels');
+      labels.append(el('span', 'Modalidad exacta: mod'), el('span', 'Valores observados de mod_abv'));
+      stage.append(labels);
+      const branches = el('div', undefined, 'branches');
+      for (const [modality, rows] of selected.modalities) {
+        const branch = el('div', undefined, 'branch');
+        const columns = el('div', undefined, 'branch-columns');
+        const count = rows.reduce((sum, row) => sum + row.unidades, 0);
+        const node = button(rawLabel(modality), () => showEditor(inventoryKey('modalidad', [selected.service, modality])), 'need');
+        node.append(el('small', `${formatCount(count)} filas · ${rows.length} combinación(es)`));
+        const values = el('div', undefined, 'service-nodes');
+        for (const row of rows) values.append(button(
+          `${rawLabel(row.mod_abv)} · ${formatCount(row.unidades)} filas`,
+          () => showEditor(inventoryKey('combinacion', [row.servicio, row.mod, row.mod_abv])),
+          'service-node',
+        ));
+        columns.append(node, values);
+        branch.append(columns);
+        branches.append(branch);
+      }
+      stage.append(branches);
+      if ([...selected.modalities.values()].some(rows => rows.length > 1)) {
+        notice(stage, 'Una misma modalidad tiene varios valores de mod_abv. No asumir que este campo es una abreviatura literal o una submodalidad oficial.');
+      }
+      showEditor(inventoryKey('servicio', [selected.service]));
+    }
+    const missing = Object.entries(inventory.quality).filter(([, count]) => count > 0);
+    if (missing.length) notice(stage, `Filas con campos ausentes: ${missing.map(([field, count]) => `${field}: ${formatCount(count)}`).join('; ')}.`);
+    const provenance = el('p', `Captura: ${inventory.capturedAt}. Transacción de solo lectura confirmada.`, 'source');
+    stage.append(provenance);
+    const links = el('div', undefined, 'document-links');
+    link('Consulta y captura agregada', 'fuentes/inventario-servicio-modalidad.md', links);
+    link('Análisis de pertenencia y límites', '04-servicios-modalidades.md', links);
+    stage.append(links);
+  }
+  function render() {
+    renderNavigation();
+    ({ routes: renderRoutes, inventory: renderInventory, catalogue: renderCatalogue, asesor: renderAsesor, cdi: renderCdi, issues: renderIssues })[state.mode]();
+  }
+
+  function download(content, filename, type) {
+    const url = URL.createObjectURL(new Blob([content], { type }));
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+    $('message').textContent = 'Archivo preparado para descarga. Comprueba que el navegador lo haya guardado.';
+  }
+  $('review-form').addEventListener('submit', event => event.preventDefault());
+  $('review-status').addEventListener('change', saveEditor);
+  $('review-notes').addEventListener('input', saveEditor);
+  $('review-proposal').addEventListener('input', saveEditor);
+  $('search').addEventListener('input', render);
+  $('export-json').addEventListener('click', () => download(JSON.stringify(envelope(), null, 2), 'borrador-revision-unidades.json', 'application/json;charset=utf-8'));
+  $('export-md').addEventListener('click', () => {
+    const quote = text => text.replace(/\r\n?/g, '\n').split('\n').map(line => `> ${line}`).join('\n');
+    const lines = [
+      '# Revisión de contenido: Unidades de Atención', '',
+      `Captura fuente: ${data.date}.`, `Identificador: ${data.datasetId}.`, `Captura de inventario: ${inventory.capturedAt}.`,
+      `Exportación: ${new Date().toISOString()}.`, '',
+      'Este documento contiene observaciones y propuestas. No modifica las fuentes ni acredita aprobación institucional.', '',
+      `Piloto: ${pilotSource}`, 'Asesor593: https://asesor593.trabajo.gob.ec/api/servicios', '',
+    ];
+    for (const [key, item] of Object.entries(notes)) {
+      lines.push(`## ${metadata.get(key)}`, '', `Elemento: ${key}`, `Estado: ${statusLabels[item.status]}`,
+        ...(item.evidenceRevision ? [`Captura de evidencia de la nota: ${item.evidenceRevision}`] : []), '',
+        '### Observaciones', '', quote(item.notes || 'Sin observaciones.'), '',
+        '### Redacción o cambio propuesto', '', quote(item.proposal || 'Sin propuesta.'), '');
+    }
+    if (!Object.keys(notes).length) lines.push('Todavía no se han registrado observaciones.');
+    download(lines.join('\n'), 'revision-contenido-unidades.md', 'text/markdown;charset=utf-8');
+  });
+  $('import-button').addEventListener('click', () => $('import-file').click());
+  window.addEventListener('storage', event => {
+    if ((event.key === storageKey || event.key === null) && event.newValue !== storedVersion) {
+      externalChange = true;
+      persistent = false;
+      updateSaveStatus();
+    }
+  });
+  $('import-file').addEventListener('change', async event => {
+    const file = event.target.files[0];
+    if (!file) return;
+    try {
+      if (file.size > 5000000) throw new Error('El archivo supera el límite de 5 MB.');
+      const imported = validateDraft(JSON.parse(await file.text()));
+      const count = Object.keys(imported).length;
+      if (!confirm(`Importar ${count} observaciones de esta captura? Se reemplazan las notas de los elementos incluidos; las demás se conservan.`)) return;
+      for (const [key, value] of Object.entries(imported)) notes[key] = value;
+      persist();
+      showEditor(currentKey);
+      $('message').textContent = `Se importaron ${count} elementos. Las fuentes no se modificaron.`;
+    } catch (error) {
+      $('message').textContent = error instanceof SyntaxError ? 'No se pudo leer el JSON. No se ha importado.' : error.message;
+    } finally { event.target.value = ''; }
+  });
+  render();
+})();
+</script>
+</body>
+</html>

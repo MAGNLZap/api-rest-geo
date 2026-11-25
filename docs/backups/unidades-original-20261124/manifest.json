@@ -1,0 +1,30 @@
+﻿[
+    {
+        "path":  "frontend/src/views/UnidadesView.vue",
+        "sha256":  "1277794E802301C7BF120CC7DA6D0F339B035B3665F03729C50FBA9FE5EA0C46"
+    },
+    {
+        "path":  "frontend/src/features/unidades/map.js",
+        "sha256":  "1D0B2C11AE62EB4BDABBFAC4EDCFFED18E683F74AD9E80171BCF8F99664F9920"
+    },
+    {
+        "path":  "frontend/src/styles/unidades.css",
+        "sha256":  "2ACB14A799A2BC8A5C6191D3FFAE2E62DBE0BE3682348FE2DB42F6948254407C"
+    },
+    {
+        "path":  "frontend/src/features/leaflet.js",
+        "sha256":  "EEACA96148F4F7F7F8AA785FAA9CCF88D8FADB4274DE4D186E6E201951BB4907"
+    },
+    {
+        "path":  "demo/unidades_infancia.html",
+        "sha256":  "FE23474D9F9043FF61BD88E1B6FC58789D92BB737464D26A57BA1896F8350E6C"
+    },
+    {
+        "path":  "frontend/src/App.vue",
+        "sha256":  "E488B3F2ACDA6B20FD22D3F333E39DC92A271341B3D6EBCA865E42282E0D7517"
+    },
+    {
+        "path":  "frontend/src/views/HomeView.vue",
+        "sha256":  "A65ECAC92E6B7C9F9885BA5E84CF2C103EF39F8232F00FDBA1499BA437E8B318"
+    }
+]

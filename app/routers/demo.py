@@ -34,10 +34,6 @@ async def portal_asset(asset_name: str) -> FileResponse:
         return FileResponse(PORTAL_ASSETS / asset_name, media_type="text/css")
     if asset_name == "map-loading.js":
         return FileResponse(PORTAL_ASSETS / asset_name, media_type="application/javascript")
-    if asset_name == "map-loading.css":
-        return FileResponse(PORTAL_ASSETS / asset_name, media_type="text/css")
-    if asset_name == "map-loading.js":
-        return FileResponse(PORTAL_ASSETS / asset_name, media_type="application/javascript")
     if asset_name not in {
         "preview_unidades.svg",
         "preview_amenazas.svg",

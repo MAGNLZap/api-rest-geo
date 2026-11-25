@@ -1,0 +1,32 @@
+:root {
+  --ui-control-radius: 12px;
+  --ui-menu-radius: 16px;
+  --ui-option-radius: 9px;
+  --ui-control-height: 46px;
+  --ui-control-font-size: 14px;
+  --ui-control-padding-inline: 13px;
+  --ui-control-label-gap: 6px;
+  --ui-control-text: var(--brand-ink);
+  --ui-control-placeholder: var(--brand-muted);
+  --ui-control-surface: var(--brand-white);
+  --ui-control-border: #b8b9ce;
+  --ui-control-disabled-surface: var(--brand-paper);
+  --ui-control-disabled-border: var(--brand-line);
+  --ui-control-disabled-text: var(--brand-muted);
+  --ui-control-accent: var(--brand-indigo);
+  --ui-option-hover: var(--brand-paper);
+  --ui-option-selected: var(--brand-indigo-soft);
+  --ui-option-selected-text: var(--brand-indigo-deep);
+  --ui-control-shadow: 0 2px 4px rgb(32 30 76 / 3%);
+  --ui-menu-shadow: 0 12px 34px rgb(32 30 76 / 16%), 0 2px 6px rgb(32 30 76 / 5%);
+  --ui-interaction-strong: var(--brand-indigo);
+  --ui-interaction-deep: var(--brand-indigo-deep);
+  --ui-interaction-accent: var(--brand-gold);
+  --ui-interaction-soft: var(--brand-indigo-soft);
+  --ui-interaction-on-strong: var(--brand-white);
+  --ui-interaction-shadow: 0 10px 24px rgb(32 30 76 / 16%), 0 0 0 3px rgb(245 200 66 / 12%);
+  --ui-interaction-duration: 180ms;
+}
+@media (max-width: 760px) {
+  :root { --ui-control-font-size: 16px; }
+}

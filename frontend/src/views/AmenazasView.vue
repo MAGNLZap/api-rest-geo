@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, useTemplateRef } from 'vue'
 import MapLoading from '../components/MapLoading.vue'
+import SocialIcon from '../components/SocialIcon.vue'
 import logo from '@amenazas/logo_encabezado.png'
 import { portalUrl } from '../services/api'
 import { mountAmenazas } from '../features/amenazas/map'
@@ -28,7 +29,7 @@ onBeforeUnmount(() => { controller?.destroy() })
 <header class="topbar">
   <div class="brand">
     <a class="btn btn-home" :href="portalUrl()" title="Volver al menú principal" aria-label="Volver al menú principal">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M9 20v-6h6v6"/></svg>
+      <SocialIcon name="home" :size="20" />
     </a>
     <div class="brand-text">
       <h1>Plan de Activación Fenómeno de El Niño</h1>
@@ -76,7 +77,7 @@ onBeforeUnmount(() => { controller?.destroy() })
         <button class="seg-btn" data-metric="p">% de UA</button>
       </div>
       <button class="btn btn-yellow full" id="btnExport" style="margin-top:12px" title="Descargar el reporte Excel de los resultados filtrados">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 19h16" /></svg>
+        <SocialIcon name="download" :size="20" />
         Descargar resultados filtrados
       </button>
     </section>
@@ -91,15 +92,15 @@ onBeforeUnmount(() => { controller?.destroy() })
       <p class="sub" style="margin-top:12px">Selección por polígono</p>
       <div class="btn-row">
         <button class="btn btn-outline sm" id="btnDraw">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18l4-12 9 3 3 9-9 2z"/></svg>Dibujar polígono</button>
-        <button class="btn btn-outline sm" id="btnClearSel" disabled>Quitar selección</button>
+          <SocialIcon name="polygon" :size="20" />Dibujar polígono</button>
+        <button class="btn btn-outline sm" id="btnClearSel" disabled><SocialIcon name="clear" :size="20" />Quitar selección</button>
       </div>
       <p class="note" id="selInfo">Dibuje un polígono sobre el mapa para seleccionar las UA que quedan dentro (según los filtros activos).</p>
       <button class="btn btn-azul full" id="btnExportSel" disabled>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 19h16" /></svg>Descargar UA seleccionadas por polígono</button>
+        <SocialIcon name="download" :size="20" />Descargar UA seleccionadas por polígono</button>
     </section>
 
-    <button class="btn btn-outline full" id="btnClear">Limpiar filtros</button>
+    <button class="btn btn-outline full" id="btnClear"><SocialIcon name="clear" :size="20" />Limpiar filtros</button>
     <p class="note">Las UA ubicadas en parroquias urbanas se representan agrupadas en la cabecera cantonal correspondiente.</p>
   </aside>
 

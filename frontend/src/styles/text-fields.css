@@ -1,0 +1,79 @@
+#app input.filter-control:is([type="search"], [type="text"]),
+#app :is(.social-catalog-search, .social-center-search) {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: var(--ui-control-height);
+  border: 1px solid var(--ui-control-border);
+  border-radius: var(--ui-control-radius);
+  background: var(--ui-control-surface);
+  box-shadow: var(--ui-control-shadow);
+  color: var(--ui-control-text);
+  font-size: var(--ui-control-font-size);
+}
+#app input.filter-control:is([type="search"], [type="text"]) {
+  width: 100%;
+  padding: 10px var(--ui-control-padding-inline);
+  line-height: 1.4;
+}
+#app :is(.social-catalog-search, .social-center-search) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 var(--ui-control-padding-inline);
+}
+#app :is(.social-catalog-search, .social-center-search) input {
+  appearance: none;
+  box-sizing: border-box;
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
+  min-height: calc(var(--ui-control-height) - 2px);
+  margin: 0;
+  padding: 10px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  line-height: 1.4;
+}
+#app input.filter-control:is([type="search"], [type="text"])::placeholder,
+#app :is(.social-catalog-search, .social-center-search) input::placeholder {
+  color: var(--ui-control-placeholder);
+  opacity: 1;
+}
+#app input.filter-control:is([type="search"], [type="text"]):hover,
+#app :is(.social-catalog-search, .social-center-search):hover {
+  border-color: var(--s-action, var(--portal-indigo, var(--ui-control-accent)));
+}
+#app input.filter-control:is([type="search"], [type="text"]):focus-visible,
+#app :is(.social-catalog-search, .social-center-search):focus-within {
+  outline: 2px solid var(--s-action, var(--portal-indigo, var(--ui-control-accent)));
+  outline-offset: 3px;
+  border-color: var(--s-action, var(--portal-indigo, var(--ui-control-accent)));
+  box-shadow: none;
+}
+#app :is(.social-catalog-search, .social-center-search) input:focus {
+  outline: none;
+  box-shadow: none;
+}
+#app .social-territory {
+  gap: 12px;
+}
+#app .social-territory label {
+  padding: 0;
+  border: 0;
+}
+#app .social-location-search {
+  align-items: flex-end;
+}
+#app .social-location-search > .social-button {
+  min-height: var(--ui-control-height);
+}
+#app .social-list-toolbar {
+  flex-wrap: wrap;
+}
+#app .social-center-search {
+  flex-basis: 180px;
+}

@@ -3,19 +3,23 @@ import ecuadorHero from '@portal/ecuador_hero.svg'
 import previewUnidades from '@portal/preview_unidades.svg'
 import previewAmenazas from '@portal/preview_amenazas.svg'
 import logo from '@amenazas/logo_encabezado.png'
+import SocialIcon from '../components/SocialIcon.vue'
+import ServiceJourneyIllustration from '../components/ServiceJourneyIllustration.vue'
 import { portalUrl } from '../services/api'
 import '../styles/home.css'
+import '../styles/home-orientacion.css'
+import '../styles/orientacion-typography.css'
 
 document.title = 'Geoportal del Ministerio de Trabajo y Desarrollo Humano'
 </script>
 
 <template>
-<header class="masthead">
+<header class="masthead masthead--welcome">
     <div class="hero">
       <div class="hero-copy">
-        <p class="hero-institution"><span class="hero-chip-dot" aria-hidden="true"></span>Información geográfica</p>
-        <h1>Geoportal del Ministerio de Trabajo y Desarrollo Humano</h1>
-        <p>Insumos cartográficos institucionales a nivel nacional.</p>
+        <p class="hero-institution"><span class="hero-chip-dot" aria-hidden="true"></span>Ministerio de Trabajo y Desarrollo Humano</p>
+        <h1>¿Qué te gustaría consultar?</h1>
+        <p>Conoce los servicios del Ministerio para ti y tu familia o explora información territorial del Ecuador.</p>
       </div>
       <img class="ecuador-visual" :src="ecuadorHero" alt="" aria-hidden="true">
     </div>
@@ -25,29 +29,42 @@ document.title = 'Geoportal del Ministerio de Trabajo y Desarrollo Humano'
     <div class="main-content">
       <section aria-labelledby="maps-heading">
         <div class="section-intro">
-          <h2 id="maps-heading">Cada mapa, una mirada del territorio</h2>
+          <h2 id="maps-heading">Elige cómo empezar</h2>
         </div>
+
+          <a class="map-card map-card--services home-services-featured" :href="portalUrl('servicios_sociales')" aria-labelledby="services-title">
+            <div class="card-art">
+              <ServiceJourneyIllustration />
+            </div>
+            <div class="card-body">
+              <span class="card-kicker">Para la ciudadanía</span>
+              <h3 id="services-title">Encuentra servicios para ti y tu familia</h3>
+              <p>Cuéntanos qué necesitas. Te orientamos sobre los 18 servicios del Ministerio y cómo acceder. También puedes consultar ubicaciones de Centros de Desarrollo Infantil.</p>
+              <span class="card-cue">Conocer servicios <SocialIcon name="chevron-right" :size="20" /></span>
+            </div>
+          </a>
 
         <div class="map-grid">
           <a class="map-card map-card--units" :href="portalUrl('unidades_infancia')" aria-labelledby="units-title">
             <div class="card-art">
-              <img :src="previewUnidades" alt="Vista cartográfica de la distribución de las Unidades de Atención" loading="lazy">
+              <img :src="previewUnidades" alt="Vista cartográfica de la distribución de las unidades de atención" loading="lazy">
             </div>
             <div class="card-body">
-              <span class="card-kicker">Servicios de atención social</span>
+              <span class="card-kicker">Mapa general de unidades</span>
               <h3 id="units-title">Unidades de Atención</h3>
               <p>Explora los servicios, modalidades y unidades de atención por provincia, cantón y parroquia.</p>
+              <span class="card-cue">Explorar mapa de unidades <SocialIcon name="chevron-right" :size="20" /></span>
             </div>
           </a>
-
           <a class="map-card map-card--hazards" :href="portalUrl('ua_amenazas')" aria-labelledby="hazards-title">
             <div class="card-art">
               <img :src="previewAmenazas" alt="Vista cartográfica de los niveles de susceptibilidad a inundaciones" loading="lazy">
             </div>
             <div class="card-body">
-              <span class="card-kicker">Planificación y amenazas</span>
-              <h3 id="hazards-title">Plan de Activación Fenómeno de El Niño</h3>
-              <p>Consulta las Unidades de Atención que se encuentran en zonas susceptibles a amenazas asociadas al Evento El Niño.</p>
+              <span class="card-kicker">Información territorial</span>
+              <h3 id="hazards-title">Evento El Niño y unidades de atención</h3>
+              <p>Explora las amenazas y la exposición de las unidades de atención para apoyar la consulta y planificación territorial.</p>
+              <span class="card-cue">Explorar información territorial <SocialIcon name="chevron-right" :size="20" /></span>
             </div>
           </a>
         </div>

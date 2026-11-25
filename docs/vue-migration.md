@@ -67,3 +67,22 @@ divide en nuevas funcionalidades.
 - Recursos compartidos SVG comprobados: respuesta 200.
 - Driver del contenedor confirmado: `postgresql+asyncpg`.
 - Huella SHA-256 de `.env` idéntica antes y después del ajuste.
+
+## Limpieza conservadora posterior
+
+- Se mantienen los HTML y sus rutas activas como respaldo.
+- Se retiraron condiciones duplicadas del router de recursos.
+- Se eliminaron constantes, una lectura y una función sin referencias en
+  Unidades; Amenazas conserva su lógica y solo pierde un parámetro sin uso.
+- Se retiraron `aiosqlite`, las ramas SQLite del cargador y el archivo SQL
+  específico de ese motor. No se ejecutó el cargador ni ninguna migración.
+- La configuración exige `postgresql+asyncpg`; los errores de validación
+  no muestran el valor recibido de la conexión.
+- Las fixtures usan PostgreSQL exclusivo con URL explícita, rechazo de
+  la BD configurada y esquema aleatorio aislado. No se ejecutaron.
+- La BD, `.env` y los contratos de la API permanecen fuera de esta limpieza.
+- Se adaptaron los consumidores de las fixtures y se rechazaron parámetros
+  que podrían redirigir la conexión de pruebas a otra BD.
+- Verificación de limpieza: compilación Vue e imagen API correctas;
+  revisión independiente sin hallazgos importantes pendientes. Las
+  fixtures PostgreSQL y las suites siguen pendientes de ejecución autorizada.

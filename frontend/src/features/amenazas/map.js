@@ -70,7 +70,7 @@ export function mountAmenazas(loading) {
       return response.json();
     }).then((data) => adaptDpa(name, data));
   }
-  function loadBinary(name, path) {
+  function loadBinary(path) {
     return fetch(path).then((response) => {
       if (!response.ok) throw new Error(`No se pudo cargar ${path}: HTTP ${response.status}`);
       return response.arrayBuffer();
@@ -644,7 +644,7 @@ export function mountAmenazas(loading) {
     try {
       const { default: ExcelJS } = await import('exceljs');
       if (!MATRIZ) MATRIZ = DATA.matrix;
-      const bannerBuf = await loadBinary('banner', reportBannerUrl);
+      const bannerBuf = await loadBinary(reportBannerUrl);
       const sel = bySelection ? selected() : filtered();
       const afect = sel.filter((u) => exposed(u));
       const wb = new ExcelJS.Workbook();

@@ -1,0 +1,162 @@
+#app .social-choice,
+#app .social-button,
+#app .social-text-button,
+#app .social-service,
+#app .social-header-nav button,
+#app .social-detail-close,
+#app .social-mobile-switch button {
+  transition:
+    background-color var(--ui-interaction-duration) ease,
+    color var(--ui-interaction-duration) ease,
+    border-color var(--ui-interaction-duration) ease,
+    box-shadow var(--ui-interaction-duration) ease,
+    transform var(--ui-interaction-duration) ease;
+}
+#app .social-choice-icon,
+#app .social-choice-text small,
+#app .social-choice-check,
+#app .social-center-number {
+  transition: background-color var(--ui-interaction-duration) ease, color var(--ui-interaction-duration) ease;
+}
+#app .social-choice-icon { flex-shrink: 0; }
+#app .social-choice.chosen .social-choice-icon,
+#app .social-choice:active .social-choice-icon {
+  background: var(--ui-interaction-accent);
+  color: var(--ui-interaction-deep);
+}
+#app .panel-icon { color: var(--brand-white); }
+#app :is(.icon-btn, .btn, .panel-icon, .filter-close) .app-icon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  stroke: none;
+}
+#app .filter-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+#app :is(.icon-btn, .filter-close):active {
+  background: var(--brand-indigo-deep);
+  color: var(--brand-white);
+}
+#app .map-filter-toggle[aria-expanded="true"] {
+  background: var(--brand-indigo);
+  border-color: var(--brand-gold);
+  color: var(--brand-white);
+}
+#app .filter-close:focus-visible {
+  outline: 3px solid var(--brand-gold);
+  outline-offset: 3px;
+}
+@media (hover: hover) and (pointer: fine) {
+  #app .filter-close:hover {
+    background: var(--brand-indigo);
+    color: var(--brand-white);
+    border-color: var(--brand-gold);
+  }
+}
+#app .social-choice:focus-visible {
+  border-color: var(--ui-interaction-accent);
+  background: var(--ui-interaction-strong);
+  color: var(--ui-interaction-on-strong);
+  outline: 3px solid var(--ui-interaction-strong);
+  outline-offset: 4px;
+  box-shadow: var(--ui-interaction-shadow);
+}
+#app .social-choice:focus-visible .social-choice-text small {
+  color: rgb(255 255 255 / 86%);
+}
+#app .social-choice:focus-visible .social-choice-icon {
+  background: var(--ui-interaction-accent);
+  color: var(--ui-interaction-deep);
+}
+#app .social-choice:focus-visible .social-choice-check {
+  border-color: var(--ui-interaction-accent);
+  background: rgb(255 255 255 / 12%);
+  color: var(--ui-interaction-on-strong);
+}
+#app .social-text-button,
+#app .social-header-nav button {
+  border-radius: 8px;
+}
+#app .social-header-nav button { padding-inline: 12px; }
+#app .social-service { border-radius: 12px; }
+#app .social-center { border-radius: 10px; }
+#app .social-button:focus-visible {
+  outline: 3px solid var(--ui-interaction-strong);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 2px var(--ui-interaction-accent);
+}
+@media (hover: hover) and (pointer: fine) {
+  #app .social-choice:not(:disabled):hover {
+    background: var(--ui-interaction-strong);
+    color: var(--ui-interaction-on-strong);
+    border-color: var(--ui-interaction-accent);
+    box-shadow: var(--ui-interaction-shadow);
+    transform: translateY(-3px);
+  }
+  #app .social-choice:hover .social-choice-text small {
+    color: rgb(255 255 255 / 86%);
+  }
+  #app .social-choice:hover .social-choice-icon {
+    background: var(--ui-interaction-accent);
+    color: var(--ui-interaction-deep);
+  }
+  #app .social-choice:hover .social-choice-check {
+    border-color: var(--ui-interaction-accent);
+    background: rgb(255 255 255 / 12%);
+    color: var(--ui-interaction-on-strong);
+  }
+  #app .social-button:not(:disabled):hover {
+    background: var(--ui-interaction-strong);
+    border-color: var(--ui-interaction-accent);
+    color: var(--ui-interaction-on-strong) !important;
+    box-shadow: var(--ui-interaction-shadow);
+    transform: translateY(-2px);
+  }
+  #app :is(.social-text-button, .social-header-nav button):not(:disabled):hover {
+    background: var(--ui-interaction-soft);
+    color: var(--ui-interaction-deep);
+    text-decoration-color: var(--ui-interaction-strong);
+  }
+  #app .social-service:hover,
+  #app .social-service:focus-within {
+    background: var(--ui-interaction-soft);
+    border-bottom-color: var(--ui-interaction-strong);
+  }
+  #app .social-detail-close:hover {
+    background: var(--ui-interaction-strong);
+    border-color: var(--ui-interaction-accent);
+    color: var(--ui-interaction-on-strong);
+  }
+  #app .social-mobile-switch button:not([aria-pressed="true"]):hover {
+    background: var(--ui-interaction-soft);
+    color: var(--ui-interaction-deep);
+  }
+  #app select:not([multiple]):not([size]):not(:disabled):hover,
+  #app input.filter-control:is([type="search"], [type="text"]):hover,
+  #app :is(.social-catalog-search, .social-center-search):hover {
+    border-color: var(--ui-interaction-strong);
+    box-shadow: 0 0 0 3px var(--ui-interaction-soft);
+  }
+}
+#app .social-choice:not(:disabled):active,
+#app .social-button:not(:disabled):active {
+  transform: translateY(0);
+  background: var(--ui-interaction-deep);
+  border-color: var(--ui-interaction-accent);
+  color: var(--ui-interaction-on-strong) !important;
+  box-shadow: none;
+}
+#app .social-choice:active .social-choice-text small {
+  color: rgb(255 255 255 / 86%);
+}
+@media (prefers-reduced-motion: reduce) {
+  #app .social-page *,
+  #app .social-page *::before,
+  #app .social-page *::after {
+    transition: none !important;
+    transform: none;
+  }
+}

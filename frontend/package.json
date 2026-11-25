@@ -12,6 +12,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@iconify-icons/mdi": "2.0.0",
+    "@iconify/vue": "5.0.5",
     "@turf/union": "7.4.0",
     "exceljs": "4.4.0",
     "html2canvas": "1.4.1",

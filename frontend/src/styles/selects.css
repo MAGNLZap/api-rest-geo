@@ -1,0 +1,117 @@
+#app select:not([multiple]):not([size]) {
+  --select-accent: var(--s-action, var(--portal-indigo, var(--azul, var(--ui-control-accent))));
+  box-sizing: border-box;
+  appearance: none;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: var(--ui-control-height);
+  margin: 0;
+  padding: 10px 38px 10px var(--ui-control-padding-inline);
+  border: 1px solid var(--ui-control-border);
+  border-radius: var(--ui-control-radius);
+  background-color: var(--ui-control-surface);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23566e83' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+  box-shadow: var(--ui-control-shadow);
+  color: var(--ui-control-text);
+  font-size: var(--ui-control-font-size);
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+#app select:not([multiple]):not([size]):not(:disabled):hover {
+  border-color: var(--select-accent);
+}
+#app select:not([multiple]):not([size]):focus-visible {
+  border-color: var(--select-accent);
+  outline: 2px solid var(--select-accent);
+  outline-offset: 3px;
+  box-shadow: none;
+}
+#app select:not([multiple]):not([size]):disabled {
+  background-color: var(--ui-control-disabled-surface);
+  border-color: var(--ui-control-disabled-border);
+  color: var(--ui-control-disabled-text);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 1;
+}
+#app select option {
+  background: var(--ui-control-surface);
+  color: var(--ui-control-text);
+}
+#app label:has(> select) {
+  display: grid;
+  gap: var(--ui-control-label-gap);
+  min-width: 0;
+}
+@supports (appearance: base-select) {
+  #app select:not([multiple]):not([size]),
+  #app select:not([multiple]):not([size])::picker(select) {
+    appearance: base-select;
+  }
+  #app select:not([multiple]):not([size])::picker-icon {
+    display: none;
+  }
+  #app select:not([multiple]):not([size]):open {
+    border-color: var(--select-accent);
+  }
+  #app select:not([multiple]):not([size])::picker(select) {
+    margin-block-start: 7px;
+    padding: 6px;
+    border: 1px solid var(--ui-control-border);
+    border-radius: var(--ui-menu-radius);
+    background: var(--ui-control-surface);
+    color: var(--ui-control-text);
+    box-shadow: var(--ui-menu-shadow);
+    max-block-size: min(340px, 55dvh);
+    max-inline-size: calc(100vw - 24px);
+    overflow: auto;
+    overscroll-behavior: contain;
+    font: inherit;
+  }
+  #app select:not([multiple]):not([size]) option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: var(--ui-control-height);
+    padding: 10px 12px;
+    border-radius: var(--ui-option-radius);
+    background: var(--ui-control-surface);
+    font-size: var(--ui-control-font-size);
+    line-height: 1.45;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+  }
+  #app select:not([multiple]):not([size]) option + option {
+    margin-block-start: 2px;
+  }
+  #app select:not([multiple]):not([size]) option:is(:hover, :focus-visible) {
+    background: var(--ui-option-hover);
+    outline: none;
+  }
+  #app select:not([multiple]):not([size]) option:checked {
+    background: var(--ui-option-selected);
+    color: var(--ui-option-selected-text);
+    font-weight: 650;
+  }
+  #app select:not([multiple]):not([size]) option::checkmark {
+    color: var(--ui-control-accent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #app select:not([multiple]):not([size]) { transition: none; }
+}
+@media (forced-colors: active) {
+  #app select:not([multiple]):not([size]) {
+    appearance: auto;
+    background-image: none;
+    border-color: ButtonText;
+    color: ButtonText;
+  }
+}

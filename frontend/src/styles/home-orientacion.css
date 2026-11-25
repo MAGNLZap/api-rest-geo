@@ -1,0 +1,37 @@
+.masthead--welcome{min-height:300px}
+.masthead--welcome .hero{min-height:260px;padding-block:32px}
+.masthead--welcome .hero-copy{max-width:760px}
+.masthead--welcome .hero h1{max-width:690px;font-size:clamp(34px,4vw,49px);line-height:1.1}
+.masthead--welcome .hero p:not(.hero-institution){max-width:600px;font-size:17px;margin-top:21px}
+.masthead--welcome .hero-institution{font-size:12px;margin-bottom:22px}
+.masthead--welcome .ecuador-visual{height:350px;opacity:.32}
+.map-card--services{--card-accent:var(--gold);--card-border:var(--gold);--card-hover-border:#ffe58a;--card-hover-bg:var(--indigo-deep);--card-hover-glow:rgb(32 30 76 / 30%);background:var(--indigo);border-color:var(--gold);box-shadow:0 14px 32px rgb(32 30 76 / 17%),0 0 0 3px rgb(245 200 66 / 12%)}
+.map-card--services .card-body{border-top-color:var(--gold)}
+.map-card--services .card-kicker,.map-card--services .card-cue{color:var(--gold)}
+.map-card--services .card-body h3{color:var(--white)}
+.map-card--services .card-body p{color:rgb(255 255 255 / 86%)}
+.map-card .card-cue:has(svg)::after{content:none}
+.map-card--services .card-art{background:var(--indigo-soft);padding:24px}
+.home-services-featured{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);margin-bottom:28px}
+.home-services-featured .card-art{height:100%;min-height:245px;padding:14px 18px}
+.home-services-featured .card-body{min-width:0;justify-content:center;padding:30px 34px;border-top:0;border-left:3px solid var(--gold)}
+.home-services-featured .card-body h3{font-size:clamp(24px,2.4vw,30px);max-width:25ch}
+.home-services-featured .card-body p{max-width:65ch}
+.home-services-featured .card-cue{margin-top:4px}
+:is(.map-card--services,.map-card--units) .card-cue{border:1px solid rgb(245 200 66 / 55%);border-radius:999px;background:rgb(255 255 255 / 9%);padding:11px 16px;color:var(--gold);transition:background-color 180ms ease,color 180ms ease,box-shadow 180ms ease}
+:is(.map-card--services,.map-card--units):focus-visible .card-cue{background:var(--gold);color:var(--indigo-deep)}
+@media(hover:hover) and (pointer:fine){
+  :is(.map-card--services,.map-card--units):hover .card-cue{background:var(--gold);color:var(--indigo-deep);box-shadow:0 7px 18px rgb(0 0 0 / 18%)}
+}
+@media(max-width:900px){
+  .home-services-featured{grid-template-columns:minmax(0,1fr)}
+  .home-services-featured .card-body{border-left:0;border-top:3px solid var(--gold);padding:24px}
+}
+@media(max-width:760px){
+  .masthead--welcome{min-height:260px}
+  .masthead--welcome .hero{min-height:240px;padding-block:28px}
+  .masthead--welcome .hero h1{font-size:35px}
+  .masthead--welcome .hero p:not(.hero-institution){font-size:15px}
+  .masthead--welcome .hero-institution{max-width:100%;font-size:10px;line-height:1.5;padding:8px 12px;gap:9px}
+  .map-card--services .card-art{min-height:240px;height:auto;aspect-ratio:auto;padding:20px}
+}

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Mesa de revisión · Orientación de servicios</title>
+  <style>/*__CSS__*/</style>
+</head>
+<body>
+  <a class="skip" href="#content">Ir al contenido</a>
+  <header class="header">
+    <div class="brand"><span class="brand-sign" aria-hidden="true">↳</span><div><h1>Mesa de revisión</h1><p>Orientación de servicios de atención</p></div></div>
+    <div class="tools" aria-label="Borradores de revisión">
+      <button id="export-md" class="primary" type="button">Exportar revisión .md</button>
+      <button id="export-json" type="button">Guardar borrador .json</button>
+      <button id="import-button" type="button">Importar borrador</button>
+      <input id="import-file" type="file" accept=".json,application/json" hidden>
+    </div>
+  </header>
+  <div class="scope"><strong>Documento de trabajo independiente.</strong> No es el formulario de la app, no decide elegibilidad y no se conecta a la base de datos. Cada fuente y el inventario indican su fecha de captura.</div>
+  <div class="workspace">
+    <aside class="sidebar" aria-label="Explorar conocimiento">
+      <p class="nav-title">Contenido para revisar</p>
+      <nav id="navigation" class="navigation" aria-label="Secciones"></nav>
+      <label class="search-label" for="search">Buscar en esta sección</label>
+      <input id="search" type="search" placeholder="Nombre o necesidad…" autocomplete="off">
+      <div id="items" class="items" aria-label="Elementos de la sección"></div>
+      <div class="sidebar-foot"><p id="review-count"></p><a href="README.md" target="_blank" rel="noopener">Abrir base documental</a><p>Las observaciones son tuyas; las fuentes se mantienen sin cambios.</p></div>
+    </aside>
+    <main id="content" class="content" tabindex="-1">
+      <div class="content-head"><p id="section-label" class="section-label"></p><h2 id="content-title"></h2><p id="content-description"></p></div>
+      <div id="stage"></div>
+    </main>
+    <aside class="review" aria-labelledby="review-heading">
+      <div class="review-head"><span class="review-mark" aria-hidden="true">✎</span><h2 id="review-heading">Tu revisión</h2></div>
+      <p id="review-target" class="review-target"></p>
+      <form id="review-form">
+        <label for="review-status">Estado de revisión</label>
+        <select id="review-status"><option value="sin-revisar">Sin revisar</option><option value="observaciones">Con observaciones</option><option value="revisado">Revisado en mesa</option></select>
+        <label for="review-notes">Observaciones o dudas</label>
+        <textarea id="review-notes" rows="7" maxlength="8000" placeholder="¿Qué falta confirmar? ¿Qué asociación debe corregirse?"></textarea>
+        <label for="review-proposal">Redacción o cambio propuesto</label>
+        <textarea id="review-proposal" rows="7" maxlength="8000" placeholder="Escribe una propuesta. No reemplaza el contenido fuente."></textarea>
+      </form>
+      <p id="save-status" class="save-status" role="status" aria-live="polite"></p>
+      <p class="review-help">«Revisado en mesa» no significa aprobado por la institución. No incluyas cédulas, nombres de usuarios ni datos de casos reales.</p>
+      <div id="message" class="message" role="status" aria-live="polite"></div>
+    </aside>
+  </div>
+  <noscript>Activa JavaScript para explorar el visor. Los documentos Markdown originales siguen disponibles en esta carpeta.</noscript>
+  <script id="knowledge" type="application/json">/*__DATA__*/</script>
+  <script>/*__JS__*/</script>
+</body>
+</html>

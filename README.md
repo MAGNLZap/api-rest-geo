@@ -214,14 +214,28 @@ Acceder en `http://localhost:8001/unidades_infancia`. El mapa Leaflet permite ex
 
 ## Tests
 
-```bash
+Ejecutar únicamente cuando se solicite expresamente. Requieren una base
+PostgreSQL exclusiva para pruebas, ya creada y distinta de la aplicación:
+
+```powershell
+$env:TEST_DATABASE_URL = "postgresql+asyncpg://usuario:clave@servidor-test:5432/apirestgeo_test"
 python -m pytest tests/ -v
 ```
 
-27 tests en total: 3 de health/arranque + 20 de unidades + 4 de DPA. Configuración en `pyproject.toml`:
+Suites de health/arranque, unidades y DPA. Configuración en `pyproject.toml`:
 - `asyncio_mode = "auto"` (pytest-asyncio)
 - `testpaths = ["tests"]`
-- Base de datos SQLite en memoria, recreada automáticamente por cada test
+- `TEST_DATABASE_URL` obligatorio, con driver `postgresql+asyncpg` y nombre
+  de BD terminado en `_test`; no se toma de `.env` ni tiene fallback.
+- Se exige host explícito y se rechaza el nombre de BD utilizado por la
+  aplicación, incluso en otro host. Solo se admite `ssl` como parámetro de
+  la URL para impedir redirecciones mediante parámetros de conexión.
+- Cada test crea un esquema aleatorio `apirestgeo_test_*` y elimina
+  únicamente ese esquema al finalizar. El usuario de pruebas necesita
+  permiso para crear esquemas en la BD de pruebas.
+- No ejecutar contra producción ni reutilizar credenciales de producción.
+  Estas fixtures crean tablas de prueba; no ejecutan las migraciones ni
+  las cargas del proyecto y no se ejecutan al arrancar la aplicación.
 
 ## Estructura del proyecto
 
@@ -283,7 +297,7 @@ ApiRestGeo/
 - **Desarrollo y producción:** PostgreSQL/PostGIS externo (`postgresql+asyncpg://...`)
 - **Conexión:** `DATABASE_URL` obligatorio; no hay fallback local ni creación de tablas al arrancar
 - **Modelo:** `UnidadAtencion` con 39 campos y 7 índices (incluyendo compuesto `longitude, latitude`)
-- **Tests:** Base de datos SQLite en memoria, recreada para cada test
+- **Tests:** PostgreSQL exclusivo con `TEST_DATABASE_URL` y esquema aislado por test
 
 ## Cache DPA
 

@@ -5,6 +5,7 @@ import { pagePath } from './services/api'
 const pages = {
   '/': () => import('./views/HomeView.vue'),
   '/unidades_infancia': () => import('./views/UnidadesView.vue'),
+  '/servicios_sociales': () => import('./views/ServiciosView.vue'),
   '/ua_amenazas': () => import('./views/AmenazasView.vue'),
 }
 const path = pagePath(window.location.pathname)

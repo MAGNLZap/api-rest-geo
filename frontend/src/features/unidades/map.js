@@ -26,8 +26,6 @@ const markersLayer=L.layerGroup().addTo(map);
 
 const ECUADOR_GEOJSON_URL="https://raw.githubusercontent.com/jpmarindiaz/geo-collection/master/ecu/ecuador.geojson";
 
-const regionKeys=['costa','sierra','amazonia','galapagos'];
-
 const regionColors={
     costa:{fill:'#FFCD56',border:'#e6b800',label:'#b8860b',text:'rgba(0,0,0,.8)'},
     sierra:{fill:'#5C9EFF',border:'#3a7fd9',label:'#2563eb',text:'white'},
@@ -209,7 +207,6 @@ let filteredFeatures=[];
 let index=new Supercluster({radius:80,maxZoom:14});
 
 const filterFields={search:'filterSearch',region:'filterRegion',province:'filterProvince',canton:'filterCanton',parish:'filterParish',service:'filterService',modality:'filterModality',area:'filterArea',type:'filterType',admin:'filterAdmin',cooperator:'filterCooperator'};
-const filterDefaults={region:'Todas',province:'Todas',canton:'Todos',parish:'Todas',service:'Todos',modality:'Todas',area:'Todas',type:'Todos',admin:'Todas',cooperator:'Todas'};
 function fieldValue(feature,key){return String(feature.properties[key]??'').trim()}
 function uniqueValues(features,key){return Array.from(new Set(features.map(function(f){return fieldValue(f,key)}).filter(Boolean))).sort(function(a,b){return a.localeCompare(b,'es')})}
 function fillSelect(id,values,first){const el=document.getElementById(id);const previous=el.value;el.replaceChildren(new Option(first,''));values.forEach(function(v){el.add(new Option(v,v))});if(values.includes(previous))el.value=previous}
@@ -239,7 +236,6 @@ function applyFilters(){
         if(q&&!['nombre','servicio','ruc','codigo'].some(function(key){return fieldValue(feature,key).toLocaleLowerCase('es').includes(q)}))return false;
         return true;
     });
-    const mapMode=document.getElementById('filterMapMode').value;
     if(dpaLayers[activeDpa])dpaLayers[activeDpa].eachLayer(function(layer){if(layer.feature)layer.setStyle(getDpaStyle(layer.feature))});
     index=new Supercluster({radius:80,maxZoom:14});index.load(filteredFeatures);
     const users=filteredFeatures.reduce(function(total,f){return total+(Number(f.properties.total)||0)},0);
@@ -417,14 +413,6 @@ async function loadAllData(){
     }finally{
         loading.style.display='none';
     }
-}
-
-async function reloadData(){
-    markersLayer.clearLayers();
-    allFeatures=[];
-    filteredFeatures=[];
-    index=new Supercluster({radius:80,maxZoom:14});
-    if(await loadAllData())updateClusters();
 }
 
 map.on('moveend zoomend',updateClusters);
