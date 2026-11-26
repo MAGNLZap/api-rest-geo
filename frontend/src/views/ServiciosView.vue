@@ -74,8 +74,9 @@ const title = computed(() => ({
 })[paso.value])
 const activeStep = computed(() => paso.value === 'publico' ? 1 : paso.value === 'necesidad' ? 2 : 3)
 const consultaDirecta = computed(() => verCatalogo.value && (paso.value === 'resultados' || paso.value === 'centros'))
+const progressLabel = computed(() => activeStep.value < 3 ? `Pregunta ${activeStep.value} de 2` : 'Tus opciones de ayuda')
 const progressDescription = computed(() => ({
-  publico: '',
+  publico: 'Dos preguntas para orientarte',
   necesidad: 'Cuéntanos qué necesitas',
   resultados: 'Explora tus opciones de ayuda',
   centros: 'Consulta las ubicaciones de centros',
@@ -100,6 +101,11 @@ function volver() {
   if (paso.value === 'centros') paso.value = 'resultados'
   else if (paso.value === 'resultados') paso.value = necesidad.value && !verCatalogo.value ? 'necesidad' : 'publico'
   else paso.value = 'publico'
+}
+function volverAPaso(numero: number) {
+  if (numero >= activeStep.value) return
+  if (numero === 1) paso.value = 'publico'
+  else if (numero === 2 && publico.value) paso.value = 'necesidad'
 }
 function iniciar() {
   cerrarDetalle()
@@ -175,13 +181,18 @@ onBeforeUnmount(() => { detail.value?.close(); observadorCentros?.disconnect() }
       </section>
 
       <div v-if="!consultaDirecta" class="social-progress">
-        <div class="social-progress-caption"><strong>Paso {{ activeStep }} de 3</strong><span v-if="progressDescription">{{ progressDescription }}</span></div>
-        <div class="social-progress-track" role="progressbar" aria-label="Avance de orientación" :aria-valuenow="activeStep - 1" :aria-valuemax="2" :aria-valuemin="0" :aria-valuetext="`Paso ${activeStep} de 3${progressDescription ? `. ${progressDescription}` : ''}`"><span :style="{ width: `${(activeStep - 1) * 50}%` }"></span></div>
-        <ol class="social-steps" aria-label="Pasos de orientación">
-          <li :aria-current="activeStep === 1 ? 'step' : undefined" :class="{ done: activeStep > 1 }"><span><SocialIcon v-if="activeStep > 1" name="check" :size="13" /><template v-else>1</template></span><b>Para quién</b></li>
-          <li :aria-current="activeStep === 2 ? 'step' : undefined" :class="{ done: activeStep > 2 }"><span><SocialIcon v-if="activeStep > 2" name="check" :size="13" /><template v-else>2</template></span><b>Qué necesitas</b></li>
-          <li :aria-current="activeStep === 3 ? 'step' : undefined"><span>3</span><b>Opciones de ayuda</b></li>
-        </ol>
+        <div class="social-progress-caption"><span>{{ progressDescription }}</span></div>
+        <div class="social-progress-path">
+          <div class="social-progress-track" role="progressbar" aria-label="Avance de orientación" :aria-valuenow="activeStep - 1" :aria-valuemax="2" :aria-valuemin="0" :aria-valuetext="`${progressLabel}. ${progressDescription}`"><span :style="{ width: `${(activeStep - 1) * 50}%` }"></span></div>
+          <ol class="social-steps" aria-label="Pasos de orientación">
+            <li v-for="(label, index) in ['Para quién', 'Qué necesitas', 'Opciones de ayuda']" :key="label" :aria-current="activeStep === index + 1 ? 'step' : undefined" :class="{ done: activeStep > index + 1 }">
+              <button type="button" class="social-step-button" :disabled="index + 1 >= activeStep" :aria-label="index + 1 < activeStep ? `Volver a ${label.toLocaleLowerCase('es')}` : label" @click="volverAPaso(index + 1)">
+                <span class="social-step-marker" aria-hidden="true"><SocialIcon v-if="activeStep > index + 1" name="check" :size="21" /><template v-else>{{ index + 1 }}</template></span>
+                <b>{{ label }}</b>
+              </button>
+            </li>
+          </ol>
+        </div>
       </div>
 
       <template v-if="paso === 'publico' || paso === 'necesidad'">

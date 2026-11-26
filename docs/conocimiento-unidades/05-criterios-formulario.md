@@ -99,7 +99,7 @@ Fuentes de las observaciones:
 La matriz de homologación deberá registrar, por cada ruta: ficha del piloto,
 servicio y modalidad exactos de BD si corresponden, complemento de Asesor593,
 tipo de relación, fuente y estado de validación. **Una correspondencia
-candidata no habilita por sí sola una regla del cuestionario.**
+candidata no habilita por sí sola una regla del fcuestionario.**
 
 ## 6. Registro de cada diferencia
 

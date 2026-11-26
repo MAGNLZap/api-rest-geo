@@ -86,6 +86,25 @@ hacer hover para evitar saltos de tamaño.
   sin interpretar HTML de los datos. No contiene botones que desaparezcan
   al retirar el cursor; el punto abre la ficha y sus acciones.
 
+### Progreso del recorrido
+
+Las dos preguntas y los resultados se representan mediante tres hitos
+alineados en columnas iguales. La línea une sus centros, detrás de los
+círculos, y avanza por tramos completos. El estado actual usa dorado con
+anillo exterior; los completados, indigo y check. Los pasos anteriores
+son botones para volver y revisar respuestas, con foco visible y acceso por
+teclado. Se conservan las selecciones; cambiar de público limpia la necesidad
+anterior. El paso actual y los pendientes están deshabilitados: no se permite
+saltar preguntas.
+
+El encabezado muestra solo la frase de orientación, inicialmente
+«Dos preguntas para orientarte». El conteo de preguntas se conserva
+únicamente en el texto accesible del progreso.
+Los círculos miden 44px en escritorio y 36px en móvil; los textos
+pueden ocupar dos líneas sin reducirse a 10px. Se mantienen `aria-current`,
+el valor accesible de progreso, estados completados textuales y el respeto
+a movimiento reducido. La consulta directa conserva su tratamiento aparte.
+
 ### Tipografía de orientación ciudadana
 
 `orientacion-typography.css` incorpora Changa One en la pregunta
@@ -117,7 +136,8 @@ sincronizar con `docker compose -f compose.dev.yaml exec -T web npm install`
 y reiniciar solo `web` si Vite conserva errores de resolución.
 
 Los públicos usan infancia (`human-child`), persona mayor (`human-cane`),
-discapacidad (`wheelchair-accessibility`), familia (`human-male-female-child`),
+discapacidad (`el:wheelchair`, datos locales de `@iconify-icons/el`),
+familia (`human-male-female-child`),
 protección (`shield-account-outline`) y otras opciones (`help-circle-outline`).
 La silla de ruedas funciona como referencia visual,
 no como restricción del público ni de la discapacidad atendida. El encabezado

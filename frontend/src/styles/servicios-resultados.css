@@ -2,7 +2,7 @@
 #app .social-home-link:focus-visible{outline:3px solid var(--s-accent);outline-offset:4px}
 #app .social-header .social-original-link{display:inline-flex!important;align-items:center;justify-content:center;gap:9px;min-height:46px;padding:10px 16px;border:1px solid var(--s-accent);border-radius:var(--ui-control-radius);background:var(--s-accent);color:var(--s-deep);text-decoration:none;font-size:14px;font-weight:700;white-space:nowrap;box-shadow:0 4px 14px rgb(0 0 0 / 12%);transition:background-color var(--ui-interaction-duration) ease,box-shadow var(--ui-interaction-duration) ease}
 #app .social-header .social-original-link:focus-visible{outline:3px solid var(--s-surface);outline-offset:4px}
-.social-progress{width:min(100%,640px);margin:28px auto 36px;padding:0;background:transparent;border:0}
+.social-progress{--step-size:44px;width:min(100%,860px);margin:32px auto 44px;padding:0;background:transparent;border:0}
 .social-header-explore,.social-inline-action{display:inline-flex;align-items:center;justify-content:center;gap:7px}
 .social-header-explore{min-width:0}
 #app .social-header-explore{background:var(--s-soft);color:var(--s-deep);border:1px solid transparent;border-radius:var(--ui-control-radius);padding:10px 13px}
@@ -18,18 +18,27 @@
 .social-content-sources ul{margin:10px 0 0;padding-left:18px;font-size:12px;line-height:1.6}
 .social-content-sources li+li{margin-top:8px}
 .social-dialog .social-content-sources p{font-size:12px;line-height:1.6}
-.social-progress-caption{display:flex;justify-content:center;align-items:center;gap:14px;font-size:13px;line-height:1.4}
+.social-progress-caption{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;margin-bottom:24px;font-size:15px;line-height:1.5;text-align:center}
 .social-progress-caption strong{color:var(--s-action);font-weight:700;white-space:nowrap}
-.social-progress-caption>span{color:var(--s-muted);text-align:right}
-.social-progress-track{height:6px;background:var(--s-soft);border-radius:999px;margin:12px 0 13px;overflow:hidden}
+.social-progress-caption>span{color:var(--s-muted);font-size:14px}
+.social-progress-path{position:relative;isolation:isolate}
+.social-progress-track{position:absolute;top:calc(var(--step-size) / 2 - 2px);left:calc(100% / 6);right:calc(100% / 6);height:4px;background:var(--s-soft);border-radius:999px;overflow:hidden}
 .social-progress-track>span{position:relative;display:block;height:100%;border-radius:inherit;background:var(--s-action);transition:width 220ms ease}
-.social-progress-track>span::after{content:"";position:absolute;right:0;top:0;width:9px;height:6px;border-radius:999px;background:var(--s-accent)}
-.social-progress .social-steps{justify-content:space-between;gap:10px;margin:0}
-.social-progress .social-steps li{gap:6px;font-size:11px}
-.social-progress .social-steps li span{width:23px;height:23px;background:var(--s-surface)}
-.social-progress .social-steps .done span{background:var(--s-action);border-color:var(--s-action);color:var(--s-surface)}
-.social-progress .social-steps [aria-current=step] span{background:var(--s-accent);border-color:var(--s-accent);color:var(--s-deep);font-weight:750}
-.social-progress .social-steps [aria-current=step] b{color:var(--s-deep)}
+.social-progress .social-steps{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin:0}
+.social-progress .social-steps li{display:flex;flex-direction:column;align-items:center;gap:14px;min-width:0;font-size:15px;line-height:1.4;text-align:center}
+.social-progress .social-step-button{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;min-height:44px;padding:0;border:0;border-radius:10px;background:transparent;color:inherit;font:inherit;text-align:center}
+.social-progress .social-step-button:disabled{opacity:1;cursor:default}
+.social-progress .social-step-button:focus-visible{outline:3px solid var(--s-action);outline-offset:10px}
+.social-progress .social-step-marker{width:var(--step-size);height:var(--step-size);border:2px solid var(--s-line);background:var(--s-surface);color:var(--s-muted);font-size:16px;font-weight:650}
+.social-progress .social-step-button>b{max-width:18ch;padding-inline:6px;font-weight:500}
+.social-progress .social-steps .done .social-step-marker{background:var(--s-action);border-color:var(--s-action);color:var(--s-surface)}
+.social-progress .social-steps .done b{color:var(--s-action)}
+.social-progress .social-steps [aria-current=step] .social-step-marker{background:var(--s-accent);border-color:var(--s-accent);color:var(--s-deep);font-weight:750;box-shadow:0 0 0 6px var(--s-surface),0 0 0 8px var(--s-accent)}
+.social-progress .social-steps [aria-current=step] b{color:var(--s-deep);font-weight:700}
+@media(hover:hover) and (pointer:fine){
+  .social-progress .social-step-button:not(:disabled):hover b{text-decoration:underline;text-underline-offset:4px}
+  .social-progress .social-step-button:not(:disabled):hover .social-step-marker{background:var(--s-deep);border-color:var(--s-deep)}
+}
 .social-direct-progress{display:flex;align-items:center;justify-content:center;gap:11px;background:transparent;border:0;margin:24px auto 30px;padding:0;color:var(--s-action)}
 .social-direct-progress strong,.social-direct-progress small{display:block}
 .social-direct-progress small{font-size:11px;color:var(--s-muted);margin-top:3px}
@@ -186,11 +195,12 @@
   .social-header-explore>span{min-width:0}
   .social-needs .social-choice-icon{width:40px;height:40px;border-radius:11px}
   #app .social-header .social-original-link{font-size:13px;padding:9px 12px}
-  .social-progress{width:100%;padding:0;margin:24px auto 30px}
-  .social-progress-caption{font-size:11px;gap:10px}
-  .social-progress .social-steps{gap:7px}
-  .social-progress .social-steps li{font-size:10px;gap:4px}
-  .social-progress .social-steps li span{width:21px;height:21px}
+  .social-progress{--step-size:36px;width:100%;padding:0;margin:28px auto 36px}
+  .social-progress-caption{font-size:15px;margin-bottom:22px}
+  .social-progress-caption>span{font-size:13px}
+  .social-progress .social-steps li{font-size:13px;gap:13px}
+  .social-progress .social-step-button{gap:13px}
+  .social-progress .social-step-marker{font-size:15px}
   .social-direct-progress{width:100%}
   .social-service-main{gap:13px;padding:21px 17px;align-items:flex-start}
   .social-service-detail-label{padding-top:14px}
