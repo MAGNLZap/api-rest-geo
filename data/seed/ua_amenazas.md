@@ -1,5 +1,17 @@
 # Dataset UA-Amenazas
 
+## Distribución pública
+
+El Excel y el CSV operativos no se distribuyen con el código. Deben
+obtenerse por un canal autorizado y permanecer fuera de Git. Esta guía
+describe una preparación histórica específica; no es un paso del
+despliegue Docker ni una migración automática.
+
+El preparador también necesita un HTML fuente con un bloque `embedded-ua`
+del dataset de origen. Ese HTML con datos no forma parte de la distribución;
+el HTML actual consume la API. Por ello no ejecutar el preparador esperando
+que un clon público incluya todas sus entradas.
+
 `au_amenazadas_data.xlsx` es la fuente principal de atributos e informes. `ua_amenazas_pg.csv` contiene una fila plana por registro y añade del bloque `embedded-ua` únicamente los valores que el HTML necesita para el mapa: coordenadas WGS84, niveles numéricos de amenaza y códigos DPA de filtro.
 
 ## Preparación

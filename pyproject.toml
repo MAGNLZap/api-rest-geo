@@ -1,7 +1,8 @@
 [project]
-name = "api-rest-geo"
+name = "geoportal-mtdh"
 version = "0.1.0"
-description = "API REST para información geográfica con unidades de atención"
+description = "Geoportal de consulta territorial y orientación sobre servicios sociales"
+license = "Apache-2.0"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi==0.115.12",

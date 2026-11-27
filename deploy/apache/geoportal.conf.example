@@ -1,0 +1,6 @@
+# Fragmento para el VirtualHost HTTPS existente; NO reemplaza el sitio completo.
+# Mantener certificados y configurar ServerName con el dominio propio.
+ProxyPreserveHost On
+ProxyPass / http://127.0.0.1:18081/
+ProxyPassReverse / http://127.0.0.1:18081/
+RequestHeader set X-Forwarded-Proto "https"

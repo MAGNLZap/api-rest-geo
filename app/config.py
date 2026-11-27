@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     ALLOW_LOCAL_NETWORK: bool = True
     HOST: str = "0.0.0.0"
     PORT: int = 8001
-    ROOT_PATH: str = "/api-geo"
+    ROOT_PATH: str = ""
     FORWARDED_ALLOW_IPS: str = "127.0.0.1"
     RATE_LIMIT_ENABLED: bool = True
     RATE_LIMIT_STORAGE: str = "memory://"

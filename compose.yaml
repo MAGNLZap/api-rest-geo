@@ -1,20 +1,21 @@
-name: apirestgeo
+name: geoportal-mtdh
 
 services:
   api:
     build:
       context: .
       dockerfile: Dockerfile
-    image: apirestgeo-api:local
+    image: geoportal-api:${IMAGE_TAG:?Define IMAGE_TAG en .env.production}
+    container_name: geoportal-api
     env_file:
       - .env.production
     environment:
       ENVIRONMENT: production
       HOST: 0.0.0.0
       PORT: "8001"
-      ROOT_PATH: /api-geo
+      ROOT_PATH: ""
       ALLOW_LOCAL_NETWORK: "false"
-      FORWARDED_ALLOW_IPS: 172.30.40.10
+      FORWARDED_ALLOW_IPS: ${WEB_IPV4:-172.30.41.10}
     restart: unless-stopped
     networks:
       - geo
@@ -25,26 +26,26 @@ services:
       dockerfile: frontend/Dockerfile
       target: production
       args:
-        PUBLIC_BASE: /api-geo/
-        API_BASE: /api-geo
-    image: apirestgeo-web:local
+        PUBLIC_BASE: /
+        API_BASE: ""
+    image: geoportal-web:${IMAGE_TAG:?Define IMAGE_TAG en .env.production}
+    container_name: geoportal-web
     environment:
-      PUBLIC_PATH: /api-geo
       API_UPSTREAM: api:8001
       PUBLIC_SCHEME: ${PUBLIC_SCHEME:-http}
-      TRUSTED_PROXY_CIDR: 172.30.40.1/32
+      TRUSTED_PROXY_CIDR: ${GEO_GATEWAY_CIDR:-172.30.41.1/32}
     ports:
-      - "127.0.0.1:${WEB_PORT:-8080}:8080"
+      - "127.0.0.1:${WEB_PORT:-18081}:8080"
     depends_on:
       api:
         condition: service_healthy
     restart: unless-stopped
     networks:
       geo:
-        ipv4_address: 172.30.40.10
+        ipv4_address: ${WEB_IPV4:-172.30.41.10}
 
 networks:
   geo:
     ipam:
       config:
-        - subnet: 172.30.40.0/24
+        - subnet: ${GEO_SUBNET:-172.30.41.0/24}

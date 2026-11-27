@@ -33,18 +33,18 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         level=getattr(logging, settings.LOG_LEVEL),
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
-    logger.info("Starting ApiRestGeo API v%s [%s]", VERSION, settings.ENVIRONMENT)
+    logger.info("Starting geoportal-api v%s [%s]", VERSION, settings.ENVIRONMENT)
     try:
         warmup_cache()
         yield
     finally:
         await database.engine.dispose()
-        logger.info("Shutting down ApiRestGeo API")
+        logger.info("Shutting down geoportal-api")
 
 
 app = FastAPI(
     root_path=settings.ROOT_PATH,
-    title="ApiRestGeo",
+    title="geoportal-mtdh API",
     description="API REST para información geográfica",
     version=VERSION,
     docs_url="/docs" if settings.is_dev else None,

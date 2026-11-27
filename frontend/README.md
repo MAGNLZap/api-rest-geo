@@ -12,7 +12,7 @@ Desde la raíz del proyecto:
 docker compose --env-file .env -f compose.dev.yaml up -d --build
 ```
 
-En Docker Desktop → **Containers** aparece el grupo **apirestgeo-dev**:
+En Docker Desktop → **Containers** aparece el grupo **geoportal-mtdh-dev**:
 
 - `web`: Vue/Vite, http://127.0.0.1:5173/
 - `api`: FastAPI, http://127.0.0.1:8001/docs
@@ -128,8 +128,8 @@ Configuración pública en tiempo de compilación:
 
 | Variable | Desarrollo | Producción actual |
 |---|---|---|
-| `VITE_PUBLIC_BASE` | `/` | `/api-geo/` |
-| `VITE_API_BASE` | vacío (mismo origen) | `/api-geo` |
+| `VITE_PUBLIC_BASE` | `/` | `/` |
+| `VITE_API_BASE` | vacío (mismo origen) | vacío (mismo origen) |
 | `API_PROXY_TARGET` | `http://127.0.0.1:8001` | solo desarrollo |
 
 No incluir contraseñas ni tokens en `VITE_*`: se incorporan al JavaScript

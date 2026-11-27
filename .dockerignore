@@ -7,8 +7,21 @@ __pycache__
 *.py[cod]
 *.db
 *.sqlite3
+**/*.xlsx
+**/*.csv
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.dump
+**/*.backup
+**/*.bak
+**/*.save
+**/*.tar.gz
 .env
 .env.*
+**/.env
+**/.env.*
 data
 tests
 app/data/*.bak
@@ -19,3 +32,4 @@ frontend/dist
 **/*.tsbuildinfo
 .ruff_cache
 docs
+releases

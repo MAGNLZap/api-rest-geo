@@ -1,4 +1,4 @@
-name: apirestgeo-dev
+name: geoportal-mtdh-dev
 
 services:
   api:

@@ -6,7 +6,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const base = env.VITE_PUBLIC_BASE || '/'
   if (!base.startsWith('/') || !base.endsWith('/') || base.includes('//')) {
-    throw new Error('VITE_PUBLIC_BASE debe ser una ruta con / inicial y final, por ejemplo /api-geo/.')
+    throw new Error('VITE_PUBLIC_BASE debe ser una ruta con / inicial y final, por ejemplo /.')
   }
   const apiProxy = {
     target: env.API_PROXY_TARGET || 'http://127.0.0.1:8001',

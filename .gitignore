@@ -14,8 +14,13 @@ ENV/
 
 # Variables de entorno
 .env
-.env.local
-.env.production
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
 
 # IDE
 .vscode/
@@ -35,6 +40,15 @@ logs/
 # Datos
 data/*.json
 data/*.xlsx
+*.xlsx
+*.csv
+*.sql.gz
+*.dump
+*.backup
+*.bak
+*.save
+*.save.*
+*.tar.gz
 app/data/*.json
 app/data/*.bak
 app/data/*.tmp
@@ -45,3 +59,13 @@ frontend/dist/
 *.tsbuildinfo
 .env.development.local
 .env.production.local
+
+# Paquetes locales de despliegue (fuentes, no credenciales)
+/releases/
+
+# Archivos locales de trabajo, no forman parte de la distribución pública
+/docs/backups/
+/docs/superpowers/
+/.opencode/
+/opencode.jsonc
+/.superpowers/

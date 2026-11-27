@@ -51,7 +51,7 @@ divide en nuevas funcionalidades.
 
 ## Ajuste aprobado: desarrollo íntegro en Docker
 
-- Vue y API se ejecutan en `apirestgeo-dev`, con recarga automática.
+- Vue y API se ejecutan en `geoportal-mtdh-dev`, con recarga automática.
 - Se detuvo el proceso Vue nativo para liberar 5173.
 - PostgreSQL/PostGIS externo para ambos mapas: sin fallback SQLite ni
   contenedor/volumen de base de datos en Compose.
